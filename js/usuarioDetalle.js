@@ -34,16 +34,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Listeners de ejemplo (para redirección o abrir otra página)
         document.getElementById('btn-compras').addEventListener('click', () => {
-            window.location.href = `compras.html?usuario=${usuarioId}`;
+            window.location.href = `misCompras.html?usuario=${usuarioId}`;
         });
         document.getElementById('btn-ventas').addEventListener('click', () => {
-            window.location.href = `ventas.html?usuario=${usuarioId}`;
+            window.location.href = `misVentas.html?usuario=${usuarioId}`;
         });
         document.getElementById('btn-vehiculos').addEventListener('click', () => {
             window.location.href = `misVehiculos.html?usuario=${usuarioId}`;
         });
         document.getElementById('btn-publicaciones').addEventListener('click', () => {
-            window.location.href = `publicaciones.html?usuario=${usuarioId}`;
+            window.location.href = `misPublicaciones.html?usuario=${usuarioId}`;
         });
 
     } catch (error) {
