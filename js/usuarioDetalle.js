@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = `ventas.html?usuario=${usuarioId}`;
         });
         document.getElementById('btn-vehiculos').addEventListener('click', () => {
-            window.location.href = `vehiculos.html?usuario=${usuarioId}`;
+            window.location.href = `misVehiculos.html?usuario=${usuarioId}`;
         });
         document.getElementById('btn-publicaciones').addEventListener('click', () => {
             window.location.href = `publicaciones.html?usuario=${usuarioId}`;
