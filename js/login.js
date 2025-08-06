@@ -24,13 +24,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const mensaje = document.getElementById('mensaje');
 
       if (response.ok) {
-        const data = await response.text();
-        mensaje.innerHTML = `<div class="alert alert-success">${data}</div>`;
+        const data = await response.json();
+        console.log("Respuesta del backend:", data); 
+        console.log("ID del usuario:", data.id);  
+        mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje}</div>`;
+        localStorage.setItem("usuarioId", data.id);
         setTimeout(() => {
             window.location.href = "index.html";
         }, 1000); // 1000 milisegundos = 1 segundo
-
-        // localStorage.setItem("user", JSON.stringify(data));
 
       } else {
         const error = await response.text();
