@@ -24,7 +24,7 @@ usuarios.forEach(usuario => {
         <h5 class="card-title">${usuario.nombre}</h5>
         <p class="card-text"><strong>Email:</strong> ${usuario.email}</p>
         <p class="card-text"><strong>Teléfono:</strong> ${usuario.telefono}</p>
-        <a href="usuario-detalle.html?id=${usuario.id}" class="btn btn-primary">Ver detalle</a>
+        <a href="usuarioDetalle.html?id=${usuario.id}" class="btn btn-primary">Ver detalle</a>
       </div>
     </div>
   `;
