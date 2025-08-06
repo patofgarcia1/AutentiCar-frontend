@@ -28,34 +28,14 @@
   <h1 class="mb-4" id="titulo"></h1>
   <div class="bg-light p-4 rounded shadow-sm" id="info"></div>
   </main>
-  <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get("id");
 
-        const vehiculos = {
-          1: { marca: "Toyota", modelo: "Corolla", anio: 2020, descripcion: "Un sedán confiable y eficiente." },
-          2: { marca: "Ford", modelo: "Focus", anio: 2019, descripcion: "Compacto moderno con buen rendimiento." },
-          3: { marca: "Chevrolet", modelo: "Cruze", anio: 2021, descripcion: "Diseño elegante y buena tecnología." }
-        };
-
-        const vehiculo = vehiculos[id];
-        if (vehiculo) {
-          document.getElementById("titulo").innerText = `${vehiculo.marca} ${vehiculo.modelo}`;
-          document.getElementById("info").innerHTML = `
-            <p><strong>Año:</strong> ${vehiculo.anio}</p>
-            <p><strong>Descripción:</strong> ${vehiculo.descripcion}</p>
-          `;
-        } else {
-          document.getElementById("info").innerHTML = "<p>Vehículo no encontrado.</p>";
-        }
-      });
-    </script>
 
   <footer class="bg-dark text-white text-center py-3 mt-5">
     <div class="container">
       <p class="m-0">© 2025 AutentiCar. Todos los derechos reservados.</p>
     </div>
   </footer>
+
+  <script type="module" src="js/vehiculoDetalle.js"></script>
 </body>
 </html>

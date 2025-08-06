@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="card-body">
             <h5 class="card-title">${v.marca} ${v.modelo}</h5>
             <p class="card-text"><strong>Año:</strong> ${v.anio}</p>
-            <a href="vehiculoDetalle.html?id=${v.id}" class="btn btn-primary">Ver detalle</a>
+            <a href="vehiculoDetalle.html?id=${v.idVehiculo}" class="btn btn-primary">Ver detalle</a>
           </div>
         </div>
       </div>
