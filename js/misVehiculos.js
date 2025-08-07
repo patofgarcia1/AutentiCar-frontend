@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Renderizamos solo marca, modelo y año por vehículo
+    
     contenedor.innerHTML = vehiculos.map(v => `
       <div class="col">
         <div class="card h-100 shadow-sm">
