@@ -5,3 +5,25 @@ body {
 h1, h2 {
   color: #003366;
 }
+
+#btn-agregar-vehiculo {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #003366;
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 60px;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+#btn-agregar-vehiculo:hover {
+  background-color: #001f4d;
+}
