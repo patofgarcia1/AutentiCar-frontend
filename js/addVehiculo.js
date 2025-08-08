@@ -36,8 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (response.ok) {
+        const data = await response.json();
         mensaje.innerHTML = `<div class="alert alert-success">Vehículo cargado con éxito.</div>`;
         form.reset();
+        localStorage.setItem("vehiculoId", data.id);
+        setTimeout(() => {
+            window.location.href = "addPublicacion.html";
+        }, 1000); 
       } else {
         const errorText = await response.text();
         mensaje.innerHTML = `<div class="alert alert-danger">${errorText}</div>`;

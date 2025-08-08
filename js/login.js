@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Respuesta del backend:", data); 
-        console.log("ID del usuario:", data.id);  
+        // console.log("Respuesta del backend:", data); 
+        // console.log("ID del usuario:", data.id);  
         mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje}</div>`;
         localStorage.setItem("usuarioId", data.id);
         setTimeout(() => {
