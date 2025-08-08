@@ -1,0 +1,78 @@
+import { URL_API } from '../constants/database.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const vehiculoId = params.get('id'); // viene del link "Agregar evento"
+  const usuarioId = localStorage.getItem('usuarioId');
+
+  const aviso = document.getElementById('aviso-ids');
+  const form = document.getElementById('form-evento');
+  const mensaje = document.getElementById('mensaje');
+
+  // Aviso útil
+  aviso.innerHTML = `
+    <div class="alert alert-info">
+      <strong>Vehículo ID:</strong> ${vehiculoId ?? '—'}<br>
+      <strong>Usuario ID:</strong> ${usuarioId ?? '—'}
+    </div>
+  `;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!vehiculoId) {
+      mensaje.innerHTML = `<div class="alert alert-danger">No se detectó el ID del vehículo (parámetro <code>?id</code>).</div>`;
+      return;
+    }
+    if (!usuarioId) {
+      mensaje.innerHTML = `<div class="alert alert-danger">Debés iniciar sesión para crear un evento.</div>`;
+      return;
+    }
+
+    const formData = new FormData(form);
+    const datos = Object.fromEntries(formData.entries());
+
+    const payload = {
+      titulo: datos.titulo,
+      descripcion: datos.descripcion,
+      kilometrajeEvento: parseInt(datos.kilometrajeEvento, 10),
+      validadoPorTercero: datos.validadoPorTercero === 'on',
+      tipoEvento: String(datos.tipoEvento).toUpperCase(), 
+      usuarioId: parseInt(usuarioId, 10),
+      vehiculoId: parseInt(vehiculoId, 10),
+    };
+
+    try {
+      const resp = await fetch(`${URL_API}/eventos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!resp.ok) {
+        const txt = await resp.text();
+        mensaje.innerHTML = `<div class="alert alert-danger">${txt}</div>`;
+        return;
+      }
+
+      let data = null;
+      try { data = await resp.json(); } catch {}
+
+      mensaje.innerHTML = `<div class="alert alert-success">Evento creado con éxito.</div>`;
+
+      // Redirigir: si el back devuelve el id del evento creado, vamos al detalle
+      const idEvento = data?.idEvento ?? data?.id;
+      setTimeout(() => {
+        if (idEvento) {
+          window.location.href = `eventoDetalle.html?id=${idEvento}`;
+        } else {
+          window.location.href = `eventosVehiculo.html?id=${vehiculoId}`;
+        }
+      }, 900);
+
+    } catch (error) {
+      console.error('Error creando evento:', error);
+      mensaje.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+    }
+  });
+});

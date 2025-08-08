@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Cargar Documento - AutentiCar</title>
+  <title>Carga Evento - AutentiCar</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="css/styles.css" rel="stylesheet"/>
 </head>
@@ -21,50 +21,49 @@
   </header>
 
   <main class="container flex-grow-1 py-5">
-    <h2 class="mb-4">Cargar Documento</h2>
+    <h2 class="mb-4">Agregar Evento</h2>
 
     <div id="aviso-ids" class="mb-3"></div>
 
-    <form id="form-documento">
+    <form id="form-evento">
       <div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Nombre</label>
-          <input type="text" class="form-control" name="nombre" required>
+        <div class="col-md-8 mb-3">
+          <label class="form-label">Título</label>
+          <input type="text" class="form-control" name="titulo" required>
         </div>
 
-        <div class="col-md-6 mb-3">
-          <label class="form-label">URL del documento</label>
-          <input type="url" class="form-control" name="urlDoc" placeholder="https://..." required>
-        </div>
-
-        <div class="col-md-4 mb-3">
-          <label class="form-label">Nivel de riesgo (0-100)</label>
-          <input type="number" class="form-control" name="nivelRiesgo" min="0" max="100" step="1" required>
+        <div class="col-12 mb-3">
+          <label class="form-label">Descripción</label>
+          <textarea class="form-control" name="descripcion" rows="4" placeholder="Detalle del evento (taller, repuestos, etc.)" required></textarea>
         </div>
 
         <div class="col-md-4 mb-3">
-          <label class="form-label">Tipo de documento</label>
-          <select class="form-select" name="tipoDoc" required>
-            <option value="TITULO">TÍTULO</option>
-            <option value="CEDULA">CÉDULA</option>
+          <label class="form-label">Kilometraje del evento</label>
+          <input type="number" class="form-control" name="kilometrajeEvento" min="0" step="1" required>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Tipo de evento</label>
+          <select class="form-select" name="tipoEvento" required>
+            <option value="SERVICIO">Servicio</option>
+            <option value="REPARACION">Reparación</option>
+            <option value="SINIESTRO">Siniestro</option>
             <option value="VTV">VTV</option>
-            <option value="SEGURO">SEGURO</option>
-            <option value="INFORME">INFORME</option>
-            <option value="OTRO">OTRO</option>
+            <option value="TRANSFERENCIA">Transferencia</option>
+            <option value="OTRO">Otro</option>
           </select>
         </div>
-
         <div class="col-md-4 mb-3">
-          <label class="form-label">Validado por Inteligencia Artificial</label>
+          <label class="form-label">Validado por tercero</label>
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="validadoIA" name="validadoIA">
-            <label class="form-check-label" for="validadoIA">Sí</label>
+            <input class="form-check-input" type="checkbox" id="validadoPorTercero" name="validadoPorTercero">
+            <label class="form-check-label" for="validadoPorTercero">Sí</label>
           </div>
         </div>
       </div>
 
       <div class="mt-4">
-        <button type="submit" class="btn btn-success">Cargar</button>
+        <button type="submit" class="btn btn-success">Guardar evento</button>
       </div>
     </form>
 
@@ -77,7 +76,6 @@
     </div>
   </footer>
 
-  <script type="module" src="js/addDocumento.js"></script>
+  <script type="module" src="js/addEvento.js"></script>
 </body>
 </html>
-

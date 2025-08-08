@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <a href="docsVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary">Ver documentos</a>
       <a href="eventosVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary">Ver eventos</a>
       <a href="addDocumento.html?id=${v.idVehiculo}" class="btn btn-primary">Agregar documentos</a>
+      <a href="addEvento.html?id=${v.idVehiculo}" class="btn btn-primary">Agregar evento</a>
     `;
 
   } catch (error) {
