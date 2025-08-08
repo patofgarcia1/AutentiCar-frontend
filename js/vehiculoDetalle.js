@@ -35,10 +35,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p><strong>Transmisión:</strong> ${v.tipoTransmision}</p>
       <p><strong>Fecha de alta:</strong> ${v.fechaAlta}</p>
       <p><strong>Estado:</strong> ${v.estado}</p>
-      <a href="docsVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary">Ver documentos</a>
-      <a href="eventosVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary">Ver eventos</a>
-      <a href="addDocumento.html?id=${v.idVehiculo}" class="btn btn-primary">Agregar documentos</a>
-      <a href="addEvento.html?id=${v.idVehiculo}" class="btn btn-primary">Agregar evento</a>
+
+      <div class="gap-2 mb-3">
+        <a href="docsVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver documentos</a>
+        <a href="eventosVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver eventos</a>
+      </div>
+
+      <div class="gap-2">
+        <a href="addDocumento.html?id=${v.idVehiculo}" class="btn btn-success flex-fill">Agregar documento</a>
+        <a href="addEvento.html?id=${v.idVehiculo}" class="btn btn-success flex-fill">Agregar evento</a>
+      </div>
     `;
 
   } catch (error) {

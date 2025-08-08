@@ -2,13 +2,14 @@
 body {
   font-family: 'Segoe UI', sans-serif;
 }
+
 h1, h2 {
   color: #003366;
 }
 
 #btn-agregar-vehiculo {
   position: fixed;
-  bottom: 30px;
+  bottom: 100px;
   right: 30px;
   width: 60px;
   height: 60px;
@@ -27,3 +28,4 @@ h1, h2 {
 #btn-agregar-vehiculo:hover {
   background-color: #001f4d;
 }
+
