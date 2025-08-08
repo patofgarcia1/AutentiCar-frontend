@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p><strong>Fecha de publicación:</strong> ${publicacion.fechaPublicacion}</p>
       <p><strong>Estado:</strong> ${publicacion.estadoPublicacion}</p>
       <hr/>
+
       <h5>Datos del Vehículo</h5>
       ${vehiculo ? `
         <ul>
@@ -50,6 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <li><strong>Transmisión:</strong> ${vehiculo.tipoTransmision}</li>
         </ul>
       ` : `<p class="text-muted">No se pudo cargar información del vehículo.</p>`}
+      <a href="vehiculoDetalle.html?id=${publicacion.vehiculoId}" class="btn btn-primary">Ver más del vehículo</a>
       <hr/>
       <h5>Dueño</h5>
       ${usuario ? `

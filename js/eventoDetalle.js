@@ -48,6 +48,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p><strong>Fecha del evento:</strong> ${ev.fechaEvento ?? '—'}</p>
       <hr/>
       <p><strong>Usuario:</strong> ${usuarioNombre}</p>
+      <hr/>
+      <a href="addDocumento.html?id=${ev.idVehiculo}&evento=${ev.idEvento}" class="btn btn-primary">
+        Agregar Documentos
+      </a>
     `;
   } catch (err) {
     console.error('eventoDetalle error:', err);
