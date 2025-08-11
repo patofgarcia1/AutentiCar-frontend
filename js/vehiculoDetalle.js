@@ -1,4 +1,5 @@
 import { URL_API } from '../constants/database.js';
+import { initGaleriaImagenes } from './components/imagenes.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
@@ -8,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (!vehiculoId) {
     titulo.textContent = "Error";
-    info.innerHTML = `<div class="alert alert-danger">ID de vehículo no especificado en la URL.</div>`;
+    info.innerHTML = `<div class="alert alert-danger">ID de vehículo no especificado.</div>`;
     return;
   }
 
@@ -20,7 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       info.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
       return;
     }
-
     const v = await response.json();
 
     titulo.textContent = `${v.marca} ${v.modelo} (${v.anio})`;
@@ -46,6 +46,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         <a href="addEvento.html?id=${v.idVehiculo}" class="btn btn-success flex-fill">Agregar evento</a>
       </div>
     `;
+
+    const root = document.getElementById('imagenes-root');
+    initGaleriaImagenes({
+      root,
+      vehiculoId: Number(vehiculoId),
+      allowUpload: true,
+      allowDelete: true,
+      titulo: 'Imágenes del vehículo',
+    });
 
   } catch (error) {
     console.error(error);

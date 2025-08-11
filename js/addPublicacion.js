@@ -1,4 +1,5 @@
 import { URL_API } from '../constants/database.js';
+import { initGaleriaImagenes } from './components/imagenes.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const usuarioId = localStorage.getItem('usuarioId');
@@ -7,13 +8,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('form-publicacion');
   const mensaje = document.getElementById('mensaje');
 
-  // Aviso útil de depuración (podés quitarlo luego)
   if (!usuarioId || !vehiculoId) {
     aviso.innerHTML = `<div class="alert alert-warning">
       Faltan IDs requeridos. usuarioId: ${usuarioId ?? '—'} | vehiculoId: ${vehiculoId ?? '—'}.<br>
       Asegurate de haber iniciado sesión y de venir desde la carga de vehículo.
     </div>`;
   }
+
+  const root = document.getElementById('imagenes-root');
+  const galeria = initGaleriaImagenes({
+    root,
+    vehiculoId: Number(vehiculoId),
+    allowUpload: true,
+    allowDelete: true, // o false si no querés borrar acá
+    titulo: 'Imágenes para la publicación',
+    onChange: (imgs) => {
+      // opcional: feedback, contador, etc.
+      console.log('imagenes ahora:', imgs.length);
+    }
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
