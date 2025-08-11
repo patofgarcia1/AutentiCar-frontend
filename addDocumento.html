@@ -26,20 +26,10 @@
     <div id="aviso-ids" class="mb-3"></div>
 
     <form id="form-documento">
-      <div>
+      <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">Nombre</label>
           <input type="text" class="form-control" name="nombre" required>
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <label class="form-label">URL del documento</label>
-          <input type="url" class="form-control" name="urlDoc" placeholder="https://..." required>
-        </div>
-
-        <div class="col-md-4 mb-3">
-          <label class="form-label">Nivel de riesgo (0-100)</label>
-          <input type="number" class="form-control" name="nivelRiesgo" min="0" max="100" step="1" required>
         </div>
 
         <div class="col-md-4 mb-3">
@@ -55,20 +45,38 @@
         </div>
 
         <div class="col-md-4 mb-3">
-          <label class="form-label">Validado por Inteligencia Artificial</label>
+          <label class="form-label">Nivel de riesgo (0-100)</label>
+          <input type="number" class="form-control" name="nivelRiesgo" min="0" max="100" step="1" value="0">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Validado por IA</label>
           <div class="form-check">
             <input class="form-check-input" type="checkbox" id="validadoIA" name="validadoIA">
             <label class="form-check-label" for="validadoIA">Sí</label>
           </div>
         </div>
+
+        <div class="col-md-8 mb-3">
+          <label class="form-label">Archivo (PDF / imagen)</label>
+          <input id="fileDoc" type="file" class="form-control" accept="application/pdf,image/*" required>
+          <div class="form-text">Tamaño sugerido ≤ 15 MB.</div>
+        </div>
       </div>
 
-      <div class="mt-4">
-        <button type="submit" class="btn btn-success">Cargar</button>
+      <div class="mt-3 d-flex gap-2">
+        <button id="btnSubirDoc" type="button" class="btn btn-primary">Subir documento</button>
+        <a id="btnVolver" class="btn btn-secondary" href="#">Volver al listado</a>
       </div>
     </form>
 
+    <hr class="my-4">
+
+    <h5>Documentos del vehículo</h5>
+    <div id="docs-root"></div>
+
     <div id="mensaje" class="mt-3"></div>
+
   </main>
 
   <footer class="bg-dark text-white text-center py-3 mt-5">

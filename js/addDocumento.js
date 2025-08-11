@@ -1,4 +1,5 @@
 import { URL_API } from '../constants/database.js';
+import { initDocumentos } from './components/documentos.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -8,6 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('form-documento');
   const mensaje = document.getElementById('mensaje');
   const aviso = document.getElementById('aviso-ids');
+  const fileInput = document.getElementById('fileDoc');
+  const btnSubirDoc = document.getElementById('btnSubirDoc');
+  const btnVolver = document.getElementById('btnVolver');
+
+  const inputNombre = form.querySelector('input[name="nombre"]');
+  const selTipo = form.querySelector('select[name="tipoDoc"]');
+  const inputNivel = form.querySelector('input[name="nivelRiesgo"]');
+  const chkIA = form.querySelector('input[name="validadoIA"]');
 
   // Mostrar qué IDs estamos usando
   aviso.innerHTML = `
@@ -17,54 +26,65 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   `;
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  // Listado debajo
+  const root = document.getElementById('docs-root');
+  const docsUI = initDocumentos({
+    root,
+    vehiculoId: Number(vehiculoId),
+    allowDelete: true,
+    titulo: 'Documentos del vehículo'
+  });
 
+  btnVolver.href = `docsVehiculo.html?id=${vehiculoId}`;
+
+  btnSubirDoc.addEventListener('click', async () => {
     if (!vehiculoId) {
-      mensaje.innerHTML = `<div class="alert alert-danger">No se detectó el ID del vehículo (parámetro <code>?id</code>).</div>`;
+      alert('Falta ?id=vehiculo en la URL');
       return;
     }
+    const file = fileInput.files?.[0];
+    if (!file) {
+      alert('Seleccioná un archivo');
+      return;
+    }
+    if (!(file.type.startsWith('image/') || file.type === 'application/pdf')) {
+      if (!confirm('No es imagen/PDF. Se subirá como RAW (sin vista previa). ¿Continuar?')) return;
+    }
 
-    const formData = new FormData(form);
-    const datos = Object.fromEntries(formData.entries());
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('nombre', inputNombre.value || file.name);
+    fd.append('tipoDoc', selTipo.value);
+    fd.append('nivelRiesgo', inputNivel.value || '0');
+    fd.append('validadoIA', chkIA.checked ? 'true' : 'false');
+    if (eventoIdQS) fd.append('eventoId', eventoIdQS);
 
-    const payload = {
-      nombre: datos.nombre,
-      urlDoc: datos.urlDoc,
-      nivelRiesgo: parseInt(datos.nivelRiesgo, 10),
-      validadoIA: datos.validadoIA === 'on',           // checkbox -> boolean
-      tipoDoc: String(datos.tipoDoc).toUpperCase(),    // debe matchear el enum
-      vehiculoId: parseInt(vehiculoId, 10),
-      eventoId: eventoIdQS ? parseInt(eventoIdQS, 10) : null
-    };
+    btnSubirDoc.disabled = true;
+    btnSubirDoc.textContent = 'Subiendo...';
 
     try {
-      const resp = await fetch(`${URL_API}/documentos`, {
+      const resp = await fetch(`${URL_API}/vehiculos/${vehiculoId}/documentos`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: fd
       });
-
       if (!resp.ok) {
         const txt = await resp.text();
-        mensaje.innerHTML = `<div class="alert alert-danger">${txt}</div>`;
+        alert(`Error: ${txt}`);
         return;
       }
-
-      // por si tu back devuelve JSON o solo texto
-      let data = null;
-      try { data = await resp.json(); } catch {}
-
-      mensaje.innerHTML = `<div class="alert alert-success">Documento cargado con éxito.</div>`;
-
-      // Redirigimos al listado de docs del vehículo
-      setTimeout(() => {
-        window.location.href = `docsVehiculo.html?id=${payload.vehiculoId}`;
-      }, 1000);
-
-    } catch (error) {
-      console.error('Error creando documento:', error);
-      mensaje.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+      await docsUI.reload();
+      if (mensaje) mensaje.innerHTML = `<div class="alert alert-success">Documento subido con éxito.</div>`;
+      form.reset();
+      fileInput.value = '';
+    } catch (e) {
+      console.error(e);
+      if (mensaje) mensaje.innerHTML = `<div class="alert alert-danger">No se pudo subir el documento.</div>`;
+    } finally {
+      btnSubirDoc.disabled = false;
+      btnSubirDoc.textContent = 'Subir documento';
     }
   });
+
+  // prevenimos el submit tradicional
+  form.addEventListener('submit', (e) => e.preventDefault());
 });
