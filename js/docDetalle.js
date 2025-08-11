@@ -12,8 +12,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  const PLACEHOLDER = 'https://dummyimage.com/800x500/efefef/aaaaaa&text=Documento';
+
+  function cloudThumb(url, mime) {
+    if (!url) return null;
+
+    // imágenes -> resize
+    if (mime && mime.startsWith('image/')) {
+      return url.replace('/upload/', '/upload/w_400,h_250,c_fill,f_auto,q_auto/');
+    }
+    // PDF subido como image -> miniatura página 1
+    if (mime === 'application/pdf') {
+      const t = url.replace('/upload/','/upload/pg_1,w_400,h_250,c_fill,f_auto,q_auto/');
+      return t.replace(/\.pdf($|\?)/, '.jpg$1'); // forzar extensión imagen (opcional)
+    }
+    // otros -> sin preview real
+    return null;
+  }
+
   try {
-    const url = `${URL_API}/documentos/${docId}`; // <-- usa docId (antes tenías documentoId)
+    const url = `${URL_API}/documentos/${docId}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -24,31 +42,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const doc = await response.json();
-
-    // Título: nombre del documento
     titulo.textContent = doc.nombre || "Documento sin nombre";
 
-    // Botón "Ver Evento" solo si hay idEventoVehicular
     const botonEvento = doc.idEventoVehicular
       ? `<a href="eventoDetalle.html?id=${doc.idEventoVehicular}" class="btn btn-warning me-2">Ver Evento</a>`
       : "";
 
-    // Botón "Ver documento" si hay URL
-    const botonVerDoc = doc.urlDoc
-      ? `<a href="${doc.urlDoc}" target="_blank" class="btn btn-outline-primary btn-sm">Ver documento</a>`
-      : "";
 
-    // Render
     info.innerHTML = `
       <p><strong>Tipo de documento:</strong> ${doc.tipoDoc}</p>
       <p><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo}</p>
       <p><strong>Fecha de subida:</strong> ${doc.fechaSubida ?? '—'}</p>
       <p><strong>Validado por IA:</strong> ${doc.validadoIA ? 'Sí' : 'No'}</p>
-      <div class="mt-3">
+      <div class="mt-3 d-flex gap-2">
         ${botonEvento}
-        ${botonVerDoc}
       </div>
+      <hr class="my-4">
+      <h5 class="mb-3">Vista previa</h5>
+      <div id="doc-preview"></div>
     `;
+
+    // render miniatura clickeable
+    const preview = document.getElementById('doc-preview');
+    const thumb = cloudThumb(doc.urlDoc, doc.mimeType);
+
+    const a = document.createElement('a');
+    a.href = doc.urlDoc || '#';
+    a.target = '_blank';
+    a.rel = 'noopener';
+
+    const img = document.createElement('img');
+    img.alt = doc.nombre || 'Documento';
+    img.style.cssText = 'width:100%;max-width:400px;height:250px;object-fit:cover;background:#f7f7f7;border-radius:8px;';
+    img.src = thumb || PLACEHOLDER;
+    img.onerror = () => { img.src = PLACEHOLDER; };
+
+    a.appendChild(img);
+    preview.appendChild(a);
+
   } catch (error) {
     console.error("docDetalle error:", error);
     titulo.textContent = "Error";

@@ -1,4 +1,3 @@
-
 import { URL_API } from '../constants/database.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -10,6 +9,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  const PLACEHOLDER = 'https://dummyimage.com/600x400/efefef/aaaaaa&text=Sin+foto';
+
+  // genera un thumb de Cloudinary si hay portada
+  const toThumb = (url) =>
+    url ? url.replace('/upload/', '/upload/w_500,h_250,c_fill,f_auto,q_auto/') : null;
+
   try {
     const response = await fetch(`${URL_API}/usuarios/${usuarioId}/vehiculos`);
     if (!response.ok) {
@@ -20,23 +25,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const vehiculos = await response.json();
 
-    if (vehiculos.length === 0) {
+    if (!vehiculos.length) {
       contenedor.innerHTML = `<div class="alert alert-info">No tenés vehículos cargados aún.</div>`;
       return;
     }
 
-    
-    contenedor.innerHTML = vehiculos.map(v => `
-      <div class="col">
-        <div class="card h-100 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">${v.marca} ${v.modelo}</h5>
-            <p class="card-text"><strong>Año:</strong> ${v.anio}</p>
-            <a href="vehiculoDetalle.html?id=${v.idVehiculo}" class="btn btn-primary">Ver detalle</a>
+    contenedor.innerHTML = vehiculos.map(v => {
+      const thumb = toThumb(v.portadaUrl);
+      return `
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            ${
+              thumb
+                ? `<img src="${thumb}" class="card-img-top" alt="Imagen de ${v.marca} ${v.modelo}"
+                     style="height:200px;object-fit:cover;background:#f7f7f7"
+                     onerror="this.onerror=null;this.src='${PLACEHOLDER}'">`
+                : `<img src="${PLACEHOLDER}" class="card-img-top" alt="Sin foto"
+                     style="height:200px;object-fit:cover;background:#f7f7f7">`
+            }
+            <div class="card-body">
+              <h5 class="card-title">${v.marca} ${v.modelo}</h5>
+              <p class="card-text"><strong>Año:</strong> ${v.anio}</p>
+              <a href="vehiculoDetalle.html?id=${v.idVehiculo}" class="btn btn-primary">Ver detalle</a>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
   } catch (error) {
     console.error(error);
