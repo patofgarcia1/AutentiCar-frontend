@@ -3,8 +3,8 @@ import { initDocumentos } from './components/documentos.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
-  const vehiculoId = params.get('id');          // viene de addDocumento.html?id=...
-  const eventoIdQS = params.get('evento');      // opcional: &evento=...
+  const vehiculoId = params.get('id');
+  const eventoIdQS = params.get('evento');
 
   const form = document.getElementById('form-documento');
   const mensaje = document.getElementById('mensaje');
@@ -13,12 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSubirDoc = document.getElementById('btnSubirDoc');
   const btnVolver = document.getElementById('btnVolver');
 
-  const inputNombre = form.querySelector('input[name="nombre"]');
-  const selTipo = form.querySelector('select[name="tipoDoc"]');
-  const inputNivel = form.querySelector('input[name="nivelRiesgo"]');
-  const chkIA = form.querySelector('input[name="validadoIA"]');
+  const inputNombre = document.getElementById('nombre');
+  const selTipo     = document.getElementById('tipoDoc');
+  const inputNivel  = document.getElementById('nivelRiesgo');
+  const chkIA       = document.getElementById('validadoIA');
 
-  // Mostrar qué IDs estamos usando
   aviso.innerHTML = `
     <div class="alert alert-info">
       <strong>Vehículo ID:</strong> ${vehiculoId ?? 'No detectado'}<br>
@@ -26,37 +25,66 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   `;
 
-  // Listado debajo
   const root = document.getElementById('docs-root');
   const docsUI = initDocumentos({
-    root,
-    vehiculoId: Number(vehiculoId),
-    allowDelete: true,
-    titulo: 'Documentos del vehículo'
+    root, vehiculoId: Number(vehiculoId), allowDelete: true, titulo: 'Documentos del vehículo'
   });
 
   btnVolver.href = `docsVehiculo.html?id=${vehiculoId}`;
 
-  btnSubirDoc.addEventListener('click', async () => {
-    if (!vehiculoId) {
-      alert('Falta ?id=vehiculo en la URL');
-      return;
-    }
+  function showMsg(html, type='info') {
+    if (!mensaje) return;
+    mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
+  }
+
+  function validar() {
     const file = fileInput.files?.[0];
-    if (!file) {
-      alert('Seleccioná un archivo');
-      return;
+    const nombre = (inputNombre.value || '').trim();
+    const tipo = selTipo.value;
+     const nivelS = (inputNivel.value || '').trim();
+
+    // HTML5 ya valida, pero reforzamos:
+    if (!vehiculoId) { showMsg('Falta ?id de vehículo.', 'danger'); return null; }
+    if (!file)       { showMsg('Seleccioná un archivo.', 'warning'); return null; }
+    if (!nombre)     { showMsg('Ingresá un nombre para el documento.', 'warning'); return null; }
+    if (!tipo)       { showMsg('Seleccioná un tipo de documento.', 'warning'); return null; }
+
+    if (nivelS === '') {
+    showMsg('Ingresá el nivel de riesgo.', 'warning');
+    return null;
     }
+    if (!/^\d{1,3}$/.test(nivelS)) {
+      showMsg('El nivel de riesgo debe ser un número entero.', 'warning');
+      return null;
+    }
+    const n = parseInt(nivelS, 10);
+    if (n < 0 || n > 100) {
+      showMsg('El nivel de riesgo debe estar entre 0 y 100.', 'warning');
+      return null;
+    }
+
     if (!(file.type.startsWith('image/') || file.type === 'application/pdf')) {
-      if (!confirm('No es imagen/PDF. Se subirá como RAW (sin vista previa). ¿Continuar?')) return;
+      const ok = confirm('No es imagen/PDF. Se subirá como RAW (sin vista previa). ¿Continuar?');
+      if (!ok) return null;
     }
+
+    return { file, nombre, tipo, nivel: n };
+  }
+
+  btnSubirDoc.addEventListener('click', async () => {
+    if (!form.reportValidity()) return;
+
+    const vals = validar();
+    if (!vals) return;
+
+    const { file, nombre, tipo, nivel } = vals;
 
     const fd = new FormData();
     fd.append('file', file);
-    fd.append('nombre', inputNombre.value || file.name);
-    fd.append('tipoDoc', selTipo.value);
-    fd.append('nivelRiesgo', inputNivel.value || '0');
-    fd.append('validadoIA', chkIA.checked ? 'true' : 'false');
+    fd.append('nombre', nombre);                 // ← sin defaults
+    fd.append('tipoDoc', tipo);
+    fd.append('nivelRiesgo', String(nivel));
+    fd.append('validadoIA', chkIA?.checked ? 'true' : 'false');
     if (eventoIdQS) fd.append('eventoId', eventoIdQS);
 
     btnSubirDoc.disabled = true;
@@ -67,24 +95,36 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         body: fd
       });
+
       if (!resp.ok) {
         const txt = await resp.text();
-        alert(`Error: ${txt}`);
+        showMsg(`Error: ${txt}`, 'danger');
         return;
       }
+
+      let data = null;
+      try { data = await resp.json(); } catch {}
+
+      const vId = data?.vehiculoId ?? vehiculoId; 
       await docsUI.reload();
-      if (mensaje) mensaje.innerHTML = `<div class="alert alert-success">Documento subido con éxito.</div>`;
+      showMsg('Documento subido con éxito.', 'success');
+
+      setTimeout(() => {
+        window.location.href = `docsVehiculo.html?id=${vId}`; 
+      }, 1000);
+
       form.reset();
       fileInput.value = '';
+
     } catch (e) {
       console.error(e);
-      if (mensaje) mensaje.innerHTML = `<div class="alert alert-danger">No se pudo subir el documento.</div>`;
+      showMsg('No se pudo subir el documento.', 'danger');
     } finally {
       btnSubirDoc.disabled = false;
       btnSubirDoc.textContent = 'Subir documento';
     }
   });
 
-  // prevenimos el submit tradicional
+  // evitar submit tradicional
   form.addEventListener('submit', (e) => e.preventDefault());
 });

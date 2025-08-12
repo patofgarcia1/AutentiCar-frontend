@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const PLACEHOLDER = 'https://dummyimage.com/800x500/efefef/aaaaaa&text=Documento';
 
+  function showMsg(html, type='info') {
+    if (!mensaje) return;
+    mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
+  }
+
   function cloudThumb(url, mime) {
     if (!url) return null;
 
@@ -48,6 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ? `<a href="eventoDetalle.html?id=${doc.idEventoVehicular}" class="btn btn-warning me-2">Ver Evento</a>`
       : "";
 
+    const botonEliminar = `<button id="btnEliminarDoc" class="btn btn-danger btn-sm">Eliminar documento</button>`;
 
     info.innerHTML = `
       <p><strong>Tipo de documento:</strong> ${doc.tipoDoc}</p>
@@ -56,6 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p><strong>Validado por IA:</strong> ${doc.validadoIA ? 'Sí' : 'No'}</p>
       <div class="mt-3 d-flex gap-2">
         ${botonEvento}
+        ${botonEliminar}
       </div>
       <hr class="my-4">
       <h5 class="mb-3">Vista previa</h5>
@@ -79,6 +86,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     a.appendChild(img);
     preview.appendChild(a);
+
+    // handler de eliminación
+    const btnEliminar = document.getElementById('btnEliminarDoc');
+    btnEliminar?.addEventListener('click', async () => {
+      if (!confirm('¿Seguro que querés eliminar este documento? Esta acción es permanente.')) return;
+
+      btnEliminar.disabled = true;
+      const originalText = btnEliminar.textContent;
+      btnEliminar.textContent = 'Eliminando...';
+
+      try {
+        const del = await fetch(`${URL_API}/vehiculos/documentos/${docId}`, { method: 'DELETE' });
+        if (!del.ok) {
+          const txt = await del.text();
+          alert(`Error al eliminar: ${txt}`);
+          return;
+        }
+
+        // Intentamos deducir el id del vehículo para volver al listado
+        const vehiculoId = doc.idVehiculo ?? doc.vehiculoId ?? null; // según tu DTO
+        showMsg('Documento eliminado.', 'success');
+        //alert('Documento eliminado');
+
+        if (vehiculoId) {
+          setTimeout(() => {
+            window.location.href = `docsVehiculo.html?id=${vehiculoId}`;
+          }, 1000);
+        } else {
+          // Fallback si el DTO no tiene el id del vehículo
+          history.back();
+        }
+      } catch (e) {
+        console.error(e);
+        alert('No se pudo eliminar el documento');
+      } finally {
+        btnEliminar.disabled = false;
+        btnEliminar.textContent = originalText;
+      }
+    });
 
   } catch (error) {
     console.error("docDetalle error:", error);

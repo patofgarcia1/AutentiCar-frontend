@@ -29,12 +29,13 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">Nombre</label>
-          <input type="text" class="form-control" name="nombre" required>
+          <input type="text" class="form-control" name="nombre" id="nombre" required>
         </div>
 
         <div class="col-md-4 mb-3">
           <label class="form-label">Tipo de documento</label>
-          <select class="form-select" name="tipoDoc" required>
+          <select class="form-select" name="tipoDoc" id="tipoDoc" required>
+            <option value="" selected disabled>Seleccione un tipo…</option>
             <option value="TITULO">TÍTULO</option>
             <option value="CEDULA">CÉDULA</option>
             <option value="VTV">VTV</option>
@@ -46,7 +47,7 @@
 
         <div class="col-md-4 mb-3">
           <label class="form-label">Nivel de riesgo (0-100)</label>
-          <input type="number" class="form-control" name="nivelRiesgo" min="0" max="100" step="1" value="0">
+          <input type="number" class="form-control" name="nivelRiesgo" id="nivelRiesgo" min="0" max="100" step="1" required>
         </div>
 
         <div class="col-md-4 mb-3">
@@ -59,7 +60,7 @@
 
         <div class="col-md-8 mb-3">
           <label class="form-label">Archivo (PDF / imagen)</label>
-          <input id="fileDoc" type="file" class="form-control" accept="application/pdf,image/*" required>
+          <input type="file" class="form-control" id="fileDoc" accept="image/*,application/pdf" required>
           <div class="form-text">Tamaño sugerido ≤ 15 MB.</div>
         </div>
       </div>
