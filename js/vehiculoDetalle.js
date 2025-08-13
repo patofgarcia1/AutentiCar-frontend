@@ -41,12 +41,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         <a href="eventosVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver eventos</a>
       </div>
 
-      <div class="gap-2">
+      <div class="gap-2 mb-3">
         <a href="addDocumento.html?id=${v.idVehiculo}" class="btn btn-success flex-fill">Agregar documento</a>
         <a href="addEvento.html?id=${v.idVehiculo}" class="btn btn-success flex-fill">Agregar evento</a>
       </div>
+
+      <div class="mt-2">
+        <button id="btnEliminarVehiculo" class="btn btn-danger btn-sm">Eliminar vehículo</button>
+      </div>
     `;
 
+    // Inicializa galería de imágenes
     const root = document.getElementById('imagenes-root');
     initGaleriaImagenes({
       root,
@@ -54,6 +59,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       allowUpload: true,
       allowDelete: true,
       titulo: 'Imágenes del vehículo',
+    });
+
+    // Handler de eliminación de vehículo
+    const btnEliminarVehiculo = document.getElementById('btnEliminarVehiculo');
+    btnEliminarVehiculo?.addEventListener('click', async () => {
+      if (!confirm('¿Seguro que querés eliminar este vehículo? Se eliminarán también su publicación, imágenes y documentos asociados.')) return;
+
+      btnEliminarVehiculo.disabled = true;
+      const originalText = btnEliminarVehiculo.textContent;
+      btnEliminarVehiculo.textContent = 'Eliminando...';
+
+      try {
+        const del = await fetch(`${URL_API}/vehiculos/${vehiculoId}`, { method: 'DELETE' });
+        if (!del.ok) {
+          const txt = await del.text();
+          alert(`Error al eliminar: ${txt}`);
+          return;
+        }
+
+        alert('Vehículo eliminado.');
+        window.location.href = 'misVehiculos.html';
+      } catch (e) {
+        console.error(e);
+        alert('No se pudo eliminar el vehículo');
+      } finally {
+        btnEliminarVehiculo.disabled = false;
+        btnEliminarVehiculo.textContent = originalText;
+      }
     });
 
   } catch (error) {
