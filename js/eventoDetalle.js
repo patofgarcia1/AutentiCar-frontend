@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const eventoId = params.get('id');
   const titulo = document.getElementById('titulo');
   const info = document.getElementById('info');
+  const mensaje = document.getElementById('mensaje');
+
+  function showMsg(html, type = 'info') {
+    if (!mensaje) return;
+    mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
+  }
 
   if (!eventoId) {
     titulo.textContent = "Error";
@@ -52,7 +58,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       <a href="addDocumento.html?id=${ev.idVehiculo}&evento=${ev.idEvento}" class="btn btn-primary">
         Agregar Documentos
       </a>
+      <button id="btnEliminarEvento" class="btn btn-danger ms-2">Eliminar evento</button>
     `;
+
+    // 4) Handler: eliminar evento
+    const btnEliminar = document.getElementById('btnEliminarEvento');
+    btnEliminar.addEventListener('click', async () => {
+      if (!confirm('¿Seguro que querés eliminar este evento? Esta acción es permanente.')) return;
+
+      btnEliminar.disabled = true;
+      const originalText = btnEliminar.textContent;
+      btnEliminar.textContent = 'Eliminando...';
+
+      try {
+        const resp = await fetch(`${URL_API}/eventos/${ev.idEvento}`, { method: 'DELETE' });
+        if (!resp.ok) {
+          const txt = await resp.text();
+          showMsg(`Error al eliminar: ${txt}`, 'danger');
+          return;
+        }
+
+        showMsg('Evento eliminado', 'success');
+        setTimeout(() => {
+          window.location.href = `eventosVehiculo.html?id=${ev.idVehiculo}`;
+        }, 1000);
+      } catch (e) {
+        console.error(e);
+        showMsg('No se pudo eliminar el evento', 'danger');
+      } finally {
+        btnEliminar.disabled = false;
+        btnEliminar.textContent = originalText;
+      }
+    });
+    
   } catch (err) {
     console.error('eventoDetalle error:', err);
     titulo.textContent = "Error";
