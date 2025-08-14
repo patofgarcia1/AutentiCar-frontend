@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  function showMsg(html, type='info') {
+    if (!mensaje) return;
+    mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
+  }
+
   try {
     const response = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
     if (!response.ok) {
@@ -78,8 +83,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
 
-        alert('Vehículo eliminado.');
-        window.location.href = 'misVehiculos.html';
+        showMsg('Vehículo eliminado.', 'success');
+        // alert('Vehículo eliminado.');
+        setTimeout(() => {
+            window.location.href = 'misVehiculos.html';
+        }, 1000);
       } catch (e) {
         console.error(e);
         alert('No se pudo eliminar el vehículo');
