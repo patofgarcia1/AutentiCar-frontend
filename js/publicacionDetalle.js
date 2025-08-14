@@ -1,5 +1,12 @@
 import { URL_API } from '../constants/database.js';
 
+// util para mensajes (usa el contenedor global #mensaje)
+function showMsg(html, type = 'info') {
+  const mensaje = document.getElementById('mensaje');
+  if (!mensaje) return;
+  mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const publicacionId = params.get('id');
@@ -8,11 +15,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!publicacionId) {
     container.innerHTML = `<div class="alert alert-danger">ID de publicación no especificado.</div>`;
     return;
-  }
-
-  function showMsg(html, type='info') {
-    if (!mensaje) return;
-    mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
   }
 
   try {
@@ -33,13 +35,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const usuarioResp = await fetch(`${URL_API}/usuarios/${publicacion.usuarioId}`);
     const usuario = usuarioResp.ok ? await usuarioResp.json() : null;
 
-    // 4) Renderizar todo
+    // 4) Render base
     container.innerHTML = `
       <h3>${publicacion.titulo}</h3>
       <p><strong>Descripción:</strong> ${publicacion.descripcion}</p>
       <p><strong>Precio:</strong> $${publicacion.precio}</p>
       <p><strong>Fecha de publicación:</strong> ${publicacion.fechaPublicacion}</p>
-      <p><strong>Estado:</strong> ${publicacion.estadoPublicacion}</p>
+      <p><strong>Estado:</strong> <span id="estado-publicacion">${publicacion.estadoPublicacion}</span></p>
+      <div id="acciones-publicacion" class="d-flex gap-2 mb-3 flex-wrap"></div>
       <hr/>
 
       <h5>Datos del Vehículo</h5>
@@ -57,10 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </ul>
       ` : `<p class="text-muted">No se pudo cargar información del vehículo.</p>`}
 
-      <div class="d-flex gap-2 mb-3 flex-wrap">
-        <a href="vehiculoDetalle.html?id=${publicacion.vehiculoId}" class="btn btn-primary">Ver más del vehículo</a>
-        <button id="btnEliminarPublicacion" class="btn btn-danger">Eliminar publicación</button>
-      </div>
+      <a href="vehiculoDetalle.html?id=${publicacion.vehiculoId}" class="btn btn-primary mb-3">Ver más del vehículo</a>
 
       <hr/>
       <h5>Dueño</h5>
@@ -69,40 +69,86 @@ document.addEventListener('DOMContentLoaded', async () => {
       ` : `<p class="text-muted">No se pudo cargar información del dueño.</p>`}
     `;
 
-    // 5) Handler de eliminación de publicación (NO elimina el vehículo)
-    const btnEliminarPublicacion = document.getElementById('btnEliminarPublicacion');
-    btnEliminarPublicacion?.addEventListener('click', async () => {
-      if (!confirm('¿Seguro que querés eliminar esta publicación? El vehículo asociado NO se eliminará.')) return;
+    // 5) Render dinámico de botones según estado
+    const acciones = document.getElementById('acciones-publicacion');
+    const estadoSpan = document.getElementById('estado-publicacion');
 
-      btnEliminarPublicacion.disabled = true;
-      const originalText = btnEliminarPublicacion.textContent;
-      btnEliminarPublicacion.textContent = 'Eliminando...';
-
-      try {
-        const del = await fetch(`${URL_API}/publicaciones/${publicacionId}`, { method: 'DELETE' });
-        if (!del.ok) {
-          const txt = await del.text();
-          alert(`Error al eliminar: ${txt}`);
-          return;
+    function renderBotones(estadoActual) {
+      acciones.innerHTML = `
+        ${estadoActual === 'ACTIVA'
+          ? `<button id="btnToggleEstado" class="btn btn-warning">Pausar publicación</button>`
+          : estadoActual === 'PAUSADA'
+            ? `<button id="btnToggleEstado" class="btn btn-success">Activar publicación</button>`
+            : ``
         }
+        <button id="btnEliminarPublicacion" class="btn btn-danger">Eliminar publicación</button>
+      `;
 
-        showMsg('Documento eliminado.', 'success');
-        // alert('Publicación eliminada.');
-        // Redirigimos al detalle del vehículo para mantener el contexto
-        setTimeout(() => {
-            window.location.href = `vehiculoDetalle.html?id=${publicacion.vehiculoId}`;
-          }, 1000);
-      } catch (e) {
-        console.error('Error al eliminar la publicación:', e);
-        alert('No se pudo eliminar la publicación');
-      } finally {
-        btnEliminarPublicacion.disabled = false;
-        btnEliminarPublicacion.textContent = originalText;
-      }
-    });
+      // Toggle handler
+      const btnToggle = document.getElementById('btnToggleEstado');
+      btnToggle?.addEventListener('click', async () => {
+        btnToggle.disabled = true;
+        const original = btnToggle.textContent;
+        btnToggle.textContent = 'Actualizando...';
+
+        try {
+          const resp = await fetch(`${URL_API}/publicaciones/${publicacionId}/estado`, {
+            method: 'PUT'
+          });
+          if (!resp.ok) {
+            const txt = await resp.text();
+            alert(`No se pudo actualizar el estado: ${txt}`);
+            return;
+          }
+
+          // Alternamos en el front en base al texto actual
+          const nuevo = (estadoActual === 'ACTIVA') ? 'PAUSADA' : 'ACTIVA';
+          estadoSpan.textContent = nuevo;
+          renderBotones(nuevo);
+          showMsg('Publicación actualizada', 'success');
+        } catch (e) {
+          console.error('Error al actualizar estado:', e);
+          alert('Error al actualizar el estado de la publicación');
+        } finally {
+          btnToggle.disabled = false;
+          btnToggle.textContent = original;
+        }
+      });
+
+      // Eliminar handler (opcional, si querés tenerlo acá también)
+      const btnEliminar = document.getElementById('btnEliminarPublicacion');
+      btnEliminar?.addEventListener('click', async () => {
+        if (!confirm('¿Seguro que querés eliminar esta publicación? El vehículo asociado NO se eliminará.')) return;
+
+        btnEliminar.disabled = true;
+        const originalText = btnEliminar.textContent;
+        btnEliminar.textContent = 'Eliminando...';
+
+        try {
+          const del = await fetch(`${URL_API}/publicaciones/${publicacionId}`, { method: 'DELETE' });
+          if (!del.ok) {
+            const txt = await del.text();
+            alert(`Error al eliminar: ${txt}`);
+            return;
+          }
+          showMsg('Publicación eliminada', 'success');
+          window.location.href = `vehiculoDetalle.html?id=${publicacion.vehiculoId}`;
+        } catch (e) {
+          console.error('Error al eliminar la publicación:', e);
+          alert('No se pudo eliminar la publicación');
+        } finally {
+          btnEliminar.disabled = false;
+          btnEliminar.textContent = originalText;
+        }
+      });
+    }
+
+    // Primer render de botones
+    renderBotones(publicacion.estadoPublicacion);
 
   } catch (error) {
     console.error("Error al obtener detalles de la publicación:", error);
+    const container = document.getElementById('detalle-publicacion');
     container.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
   }
 });
