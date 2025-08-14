@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const documentos = await response.json();
 
     if (!documentos.length) {
-      contenedor.innerHTML = `<div class="alert alert-info">No hay documentos asociados a este vehículo.</div>`;
+      contenedor.innerHTML = `<div class="alert alert-danger">No hay documentos asociados a este vehículo.</div>`;
       return;
     }
 
