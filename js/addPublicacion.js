@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const aviso = document.getElementById('aviso-ids');
   const form = document.getElementById('form-publicacion');
   const mensaje = document.getElementById('mensaje');
+  const btnSubmit = form.querySelector('button[type="submit"]');
 
   if (!usuarioId || !vehiculoId) {
     aviso.innerHTML = `<div class="alert alert-warning">
@@ -30,6 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    btnSubmit.textContent = 'Publicando...';
+    btnSubmit.disabled = true;
 
     if (!usuarioId || !vehiculoId) {
       mensaje.innerHTML = `<div class="alert alert-danger">Faltan datos para crear la publicación.</div>`;

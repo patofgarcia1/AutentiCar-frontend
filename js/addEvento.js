@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const aviso = document.getElementById('aviso-ids');
   const form = document.getElementById('form-evento');
   const mensaje = document.getElementById('mensaje');
+  const btnSubmit = form.querySelector('button[type="submit"]');
 
   // Aviso útil
   aviso.innerHTML = `
@@ -19,6 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    btnSubmit.textContent = 'Guardando...';
+    btnSubmit.disabled = true;
 
     if (!vehiculoId) {
       mensaje.innerHTML = `<div class="alert alert-danger">No se detectó el ID del vehículo (parámetro <code>?id</code>).</div>`;

@@ -2,9 +2,13 @@ import { URL_API } from '../constants/database.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registerForm');
+    const btnSubmit = form.querySelector('button[type="submit"]');
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
+
+        btnSubmit.textContent = 'Creando...';
+        btnSubmit.disabled = true;
 
         const nombre = document.getElementById('nombre').value;
         const apellido = document.getElementById('apellido').value;

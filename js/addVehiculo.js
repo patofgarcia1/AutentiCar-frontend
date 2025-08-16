@@ -4,9 +4,13 @@ import { URL_API } from '../constants/database.js';
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('form-vehiculo');
   const mensaje = document.getElementById('mensaje');
+  const btnSubmit = form.querySelector('button[type="submit"]');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    btnSubmit.textContent = 'Guardando...';
+    btnSubmit.disabled = true;
 
     const usuarioId = localStorage.getItem("usuarioId");
     if (!usuarioId) {
