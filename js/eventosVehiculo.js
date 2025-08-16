@@ -39,6 +39,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `).join('');
 
+    contenedor.insertAdjacentHTML(
+      'afterend',
+      `
+      <div class="d-flex justify-content-end mt-3">
+        <a href="addEvento.html?id=${vehiculoId}" class="btn btn-success">Agregar evento</a>
+      </div>
+      `
+    );
+
   } catch (error) {
     console.error("Error al obtener los eventos:", error);
     contenedor.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;

@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
 
       return `
-        <div class="col">
+        <div class="col-md-4">
           <div class="card h-100 shadow-sm">
             ${imgTag}
             <div class="card-body">
@@ -68,12 +68,21 @@ document.addEventListener('DOMContentLoaded', async () => {
               <p class="mb-3"><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo}</p>
               <div class="d-flex gap-2">
                 <a href="docDetalle.html?id=${doc.idDocVehiculo}" class="btn btn-primary btn-sm">Ver detalle</a>
-              </div>
             </div>
           </div>
+          <div class="gap-2 mb-3">
         </div>
       `;
     }).join('');
+
+    contenedor.insertAdjacentHTML(
+      'afterend',
+      `
+      <div class="d-flex justify-content-end mt-3">
+        <a href="addDocumento.html?id=${vehiculoId}" class="btn btn-success">Agregar documento</a>
+      </div>
+      `
+    );
 
   } catch (error) {
     console.error("Error al obtener documentos:", error);

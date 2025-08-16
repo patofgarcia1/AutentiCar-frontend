@@ -46,11 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <a href="eventosVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver eventos</a>
       </div>
 
-      <div class="gap-2 mb-3">
-        <a href="addDocumento.html?id=${v.idVehiculo}" class="btn btn-success flex-fill">Agregar documento</a>
-        <a href="addEvento.html?id=${v.idVehiculo}" class="btn btn-success flex-fill">Agregar evento</a>
-      </div>
-
       <div class="mt-2">
         <button id="btnEliminarVehiculo" class="btn btn-danger btn-sm">Eliminar vehículo</button>
       </div>
