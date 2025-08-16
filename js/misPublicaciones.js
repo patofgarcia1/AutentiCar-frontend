@@ -1,9 +1,31 @@
-
 import { URL_API } from '../constants/database.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const usuarioId = localStorage.getItem("usuarioId");
+  const usuarioId = localStorage.getItem("usuarioId");
   const container = document.getElementById('publicaciones-lista');
+
+  if (!usuarioId) {
+    container.innerHTML = `<div class="alert alert-warning">Debés iniciar sesión para ver tus publicaciones.</div>`;
+    return;
+  }
+
+  const PLACEHOLDER = 'https://dummyimage.com/600x400/efefef/aaaaaa&text=Sin+foto';
+  const toThumb = (url) =>
+    url ? url.replace('/upload/', '/upload/w_500,h_250,c_fill,f_auto,q_auto/') : null;
+
+  const resolveVehiculoId = (pub) =>
+    pub?.vehiculoId ?? pub?.vehiculo?.idVehiculo ?? pub?.idVehiculo ?? null;
+
+  async function fetchPortadaVehiculo(vehiculoId) {
+    try {
+      const vResp = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
+      if (!vResp.ok) return null;
+      const v = await vResp.json();
+      return toThumb(v.portadaUrl) || null;
+    } catch {
+      return null;
+    }
+  }
 
   try {
     const response = await fetch(`${URL_API}/usuarios/${usuarioId}/publicaciones`);
@@ -14,24 +36,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const publicaciones = await response.json();
-
-    if (publicaciones.length === 0) {
+    if (!Array.isArray(publicaciones) || publicaciones.length === 0) {
       container.innerHTML = `<div class="alert alert-info">No hay publicaciones disponibles.</div>`;
       return;
     }
 
-    container.innerHTML = publicaciones.map(pub => `
-      <div class="col">
-        <div class="card h-100 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">${pub.titulo}</h5>
-            <p class="card-text">${pub.descripcion}</p>
-            <p class="card-text"><strong>Precio:</strong> $${pub.precio}</p>
-            <a href="publicacionDetalle.html?id=${pub.idPublicacion}" class="btn btn-primary">Ver detalle</a>
+    // Traemos en paralelo la portada (si existe) de cada vehículo
+    const portadas = await Promise.all(
+      publicaciones.map(async (pub) => {
+        const vehiculoId = resolveVehiculoId(pub);
+        if (!vehiculoId) return null;
+        return await fetchPortadaVehiculo(vehiculoId);
+      })
+    );
+
+    container.innerHTML = publicaciones.map((pub, i) => {
+      const vehiculoId = resolveVehiculoId(pub);
+      const pubId = pub.idPublicacion ?? pub.id ?? '';
+      const imgSrc = portadas[i] || PLACEHOLDER;
+
+      return `
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow-sm" style="max-width: 300px; margin:auto">
+            <a href="publicacionDetalle.html?id=${pubId}" style="display:block">
+              <img
+                src="${imgSrc}"
+                class="card-img-top"
+                alt="Vehículo"
+                style="height:200px; object-fit:contain;"
+                onerror="this.onerror=null;this.src='${PLACEHOLDER}'"
+              >
+            </a>
+            <div class="card-body">
+              <h5 class="card-title">${pub.titulo ?? 'Publicación'}</h5>
+              <p class="card-text">${pub.descripcion ?? ''}</p>
+              <p class="card-text"><strong>Precio:</strong> $${pub.precio ?? '—'}</p>
+              <div class="d-flex gap-2">
+                <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
+                ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ``}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
   } catch (error) {
     console.error("Error al obtener publicaciones:", error);
