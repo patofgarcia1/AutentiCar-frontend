@@ -1,53 +1,98 @@
 import { URL_API } from '../constants/database.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const usuarioId = localStorage.getItem("usuarioId");
-    const container = document.getElementById('usuario-detalle');
+const mensaje = document.getElementById("mensaje");
+function showMsg(html, type='info') {
+  if (!mensaje) return;
+  mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
+}
 
-    if (!usuarioId) {
-        container.innerHTML = `<div class="alert alert-warning">No se encontró un usuario logueado.</div>`;
-        return;
+document.addEventListener('DOMContentLoaded', async () => {
+  const usuarioId = localStorage.getItem("usuarioId");
+  const container = document.getElementById('usuario-detalle');
+
+  if (!usuarioId) {
+    container.innerHTML = `<div class="alert alert-warning">No se encontró un usuario logueado.</div>`;
+    return;
+  }
+
+  try {
+    const response = await fetch(`${URL_API}/usuarios/${usuarioId}`);
+    if (!response.ok) {
+      const errorMsg = await response.text();
+      container.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
+      return;
     }
 
-    try {
-        const response = await fetch(`${URL_API}/usuarios/${usuarioId}`);
-        if (!response.ok) {
-            const errorMsg = await response.text();
-            container.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
+    const usuario = await response.json();
+
+    // Render datos + botones
+    container.innerHTML = `
+      <p><strong>Nombre:</strong> ${usuario.nombre}</p>
+      <p><strong>Apellido:</strong> ${usuario.apellido}</p>
+      <p><strong>Email:</strong> ${usuario.mail}</p>
+      <div class="mt-4">
+        <button class="btn btn-outline-primary m-1" id="btn-compras">Mis Compras</button>
+        <button class="btn btn-outline-secondary m-1" id="btn-ventas">Mis Ventas</button>
+        <button class="btn btn-outline-success m-1" id="btn-vehiculos">Mis Vehículos</button>
+        <button class="btn btn-outline-warning m-1" id="btn-publicaciones">Mis Publicaciones</button>
+      </div>
+      <div class="mt-4">
+        <button class="btn btn-danger" id="btn-eliminar">Eliminar Cuenta</button>
+      </div>
+    `;
+
+    // Navegación
+    document.getElementById('btn-compras').addEventListener('click', () => {
+      window.location.href = `misCompras.html?usuario=${usuarioId}`;
+    });
+    document.getElementById('btn-ventas').addEventListener('click', () => {
+      window.location.href = `misVentas.html?usuario=${usuarioId}`;
+    });
+    document.getElementById('btn-vehiculos').addEventListener('click', () => {
+      window.location.href = `misVehiculos.html?usuario=${usuarioId}`;
+    });
+    document.getElementById('btn-publicaciones').addEventListener('click', () => {
+      window.location.href = `misPublicaciones.html?usuario=${usuarioId}`;
+    });
+
+    // Eliminar cuenta
+    const btnEliminar = document.getElementById('btn-eliminar');
+    btnEliminar.addEventListener('click', async () => {
+      const confirmDelete = confirm("¿Seguro quieres eliminar tu cuenta?");
+      if (!confirmDelete) return;
+
+      btnEliminar.textContent = "Eliminando...";
+      btnEliminar.disabled = true;
+
+      try {
+        const deleteResp = await fetch(`${URL_API}/usuarios/${usuarioId}`, { method: 'DELETE' });
+        const txt = await deleteResp.text();           // <— lee SIEMPRE el body
+
+        if (!deleteResp.ok) {
+            console.error('Eliminar cuenta falló:', txt);
+            showMsg(txt || "Error al eliminar usuario", "danger");
+            btnEliminar.textContent = "Eliminar Cuenta";
+            btnEliminar.disabled = false;
             return;
         }
 
-        const usuario = await response.json();
-        console.log(usuario);
-        // Renderizar los datos
-        container.innerHTML = `
-            <p><strong>Nombre:</strong> ${usuario.nombre}</p>
-            <p><strong>Apellido:</strong> ${usuario.apellido}</p>
-            <p><strong>Email:</strong> ${usuario.mail}</p>
-            <div class="mt-4">
-                <button class="btn btn-outline-primary m-1" id="btn-compras">Mis Compras</button>
-                <button class="btn btn-outline-secondary m-1" id="btn-ventas">Mis Ventas</button>
-                <button class="btn btn-outline-success m-1" id="btn-vehiculos">Mis Vehículos</button>
-                <button class="btn btn-outline-warning m-1" id="btn-publicaciones">Mis Publicaciones</button>
-            </div>
-        `;
+        showMsg("Usuario eliminado correctamente", "success");
+        localStorage.removeItem("usuarioId");
 
-        // Listeners de ejemplo (para redirección o abrir otra página)
-        document.getElementById('btn-compras').addEventListener('click', () => {
-            window.location.href = `misCompras.html?usuario=${usuarioId}`;
-        });
-        document.getElementById('btn-ventas').addEventListener('click', () => {
-            window.location.href = `misVentas.html?usuario=${usuarioId}`;
-        });
-        document.getElementById('btn-vehiculos').addEventListener('click', () => {
-            window.location.href = `misVehiculos.html?usuario=${usuarioId}`;
-        });
-        document.getElementById('btn-publicaciones').addEventListener('click', () => {
-            window.location.href = `misPublicaciones.html?usuario=${usuarioId}`;
-        });
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 2000);   
 
-    } catch (error) {
-        container.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
-        console.error("Error fetching user:", error);
-    }
+      } catch (err) {
+        console.error("Error al eliminar usuario:", err);
+        showMsg("Error de conexión con el servidor", "danger");
+        btnEliminar.textContent = "Eliminar Cuenta";
+        btnEliminar.disabled = false;
+      }
+    });
+
+  } catch (error) {
+    container.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+    console.error("Error fetching user:", error);
+  }
 });
