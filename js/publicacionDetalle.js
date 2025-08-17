@@ -11,6 +11,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const publicacionId = params.get('id');
   const container = document.getElementById('detalle-publicacion');
+  const simbolos = {
+    PESOS: "$",
+    DOLARES: "U$D"
+  };
 
   if (!publicacionId) {
     container.innerHTML = `<div class="alert alert-danger">ID de publicación no especificado.</div>`;
@@ -39,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = `
       <h3>${publicacion.titulo}</h3>
       <p><strong>Descripción:</strong> ${publicacion.descripcion}</p>
-      <p><strong>Precio:</strong> $${publicacion.precio}</p>
+      <p><strong>Precio:</strong> ${simbolos[publicacion.moneda]} ${publicacion.precio}</p>
       <p><strong>Fecha de publicación:</strong> ${publicacion.fechaPublicacion}</p>
       <p><strong>Estado:</strong> <span id="estado-publicacion">${publicacion.estadoPublicacion}</span></p>
       <div id="acciones-publicacion" class="d-flex gap-2 mb-3 flex-wrap"></div>

@@ -37,6 +37,17 @@
           <textarea class="form-control" name="descripcion" rows="4" placeholder="Detalles del vehículo, estado, mantenimiento, etc." required></textarea>
         </div>
 
+        <div class="col-md-6 mb-3">
+          <label class="form-label d-block">Moneda</label>
+          <div class="btn-group" role="group">
+            <input class="btn-check" type="radio" name="moneda" id="monedaPesos" value="PESOS" checked>
+            <label class="btn btn-outline-primary" for="monedaPesos">Pesos (ARS)</label>
+
+            <input class="btn-check" type="radio" name="moneda" id="monedaDolares" value="DOLARES">
+            <label class="btn btn-outline-primary" for="monedaDolares">Dólares (USD)</label>
+          </div>
+        </div>
+
         <div class="col-md-4 mb-3">
           <label class="form-label">Precio</label>
           <input type="number" class="form-control" name="precio" min="0" step="1" required>

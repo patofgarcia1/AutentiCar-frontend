@@ -2,9 +2,14 @@ import { URL_API } from '../constants/database.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('loginForm');
+  const btnSubmit = form.querySelector('button[type="submit"]');
 
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
+
+    const originalText = btnSubmit.textContent;
+    btnSubmit.textContent = 'Ingresando...';
+    btnSubmit.disabled = true;
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -39,6 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (error) {
       document.getElementById('mensaje').innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor</div>`;
+    } finally {
+      // Si no hubo redirección, volvemos a estado normal
+      if (!document.hidden) {
+        btnSubmit.textContent = originalText;
+        btnSubmit.disabled = false;
+      }
     }
   });
 });
