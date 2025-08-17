@@ -2,6 +2,7 @@ import { URL_API } from '../constants/database.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('lista-publicaciones');
+  
 
   const PLACEHOLDER = 'https://dummyimage.com/600x400/efefef/aaaaaa&text=Sin+foto';
 
@@ -49,11 +50,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       })
     );
 
+    const SIMBOLOS = { PESOS: '$', DOLARES: 'U$D' };
+
     // Render de tarjetas con imagen (portada o placeholder)
     container.innerHTML = publicaciones.map((pub, i) => {
       const vehiculoId = resolveVehiculoId(pub);
       const imgSrc = portadas[i] || PLACEHOLDER;
       const pubId = pub.idPublicacion ?? pub.id ?? '';
+
+      const monedaKey = (pub.moneda || 'PESOS').toUpperCase();
+      const simbolo = SIMBOLOS[monedaKey] || '$';
+      const precioStr = (typeof pub.precio === 'number')
+        ? pub.precio.toLocaleString('es-AR')   // 30.000, 1.200.000, etc.
+        : (pub.precio ?? '—');
 
       return `
         <div class="col-md-4">
@@ -70,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="card-body">
               <h5 class="card-title">${pub.titulo ?? 'Publicación'}</h5>
               <p class="card-text">${pub.descripcion ?? ''}</p>
-              <p class="card-text"><strong>Precio:</strong> $${pub.precio ?? '—'}</p>
+              <p class="card-text"><strong>Precio:</strong> ${simbolo} ${precioStr}</p>
               <div class="d-flex gap-2">
                 <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
                 ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ``}
