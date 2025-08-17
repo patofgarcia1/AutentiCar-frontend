@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const originalText = btnSubmit.textContent;
     btnSubmit.textContent = 'Guardando...';
     btnSubmit.disabled = true;
 
@@ -77,6 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       console.error('Error creando evento:', error);
       mensaje.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+    } finally {
+      btnSubmit.textContent = originalText;
+      btnSubmit.disabled = false;
     }
   });
 });

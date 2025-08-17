@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
+        const originalText = btnSubmit.textContent;
         btnSubmit.textContent = 'Creando...';
         btnSubmit.disabled = true;
 
@@ -48,6 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             document.getElementById('mensaje').innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor</div>`;
+        } finally {
+            if (!document.hidden) {
+                btnSubmit.textContent = originalText;
+                btnSubmit.disabled = false;
+            }
         }
     });
 });

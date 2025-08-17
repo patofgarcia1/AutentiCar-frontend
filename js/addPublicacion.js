@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const originalText = btnSubmit.textContent;
     btnSubmit.textContent = 'Publicando...';
     btnSubmit.disabled = true;
 
@@ -85,6 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error(err);
       mensaje.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+    } finally {
+      btnSubmit.textContent = originalText;
+      btnSubmit.disabled = false;
     }
   });
 });
