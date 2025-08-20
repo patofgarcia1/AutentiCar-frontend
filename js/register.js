@@ -37,12 +37,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const mensaje = document.getElementById('mensaje');
 
             if (response.ok) {
-                const data = await response.text();
-                mensaje.innerHTML = `<div class="alert alert-success">${data}</div>`;
+                const data = await response.json();
+                const usuario = data.usuario;
+                mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje}</div>`;
 
-                setTimeout(() => {
+                if (usuario && usuario.esConcesionaria === true) {
+                    localStorage.setItem('usuarioIdVerif', String(usuario.idUsuario));
+                    setTimeout(() => {
+                    window.location.href = "formVerificacion.html";
+                    }, 1000);
+                } else {
+                    // si no, al login como antes
+                    setTimeout(() => {
                     window.location.href = "login.html";
-                }, 2000);
+                    }, 1000);
+                }
             } else {
                 const error = await response.text();
                 mensaje.innerHTML = `<div class="alert alert-danger">${error}</div>`;
