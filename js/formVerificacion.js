@@ -54,5 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnSubmit.textContent = originalText;
       btnSubmit.disabled = false;
     }
+    
   });
+
 });
