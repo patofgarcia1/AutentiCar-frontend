@@ -8,15 +8,34 @@ function showMsg(html, type='info') {
 
 document.addEventListener('DOMContentLoaded', async () => {
   const usuarioId = localStorage.getItem("usuarioId");
+  const token = localStorage.getItem("token");
   const container = document.getElementById('usuario-detalle');
 
   if (!usuarioId) {
     container.innerHTML = `<div class="alert alert-warning">No se encontró un usuario logueado.</div>`;
     return;
   }
+  if (!token) {
+    container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+    // opcional: window.location.href = 'login.html';
+    return;
+  }
 
   try {
-    const response = await fetch(`${URL_API}/usuarios/${usuarioId}`);
+    const response = await fetch(`${URL_API}/usuarios/${usuarioId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      container.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
+      // opcional: window.location.href = 'login.html';
+      return;
+    }
+    
     if (!response.ok) {
       const errorMsg = await response.text();
       container.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;

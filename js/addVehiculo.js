@@ -13,9 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSubmit.textContent = 'Guardando...';
     btnSubmit.disabled = true;
 
+    const token = localStorage.getItem("token");
     const usuarioId = localStorage.getItem("usuarioId");
-    if (!usuarioId) {
+    if (!usuarioId || !token) {
       mensaje.innerHTML = `<div class="alert alert-warning">Debés estar logueado para cargar un vehículo.</div>`;
+      btnSubmit.textContent = originalText;
+      btnSubmit.disabled = false;
       return;
     }
 
@@ -35,7 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch(`${URL_API}/vehiculos`, {
         method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(vehiculo)
       });
@@ -44,11 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await response.json();
         mensaje.innerHTML = `<div class="alert alert-success">Vehículo cargado con éxito.</div>`;
         form.reset();
-        localStorage.setItem("vehiculoId", data.id);
+        localStorage.setItem("vehiculoId", data.id ?? data.idVehiculo ?? '');
         setTimeout(() => {
             window.location.href = "addPublicacion.html";
         }, 1000); 
-      } else {
+      } else if (response.status === 401 || response.status === 403){
+        mensaje.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
+      }else{
         const errorText = await response.text();
         mensaje.innerHTML = `<div class="alert alert-danger">${errorText}</div>`;
       }

@@ -15,35 +15,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('password').value;
 
     try {
-      const response = await fetch(`${URL_API}/login`, {
+      const response = await fetch(`${URL_API}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           mail: email,
-          password: password
+          password
         })
       });
 
       const mensaje = document.getElementById('mensaje');
 
-      if (response.ok) {
-        const data = await response.json();
-        // console.log("Respuesta del backend:", data); 
-        // console.log("ID del usuario:", data.id);  
-        mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje}</div>`;
-        localStorage.setItem("usuarioId", data.id);
-        setTimeout(() => {
-            window.location.href = "index.html";
-        }, 1000); // 1000 milisegundos = 1 segundo
+      // intentar parsear JSON; si viene texto, lo mostramos igual
+      const readBody = async (res) => {
+        const text = await res.text();
+        try { return JSON.parse(text); } catch { return { ok: res.ok, mensaje: text }; }
+      };
+      const data = await readBody(response);
+
+      if (response.ok && (data.ok === true || data.ok === undefined)) {
+        mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje || 'Login exitoso'}</div>`;
+
+        // --- Compatibilidad: exponer data.id para mantener tu línea intacta
+        if (data.id == null) {
+          const u = data.usuario || {};
+          data.id = u.idUsuario ?? u.id ?? null;
+        }
+
+        // guarda el id como siempre
+        localStorage.setItem('usuarioId', data.id);
+
+        // (opcional) guardá el token para futuras requests
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+
+        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
 
       } else {
-        const error = await response.text();
-        mensaje.innerHTML = `<div class="alert alert-danger">${error}</div>`;
+        const err = data?.mensaje || 'Credenciales inválidas';
+        mensaje.innerHTML = `<div class="alert alert-danger">${err}</div>`;
       }
+
     } catch (error) {
-      document.getElementById('mensaje').innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor</div>`;
+      document.getElementById('mensaje').innerHTML =
+        `<div class="alert alert-danger">Error al conectar con el servidor</div>`;
     } finally {
       if (!document.hidden) {
         btnSubmit.textContent = originalText;
