@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const vehiculo = vehiculoResp.ok ? await vehiculoResp.json() : null;
 
     // 3) Obtener datos del usuario
-    const usuarioResp = await fetch(`${URL_API}/usuarios/${publicacion.usuarioId}`);
+    const usuarioResp = await fetch(`${URL_API}/usuarios/publico/${publicacion.usuarioId}`);
     const usuario = usuarioResp.ok ? await usuarioResp.json() : null;
 
     // 4) Render base

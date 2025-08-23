@@ -36,19 +36,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     const ev = await evResp.json();
 
-    // 2) Traer usuario (vendedor/creador) si viene idUsuario
-    let usuarioNombre = 'No disponible';
-    if (ev.idUsuario != null) {
-      try {
-        const uResp = await fetch(`${URL_API}/usuarios/${ev.idUsuario}`);
-        if (uResp.ok) {
-          const u = await uResp.json();
-          usuarioNombre = `${u.nombre ?? ''} ${u.apellido ?? ''}`.trim() || 'No disponible';
-        }
-      } catch {
-        // si falla, dejamos "No disponible"
-      }
-    }
+    // // 2) Traer usuario (vendedor/creador) si viene idUsuario
+    // let usuarioNombre = 'No disponible';
+    // if (ev.idUsuario != null) {
+    //   try {
+    //     const uResp = await fetch(`${URL_API}/usuarios/${ev.idUsuario}`);
+    //     if (uResp.ok) {
+    //       const u = await uResp.json();
+    //       usuarioNombre = `${u.nombre ?? ''} ${u.apellido ?? ''}`.trim() || 'No disponible';
+    //     }
+    //   } catch {
+    //     // si falla, dejamos "No disponible"
+    //   }
+    // }
+
+    // 2) Obtener datos del usuario
+    const usuarioResp = await fetch(`${URL_API}/usuarios/publico/${ev.idUsuario}`);
+    const usuario = usuarioResp.ok ? await usuarioResp.json() : null;
 
     // 3) Render
     titulo.textContent = ev.titulo || 'Evento';
@@ -60,7 +64,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p><strong>Validado por tercero:</strong> ${ev.validadoPorTercero ? 'Sí' : 'No'}</p>
       <p><strong>Fecha del evento:</strong> ${ev.fechaEvento ?? '—'}</p>
       <hr/>
-      <p><strong>Usuario:</strong> ${usuarioNombre}</p>
+
+      <p><strong>Usuario (que registro el evento):</strong> ${usuario ? `
+        <p>${usuario.nombre || ''} ${usuario.apellido || ''}</p>
+      ` : `<p class="text-muted">No se pudo cargar información del dueño.</p>`} </p>
+      
       <hr/>
       <a href="addDocumento.html?id=${ev.idVehiculo}&evento=${ev.idEvento}" class="btn btn-primary">
         Agregar Documentos
