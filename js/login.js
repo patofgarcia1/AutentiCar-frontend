@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await readBody(response);
 
       if (response.ok && (data.ok === true || data.ok === undefined)) {
-        mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje || 'Login exitoso'}</div>`;
+        mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje || 'Fuiste logueado exitosamente'}</div>`;
 
         // --- Compatibilidad: exponer data.id para mantener tu línea intacta
         if (data.id == null) {

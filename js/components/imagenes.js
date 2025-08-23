@@ -8,9 +8,18 @@ export function initGaleriaImagenes({
   allowDelete,    // boolean (true: muestra ícono de borrar)
   titulo = 'Imágenes',
   onChange,       // callback opcional cuando cambian (p.ej, tras subir/borrar)
+  authHeaders     // <<< OPCIONAL: { Authorization: 'Bearer <token>' }
 }) {
   if (!root) throw new Error('root es requerido');
   if (!vehiculoId) throw new Error('vehiculoId es requerido');
+
+  // Si no te pasan headers, intento tomar el token del localStorage
+  const resolvedAuthHeaders = (() => {
+    if (authHeaders && typeof authHeaders === 'object') return authHeaders;
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  })();
+
 
   // Estado interno
   let imagenes = [];
@@ -76,8 +85,14 @@ export function initGaleriaImagenes({
     files.forEach(f => fd.append('files', f));
     const res = await fetch(`${URL_API}/vehiculos/${vehiculoId}/imagenes`, {
       method: 'POST',
+      headers: {
+        ...resolvedAuthHeaders 
+      },
       body: fd
     });
+    if (res.status === 401 || res.status === 403) {
+      throw new Error('No autorizado. Iniciá sesión nuevamente.');
+    }
     if (!res.ok) {
       throw new Error(await res.text());
     }
@@ -86,8 +101,14 @@ export function initGaleriaImagenes({
 
   async function deleteImagen(imagenId) {
     const res = await fetch(`${URL_API}/vehiculos/imagenes/${imagenId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        ...resolvedAuthHeaders 
+      },
     });
+    if (res.status === 401 || res.status === 403) {
+      throw new Error('No autorizado. Iniciá sesión nuevamente.');
+    }
     if (!res.ok) throw new Error(await res.text());
   }
 

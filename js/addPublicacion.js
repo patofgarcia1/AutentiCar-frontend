@@ -4,6 +4,7 @@ import { initGaleriaImagenes } from './components/imagenes.js';
 document.addEventListener('DOMContentLoaded', () => {
   const usuarioId = localStorage.getItem('usuarioId');
   const vehiculoId = localStorage.getItem('vehiculoId');
+  const token = localStorage.getItem("token");
   const aviso = document.getElementById('aviso-ids');
   const form = document.getElementById('form-publicacion');
   const mensaje = document.getElementById('mensaje');
@@ -16,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>`;
   }
 
+  if (!token) {
+    mensaje.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;    // opcional: window.location.href = 'login.html';
+    return;
+  }
+
   const root = document.getElementById('imagenes-root');
   const galeria = initGaleriaImagenes({
     root,
@@ -23,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     allowUpload: true,
     allowDelete: true, // o false si no querés borrar acá
     titulo: 'Imágenes para la publicación',
+    authHeaders: { Authorization: `Bearer ${token}` },
     onChange: (imgs) => {
       // opcional: feedback, contador, etc.
       console.log('imagenes ahora:', imgs.length);
@@ -38,6 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!usuarioId || !vehiculoId) {
       mensaje.innerHTML = `<div class="alert alert-danger">Faltan datos para crear la publicación.</div>`;
+      btnSubmit.textContent = originalText;
+      btnSubmit.disabled = false;
       return;
     }
 
@@ -56,13 +65,22 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const resp = await fetch(`${URL_API}/publicaciones`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${token}` 
+        },
         body: JSON.stringify(payload),
       });
 
+      // manejo específico de auth
+      if (resp.status === 401 || resp.status === 403) {
+        mensaje.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
+        return;
+      }
+
       if (!resp.ok) {
         const txt = await resp.text();
-        mensaje.innerHTML = `<div class="alert alert-danger">${txt}</div>`;
+        mensaje.innerHTML = `<div class="alert alert-danger">${txt || 'Error al crear la publicación'}</div>`;
         return;
       }
 
@@ -82,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           window.location.href = 'publicaciones.html';
         }
-      }, 800);
+      }, 1000);
     } catch (err) {
       console.error(err);
       mensaje.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
