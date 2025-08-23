@@ -2,10 +2,17 @@ import { URL_API } from '../constants/database.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const usuarioId = localStorage.getItem("usuarioId");
+  const token = localStorage.getItem("token");
   const contenedor = document.getElementById('vehiculos-lista');
 
   if (!usuarioId) {
     contenedor.innerHTML = `<div class="alert alert-warning">Debés iniciar sesión para ver tus vehículos.</div>`;
+    return;
+  }
+
+  if (!token) {
+    contenedor.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+    // opcional: window.location.href = 'login.html';
     return;
   }
 
@@ -16,7 +23,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     url ? url.replace('/upload/', '/upload/w_500,h_250,c_fill,f_auto,q_auto/') : null;
 
   try {
-    const response = await fetch(`${URL_API}/usuarios/${usuarioId}/vehiculos`);
+    const response = await fetch(`${URL_API}/usuarios/${usuarioId}/vehiculos`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      contenedor.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
+      // opcional: window.location.href = 'login.html';
+      return;
+    }
+    
     if (!response.ok) {
       const errorMsg = await response.text();
       contenedor.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;

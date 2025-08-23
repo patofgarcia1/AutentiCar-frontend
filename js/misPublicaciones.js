@@ -2,10 +2,16 @@ import { URL_API } from '../constants/database.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const usuarioId = localStorage.getItem("usuarioId");
+  const token = localStorage.getItem("token");
   const container = document.getElementById('publicaciones-lista');
 
   if (!usuarioId) {
     container.innerHTML = `<div class="alert alert-warning">Debés iniciar sesión para ver tus publicaciones.</div>`;
+    return;
+  }
+  if (!token) {
+    container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+    // opcional: window.location.href = 'login.html';
     return;
   }
 
@@ -28,7 +34,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    const response = await fetch(`${URL_API}/usuarios/${usuarioId}/publicaciones`);
+    const response = await fetch(`${URL_API}/usuarios/${usuarioId}/publicaciones`,{
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      container.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
+      // opcional: window.location.href = 'login.html';
+      return;
+    }
+
     if (!response.ok) {
       const errorMsg = await response.text();
       container.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;

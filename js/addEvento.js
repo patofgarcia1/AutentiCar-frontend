@@ -4,11 +4,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const vehiculoId = params.get('id'); // viene del link "Agregar evento"
   const usuarioId = localStorage.getItem('usuarioId');
+  const token = localStorage.getItem("token");
 
   const aviso = document.getElementById('aviso-ids');
   const form = document.getElementById('form-evento');
   const mensaje = document.getElementById('mensaje');
   const btnSubmit = form.querySelector('button[type="submit"]');
+
+  if (!token) {
+    mensaje.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;    // opcional: window.location.href = 'login.html';
+    return;
+  }
 
   // Aviso útil
   aviso.innerHTML = `
@@ -50,9 +56,17 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const resp = await fetch(`${URL_API}/eventos`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${token}` 
+        },
         body: JSON.stringify(payload),
       });
+
+      if (resp.status === 401 || resp.status === 403) {
+        mensaje.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
+        return;
+      }
 
       if (!resp.ok) {
         const txt = await resp.text();

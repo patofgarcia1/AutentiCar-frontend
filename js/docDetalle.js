@@ -5,10 +5,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   const docId = params.get('id');
   const titulo = document.getElementById('titulo');
   const info = document.getElementById('info');
+  const token = localStorage.getItem("token");
 
   if (!docId) {
     titulo.textContent = "Error";
     info.innerHTML = `<div class="alert alert-danger">ID de documento no especificado en la URL.</div>`;
+    return;
+  }
+
+  if (!token) {
+    info.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+    // opcional: window.location.href = 'login.html';
     return;
   }
 
@@ -57,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     info.innerHTML = `
       <p><strong>Tipo de documento:</strong> ${doc.tipoDoc}</p>
-      <p><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo}</p>
+      <p><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo} %</p>
       <p><strong>Fecha de subida:</strong> ${doc.fechaSubida ?? '—'}</p>
       <p><strong>Validado por IA:</strong> ${doc.validadoIA ? 'Sí' : 'No'}</p>
       <div class="mt-3 d-flex gap-2">
@@ -97,7 +104,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnEliminar.textContent = 'Eliminando...';
 
       try {
-        const del = await fetch(`${URL_API}/vehiculos/documentos/${docId}`, { method: 'DELETE' });
+        const del = await fetch(`${URL_API}/vehiculos/documentos/${docId}`, {
+           method: 'DELETE',
+           headers: {
+            'Authorization': `Bearer ${token}`,   
+            'Accept': 'application/json'
+          } 
+        });
+
+        if (del.status === 401 || del.status === 403) {
+          showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
+          btnEliminar.textContent = originalText;
+          btnEliminar.disabled = false;
+          return;
+        }
+
+
         if (!del.ok) {
           const txt = await del.text();
           alert(`Error al eliminar: ${txt}`);

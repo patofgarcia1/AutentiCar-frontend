@@ -18,6 +18,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputNivel  = document.getElementById('nivelRiesgo');
   const chkIA       = document.getElementById('validadoIA');
 
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    mensaje.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+    // opcional: window.location.href = 'login.html';
+    return;
+  }
+
+  if (!vehiculoId) {
+    aviso.innerHTML = `<div class="alert alert-warning">Falta el parámetro "id" del vehículo.</div>`;
+    return;
+  }
+
   aviso.innerHTML = `
     <div class="alert alert-info">
       <strong>Vehículo ID:</strong> ${vehiculoId ?? 'No detectado'}<br>
@@ -25,10 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   `;
 
-  const root = document.getElementById('docs-root');
-  const docsUI = initDocumentos({
-    root, vehiculoId: Number(vehiculoId), allowDelete: true, titulo: 'Documentos del vehículo'
-  });
+  // const root = document.getElementById('docs-root');
+  // const docsUI = initDocumentos({
+  //   root, vehiculoId: Number(vehiculoId), allowDelete: true, titulo: 'Documentos del vehículo'
+  // });
 
   btnVolver.href = `docsVehiculo.html?id=${vehiculoId}`;
 
@@ -93,8 +106,17 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const resp = await fetch(`${URL_API}/vehiculos/${vehiculoId}/documentos`, {
         method: 'POST',
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          Accept: 'application/json'
+        },
         body: fd
       });
+
+      if (resp.status === 401 || resp.status === 403) {
+        mensaje.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
+        return;
+      }
 
       if (!resp.ok) {
         const txt = await resp.text();
@@ -106,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try { data = await resp.json(); } catch {}
 
       const vId = data?.vehiculoId ?? vehiculoId; 
-      await docsUI.reload();
+      //await docsUI.reload?.();
       showMsg('Documento subido con éxito.', 'success');
 
       setTimeout(() => {

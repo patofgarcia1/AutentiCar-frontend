@@ -84,8 +84,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnEliminar.disabled = true;
 
       try {
-        const deleteResp = await fetch(`${URL_API}/usuarios/${usuarioId}`, { method: 'DELETE' });
+        const deleteResp = await fetch(`${URL_API}/usuarios/${usuarioId}`, 
+          { method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,   
+              'Accept': 'application/json'
+            } 
+          });
         const txt = await deleteResp.text();           // <— lee SIEMPRE el body
+
+        if (deleteResp.status === 401 || deleteResp.status === 403) {
+          showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
+          btnEliminar.textContent = "Eliminar Cuenta";
+          btnEliminar.disabled = false;
+          return;
+        }
 
         if (!deleteResp.ok) {
             console.error('Eliminar cuenta falló:', txt);
@@ -97,6 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         showMsg("Usuario eliminado correctamente", "success");
         localStorage.removeItem("usuarioId");
+        localStorage.removeItem("token");
 
         setTimeout(() => {
           window.location.href = "index.html";

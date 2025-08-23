@@ -6,6 +6,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const vehiculoId = params.get('id');
   const titulo = document.getElementById('titulo');
   const info = document.getElementById('info');
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    info.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+    // opcional: window.location.href = 'login.html';
+    return;
+  }
 
   if (!vehiculoId) {
     titulo.textContent = "Error";
@@ -59,19 +66,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       allowUpload: true,
       allowDelete: true,
       titulo: 'Imágenes del vehículo',
+      authHeaders: { Authorization: `Bearer ${token}` },
     });
 
     // Handler de eliminación de vehículo
     const btnEliminarVehiculo = document.getElementById('btnEliminarVehiculo');
     btnEliminarVehiculo?.addEventListener('click', async () => {
-      if (!confirm('¿Seguro que querés eliminar este vehículo? Se eliminarán también su publicación, imágenes y documentos asociados.')) return;
+      if (!confirm('¿Seguro que querés eliminar este vehículo?')) return;
 
       btnEliminarVehiculo.disabled = true;
       const originalText = btnEliminarVehiculo.textContent;
       btnEliminarVehiculo.textContent = 'Eliminando...';
 
       try {
-        const del = await fetch(`${URL_API}/vehiculos/${vehiculoId}`, { method: 'DELETE' });
+        const del = await fetch(`${URL_API}/vehiculos/${vehiculoId}`,
+          { method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,   
+            'Accept': 'application/json'
+          } 
+        });
+
+        if (del.status === 401 || del.status === 403) {
+          showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
+          btnEliminar.textContent = originalText;
+          btnEliminar.disabled = false;
+          return;
+        }
+
         if (!del.ok) {
           const txt = await del.text();
           alert(`Error al eliminar: ${txt}`);

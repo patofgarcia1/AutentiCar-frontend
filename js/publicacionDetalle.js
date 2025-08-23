@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const publicacionId = params.get('id');
   const container = document.getElementById('detalle-publicacion');
+  const token = localStorage.getItem("token");
+
   const simbolos = {
     PESOS: "$",
     DOLARES: "U$D"
@@ -18,6 +20,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (!publicacionId) {
     container.innerHTML = `<div class="alert alert-danger">ID de publicación no especificado.</div>`;
+    return;
+  }
+
+  if (!token) {
+    container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+    // opcional: window.location.href = 'login.html';
     return;
   }
 
@@ -95,10 +103,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         const original = btnToggle.textContent;
         btnToggle.textContent = 'Actualizando...';
 
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+          btnToggle.disabled = false;
+          btnToggle.textContent = original;
+          return;
+        }
+
         try {
           const resp = await fetch(`${URL_API}/publicaciones/${publicacionId}/estado`, {
-            method: 'PUT'
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,   
+              'Accept': 'application/json'
+            } 
           });
+
+          if (resp.status === 401 || resp.status === 403) {
+            showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
+            btnEliminar.textContent = "Eliminar Cuenta";
+            btnEliminar.disabled = false;
+            return;
+          }
+
           if (!resp.ok) {
             const txt = await resp.text();
             alert(`No se pudo actualizar el estado: ${txt}`);
@@ -129,7 +158,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnEliminar.textContent = 'Eliminando...';
 
         try {
-          const del = await fetch(`${URL_API}/publicaciones/${publicacionId}`, { method: 'DELETE' });
+          const del = await fetch(`${URL_API}/publicaciones/${publicacionId}`, { 
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,   
+              'Accept': 'application/json'
+            } 
+          });
+
+          if (del.status === 401 || del.status === 403) {
+            showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
+            btnEliminar.textContent = originalText;
+            btnEliminar.disabled = false;
+            return;
+          }
+
           if (!del.ok) {
             const txt = await del.text();
             alert(`Error al eliminar: ${txt}`);

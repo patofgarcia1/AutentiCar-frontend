@@ -6,6 +6,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const titulo = document.getElementById('titulo');
   const info = document.getElementById('info');
   const mensaje = document.getElementById('mensaje');
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    mensaje.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+    // opcional: window.location.href = 'login.html';
+    return;
+  }
 
   function showMsg(html, type = 'info') {
     if (!mensaje) return;
@@ -71,7 +78,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnEliminar.textContent = 'Eliminando...';
 
       try {
-        const resp = await fetch(`${URL_API}/eventos/${ev.idEvento}`, { method: 'DELETE' });
+        const resp = await fetch(`${URL_API}/eventos/${ev.idEvento}`, 
+          { method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,   
+              'Accept': 'application/json'
+            } 
+        });
+
+        if (resp.status === 401 || resp.status === 403) {
+          showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
+          btnEliminar.textContent = originalText;
+          btnEliminar.disabled = false;
+          return;
+        }
+        
         if (!resp.ok) {
           const txt = await resp.text();
           showMsg(`Error al eliminar: ${txt}`, 'danger');
