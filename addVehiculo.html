@@ -65,9 +65,14 @@
           <input type="text" class="form-control" name="tipoTransmision" required>
         </div>
       </div>
+      <div id="grp-usuario-destino" class="mb-3 d-none">
+        <label for="usuarioIdDestino" class="form-label">Usuario destino (ID)</label>
+        <input type="number" min="1" step="1" id="usuarioIdDestino" class="form-control">
+        <div class="form-text">Solo para administradores. Si lo dejás vacío, se asigna al usuario actual.</div>
+      </div>
       <div class="tet-centexr mt-4">
         <button type="submit" class="btn btn-success">Guardar Vehículo</button>
-        </div>
+      </div>
     
     </form>
     <div id="mensaje" class="mt-3"></div>
