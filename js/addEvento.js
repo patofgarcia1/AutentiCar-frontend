@@ -3,7 +3,7 @@ import { URL_API } from '../constants/database.js';
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const vehiculoId = params.get('id'); // viene del link "Agregar evento"
-  const usuarioId = localStorage.getItem('usuarioId');
+  //const usuarioId = localStorage.getItem('usuarioId');
   const token = localStorage.getItem("token");
 
   const aviso = document.getElementById('aviso-ids');
@@ -16,11 +16,22 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // Detectar rol
+  let rol = 'ROL_USER';
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    rol = payload?.rol || 'ROL_USER';
+  } catch {}
+
+  // Mostrar/ocultar campo para ADMIN
+  const grpReg = document.getElementById('grp-usuario-registrador');
+  if (grpReg) grpReg.classList.toggle('d-none', rol !== 'ROL_ADMIN');
+
   // Aviso útil
   aviso.innerHTML = `
     <div class="alert alert-info">
       <strong>Vehículo ID:</strong> ${vehiculoId ?? '—'}<br>
-      <strong>Usuario ID:</strong> ${usuarioId ?? '—'}
+      
     </div>
   `;
 
@@ -33,12 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!vehiculoId) {
       mensaje.innerHTML = `<div class="alert alert-danger">No se detectó el ID del vehículo (parámetro <code>?id</code>).</div>`;
+      const originalText = btnSubmit.textContent;
+      btnSubmit.disabled = false;
       return;
     }
-    if (!usuarioId) {
-      mensaje.innerHTML = `<div class="alert alert-danger">Debés iniciar sesión para crear un evento.</div>`;
-      return;
-    }
+    // if (!usuarioId) {
+    //   mensaje.innerHTML = `<div class="alert alert-danger">Debés iniciar sesión para crear un evento.</div>`;
+    //   return;
+    // }
 
     const formData = new FormData(form);
     const datos = Object.fromEntries(formData.entries());
@@ -49,9 +62,25 @@ document.addEventListener('DOMContentLoaded', () => {
       kilometrajeEvento: parseInt(datos.kilometrajeEvento, 10),
       validadoPorTercero: datos.validadoPorTercero === 'on',
       tipoEvento: String(datos.tipoEvento).toUpperCase(), 
-      usuarioId: parseInt(usuarioId, 10),
+      //usuarioId: parseInt(usuarioId, 10),
       vehiculoId: parseInt(vehiculoId, 10),
     };
+
+    if (rol === 'ROL_ADMIN') {
+      const str = (document.getElementById('usuarioRegistradorId')?.value || '').trim();
+      if (str) {
+        const idNum = Number(str);
+        if (!Number.isNaN(idNum) && idNum > 0) {
+          payload.usuarioId = idNum;  // el back lo acepta solo para ADMIN
+        } else {
+          mensaje.innerHTML = `<div class="alert alert-danger">El ID de usuario registrador no es válido.</div>`;
+          btnSubmit.textContent = originalText;
+          btnSubmit.disabled = false;
+          return;
+        }
+      }
+      // si lo dejás vacío, el back registra como el admin
+    }
 
     try {
       const resp = await fetch(`${URL_API}/eventos`, {
