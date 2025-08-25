@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alt="${doc.nombre || 'Documento'}"
                 src="${thumb || PLACEHOLDER}"
                 onerror="this.onerror=null;this.src='${PLACEHOLDER}';"
-                style="height:200px;object-fit:cover;background:#f7f7f7"
               />
             </a>
           `;

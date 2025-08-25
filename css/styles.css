@@ -29,3 +29,9 @@ h1, h2 {
   background-color: #001f4d;
 }
 
+.card-img-top{
+  height:200px; 
+  object-fit:contain;
+  background:white
+}
+

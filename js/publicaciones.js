@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               src="${imgSrc}"
               class="card-img-top"
               alt="Imagen del vehículo"
-              style="height:200px; object-fit:contain;"
               onerror="this.onerror=null;this.src='${PLACEHOLDER}'"
             >
           </a>

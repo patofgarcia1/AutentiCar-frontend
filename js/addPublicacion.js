@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
       titulo: datos.titulo,
       descripcion: datos.descripcion,
       precio: parseInt(datos.precio, 10),
-      usuarioId: parseInt(usuarioId, 10),
+      //usuarioId: parseInt(usuarioId, 10),
       vehiculoId: parseInt(vehiculoId, 10),
       moneda: datos.moneda
     };

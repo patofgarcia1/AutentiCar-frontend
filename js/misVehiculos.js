@@ -58,10 +58,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${
               thumb
                 ? `<img src="${thumb}" class="card-img-top" alt="Imagen de ${v.marca} ${v.modelo}"
-                     style="height:200px;object-fit:cover;background:#f7f7f7"
                      onerror="this.onerror=null;this.src='${PLACEHOLDER}'">`
-                : `<img src="${PLACEHOLDER}" class="card-img-top" alt="Sin foto"
-                     style="height:200px;object-fit:cover;background:#f7f7f7">`
+                : `<img src="${PLACEHOLDER}" class="card-img-top" alt="Sin foto"`
             }
             <div class="card-body">
               <h5 class="card-title">${v.marca} ${v.modelo}</h5>
