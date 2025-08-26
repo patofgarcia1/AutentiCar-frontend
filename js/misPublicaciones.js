@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <h5 class="card-title">${pub.titulo ?? 'Publicación'}</h5>
               <p class="card-text">${pub.descripcion ?? ''}</p>
               <p class="card-text"><strong>Precio:</strong> $${pub.precio ?? '—'}</p>
+              <p class="card-text"><strong>Estado:</strong> ${pub.estadoPublicacion}</p>
               <div class="d-flex gap-2">
                 <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
                 ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ``}
