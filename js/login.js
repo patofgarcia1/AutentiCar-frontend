@@ -46,6 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // guarda el id como siempre
         localStorage.setItem('usuarioId', data.id);
+        
+        const rol = data?.usuario?.rol ?? data?.rol ?? '';
+        localStorage.setItem('rol', rol);
 
         // (opcional) guardá el token para futuras requests
         if (data.token) {
