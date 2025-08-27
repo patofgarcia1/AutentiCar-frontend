@@ -1,10 +1,14 @@
 import { URL_API } from '../constants/database.js';
+import { isAdmin, isUser, showIf } from './roles.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('lista-publicaciones');
-  
 
   const PLACEHOLDER = 'https://dummyimage.com/600x400/efefef/aaaaaa&text=Sin+foto';
+
+  // Mostrar/ocultar botón "Agregar vehículo"
+  const btnAdd = document.getElementById('btn-agregar-vehiculo');
+  showIf(btnAdd, isAdmin() || isUser()); // visitors y taller NO lo ven
 
   // Mismo helper que usás en misVehiculos.js para achicar/optimizar la imagen de Cloudinary
   const toThumb = (url) =>

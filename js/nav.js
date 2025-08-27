@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const token = localStorage.getItem('token');
   const rol   = localStorage.getItem('rol'); 
   const hasSession = !!token;
-  const isAdmin = rol === 'ADMIN' || rol === 'ROL_ADMIN';
+  const isAdmin = rol === 'ADMIN';
 
   // Mostrar/ocultar items según sesión
   if (hasSession) {

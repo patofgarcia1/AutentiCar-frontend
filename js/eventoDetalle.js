@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const mensaje = document.getElementById('mensaje');
   const token = localStorage.getItem("token");
 
-  if (!token) {
-    mensaje.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
-    // opcional: window.location.href = 'login.html';
-    return;
-  }
+  // if (!token) {
+  //   mensaje.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+  //   // opcional: window.location.href = 'login.html';
+  //   return;
+  // }
 
   function showMsg(html, type = 'info') {
     if (!mensaje) return;

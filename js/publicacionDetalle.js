@@ -1,4 +1,5 @@
 import { URL_API } from '../constants/database.js';
+import { isAdmin, isUser, getSession } from './roles.js';
 
 // util para mensajes (usa el contenedor global #mensaje)
 function showMsg(html, type = 'info') {
@@ -23,11 +24,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  if (!token) {
-    container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
-    // opcional: window.location.href = 'login.html';
-    return;
-  }
+  // if (!token) {
+  //   container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+  //   // opcional: window.location.href = 'login.html';
+  //   return;
+  // }
 
   try {
     // 1) Obtener publicación
@@ -85,16 +86,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     const acciones = document.getElementById('acciones-publicacion');
     const estadoSpan = document.getElementById('estado-publicacion');
 
+    // === Reglas de visibilidad para Pausar/Activar usando roles.js ===
+    const sess = getSession();
+
+    // loggedId: primero del token, si no, del localStorage (compat)
+    let loggedId = null;
+    if (sess?.userId != null) {
+      loggedId = Number(sess.userId);
+    } else {
+      const ui = localStorage.getItem('usuarioId');
+      if (ui != null) loggedId = Number(ui);
+    }
+
+    // ownerId: primero desde la publicación, luego fallback del vehículo
+    let ownerId = null;
+    if (publicacion?.usuarioId != null) {
+      ownerId = Number(publicacion.usuarioId);
+    } else if (vehiculo?.usuarioId != null) {
+      ownerId = Number(vehiculo.usuarioId);
+    } else if (vehiculo?.usuario?.idUsuario != null) {
+      ownerId = Number(vehiculo.usuario.idUsuario);
+    }
+
+    // Puede pausar/activar si es ADMIN o si es USER (particular/concesionaria) y dueño
+    const puedeToggle = isAdmin() || (isUser() && ownerId != null && loggedId === ownerId);
+
+    // Puede eliminar si es ADMIN o dueño del auto
+    const puedeEliminar = isAdmin() || (ownerId != null && loggedId === ownerId);
+
     function renderBotones(estadoActual) {
-      acciones.innerHTML = `
-        ${estadoActual === 'ACTIVA'
-          ? `<button id="btnToggleEstado" class="btn btn-warning">Pausar publicación</button>`
-          : estadoActual === 'PAUSADA'
-            ? `<button id="btnToggleEstado" class="btn btn-success">Activar publicación</button>`
-            : ``
-        }
-        <button id="btnEliminarPublicacion" class="btn btn-danger">Eliminar publicación</button>
-      `;
+
+      console.log({ loggedId, ownerId, roleToken: sess?.role, localRole: localStorage.getItem('rol') });
+
+      const btnToggleHtml =
+        (puedeToggle && (estadoActual === 'ACTIVA' || estadoActual === 'PAUSADA'))
+          ? (estadoActual === 'ACTIVA'
+              ? `<button id="btnToggleEstado" class="btn btn-warning">Pausar publicación</button>`
+              : `<button id="btnToggleEstado" class="btn btn-success">Activar publicación</button>`)
+          : ``;
+
+      const btnEliminarHtml = puedeEliminar
+          ? `<button id="btnEliminarPublicacion" class="btn btn-danger">Eliminar publicación</button>` : ``;
+      
+      acciones.innerHTML = `${btnToggleHtml} ${btnEliminarHtml}`.trim();
 
       // Toggle handler
       const btnToggle = document.getElementById('btnToggleEstado');
@@ -123,7 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           if (resp.status === 401 || resp.status === 403) {
             showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
-            btnEliminar.textContent = "Eliminar Cuenta";
+            btnEliminar.textContent = original;
             btnEliminar.disabled = false;
             return;
           }
@@ -131,6 +165,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (!resp.ok) {
             const txt = await resp.text();
             alert(`No se pudo actualizar el estado: ${txt}`);
+            btnToggle.disabled = false;
+            btnToggle.textContent = original;
             return;
           }
 
@@ -142,7 +178,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {
           console.error('Error al actualizar estado:', e);
           alert('Error al actualizar el estado de la publicación');
-        } finally {
           btnToggle.disabled = false;
           btnToggle.textContent = original;
         }

@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const info = document.getElementById('info');
   const token = localStorage.getItem("token");
 
-  if (!token) {
-    info.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
-    // opcional: window.location.href = 'login.html';
-    return;
-  }
+  // if (!token) {
+  //   info.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+  //   // opcional: window.location.href = 'login.html';
+  //   return;
+  // }
 
   if (!vehiculoId) {
     titulo.textContent = "Error";

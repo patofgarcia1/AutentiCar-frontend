@@ -13,11 +13,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  if (!token) {
-    info.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
-    // opcional: window.location.href = 'login.html';
-    return;
-  }
+  // if (!token) {
+  //   info.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+  //   // opcional: window.location.href = 'login.html';
+  //   return;
+  // }
 
   const PLACEHOLDER = 'https://dummyimage.com/800x500/efefef/aaaaaa&text=Documento';
 
