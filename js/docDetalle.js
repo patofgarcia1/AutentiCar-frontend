@@ -1,18 +1,19 @@
 import { URL_API } from '../constants/database.js';
+import { isAdmin, isUser, getSession } from './roles.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const docId = params.get('id');
   const titulo = document.getElementById('titulo');
   const info = document.getElementById('info');
-  const token = localStorage.getItem("token");
+  const mensaje = document.getElementById('mensaje'); // <- para showMsg
+  const localToken = localStorage.getItem("token");
 
   if (!docId) {
     titulo.textContent = "Error";
     info.innerHTML = `<div class="alert alert-danger">ID de documento no especificado en la URL.</div>`;
     return;
   }
-
 
   const PLACEHOLDER = 'https://dummyimage.com/800x500/efefef/aaaaaa&text=Documento';
 
@@ -23,40 +24,59 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function cloudThumb(url, mime) {
     if (!url) return null;
-
-    // imágenes -> resize
     if (mime && mime.startsWith('image/')) {
       return url.replace('/upload/', '/upload/w_400,h_250,c_fill,f_auto,q_auto/');
     }
-    // PDF subido como image -> miniatura página 1
     if (mime === 'application/pdf') {
       const t = url.replace('/upload/','/upload/pg_1,w_400,h_250,c_fill,f_auto,q_auto/');
-      return t.replace(/\.pdf($|\?)/, '.jpg$1'); // forzar extensión imagen (opcional)
+      return t.replace(/\.pdf($|\?)/, '.jpg$1');
     }
-    // otros -> sin preview real
     return null;
   }
 
   try {
-    const url = `${URL_API}/documentos/${docId}`;
-    const response = await fetch(url);
-
+    // 1) Traer detalle del documento (público)
+    const response = await fetch(`${URL_API}/documentos/${docId}`);
     if (!response.ok) {
       const errorMsg = await response.text();
       titulo.textContent = "Documento no encontrado";
       info.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
       return;
     }
-
     const doc = await response.json();
     titulo.textContent = doc.nombre || "Documento sin nombre";
 
+    // 2) Resolver si se puede eliminar (ADMIN o USER dueño del vehículo)
+    //    Necesitamos conocer el dueño del vehículo
+    const vehiculoId = doc.idVehiculo ?? doc.vehiculoId ?? null;
+    let ownerId = null;
+    if (vehiculoId != null) {
+      try {
+        const vResp = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
+        if (vResp.ok) {
+          const v = await vResp.json();
+          ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null; // tu DTO usa idUsuario
+        }
+      } catch {}
+    }
+
+    const sess = getSession(); // { isLogged, userId, token, rol }
+    const loggedId = (sess?.userId != null) ? Number(sess.userId) : null;
+    const authToken = sess?.token || localToken || null;
+
+    const puedeEliminar =
+      !!authToken && ( isAdmin() || (isUser() && ownerId != null && loggedId === ownerId) );
+
+    // 3) Botones dinámicos
     const botonEvento = doc.idEventoVehicular
       ? `<a href="eventoDetalle.html?id=${doc.idEventoVehicular}" class="btn btn-warning me-2">Ver Evento</a>`
       : "";
 
-    const botonEliminar = `<button id="btnEliminarDoc" class="btn btn-danger btn-sm">Eliminar documento</button>`;
+    const botonEliminar = puedeEliminar
+      ? `<button id="btnEliminarDoc" class="btn btn-danger btn-sm">Eliminar documento</button>`
+      : "";
 
+    // 4) Render info
     info.innerHTML = `
       <p><strong>Tipo de documento:</strong> ${doc.tipoDoc}</p>
       <p><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo} %</p>
@@ -71,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div id="doc-preview"></div>
     `;
 
-    // render miniatura clickeable
+    // 5) Vista previa
     const preview = document.getElementById('doc-preview');
     const thumb = cloudThumb(doc.urlDoc, doc.mimeType);
 
@@ -89,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     a.appendChild(img);
     preview.appendChild(a);
 
-    // handler de eliminación
+    // 6) Handler de eliminación (solo si hay botón)
     const btnEliminar = document.getElementById('btnEliminarDoc');
     btnEliminar?.addEventListener('click', async () => {
       if (!confirm('¿Seguro que querés eliminar este documento? Esta acción es permanente.')) return;
@@ -98,18 +118,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       const originalText = btnEliminar.textContent;
       btnEliminar.textContent = 'Eliminando...';
 
-      if (!token) {
+      if (!authToken) {
         showMsg("Sesión no válida. Iniciá sesión nuevamente.", "warning");
+        btnEliminar.disabled = false;
+        btnEliminar.textContent = originalText;
         return;
       }
 
       try {
         const del = await fetch(`${URL_API}/vehiculos/documentos/${docId}`, {
-           method: 'DELETE',
-           headers: {
-            'Authorization': `Bearer ${token}`,   
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
             'Accept': 'application/json'
-          } 
+          }
         });
 
         if (del.status === 401 || del.status === 403) {
@@ -119,24 +141,20 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
 
-
         if (!del.ok) {
           const txt = await del.text();
           alert(`Error al eliminar: ${txt}`);
           return;
         }
 
-        // Intentamos deducir el id del vehículo para volver al listado
-        const vehiculoId = doc.idVehiculo ?? doc.vehiculoId ?? null; // según tu DTO
+        // Volver a la lista del vehículo si logramos deducirlo
+        const backVehiculoId = vehiculoId;
         showMsg('Documento eliminado.', 'success');
-        //alert('Documento eliminado');
-
-        if (vehiculoId) {
+        if (backVehiculoId) {
           setTimeout(() => {
-            window.location.href = `docsVehiculo.html?id=${vehiculoId}`;
+            window.location.href = `docsVehiculo.html?id=${backVehiculoId}`;
           }, 1000);
         } else {
-          // Fallback si el DTO no tiene el id del vehículo
           history.back();
         }
       } catch (e) {

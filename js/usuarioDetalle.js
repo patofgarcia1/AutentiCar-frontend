@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <button class="btn btn-outline-secondary m-1" id="btn-ventas">Mis Ventas</button>
         <button class="btn btn-outline-success m-1" id="btn-vehiculos">Mis Vehículos</button>
         <button class="btn btn-outline-warning m-1" id="btn-publicaciones">Mis Publicaciones</button>
+        <button class="btn btn-outline-info m-1" id="btn-eventos">Mis Eventos</button>
       </div>
       <div class="mt-4">
         <button class="btn btn-danger" id="btn-eliminar">Eliminar Cuenta</button>
@@ -72,6 +73,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     document.getElementById('btn-publicaciones').addEventListener('click', () => {
       window.location.href = `misPublicaciones.html?usuario=${usuarioId}`;
+    });
+    document.getElementById('btn-eventos').addEventListener('click', () => {
+      window.location.href = `misEventos.html?usuario=${usuarioId}`;
     });
 
     // Eliminar cuenta
