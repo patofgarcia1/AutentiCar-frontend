@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('token');
+    localStorage.removeItem('rol');
     localStorage.removeItem('usuarioIdVerif');
     localStorage.removeItem('vehiculoId');
     window.location.href = 'index.html';
