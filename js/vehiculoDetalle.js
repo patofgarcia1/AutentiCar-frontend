@@ -1,12 +1,13 @@
 import { URL_API } from '../constants/database.js';
 import { initGaleriaImagenes } from './components/imagenes.js';
+import { isAdmin, isUser, getSession } from './roles.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const vehiculoId = params.get('id');
   const titulo = document.getElementById('titulo');
   const info = document.getElementById('info');
-  const token = localStorage.getItem("token");
+  //const token = localStorage.getItem("token");
 
   // if (!token) {
   //   info.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
@@ -21,8 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function showMsg(html, type='info') {
-    if (!mensaje) return;
-    mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
+    const msgEl = document.getElementById('mensaje'); // <-- usa el id real
+    if (!msgEl) return;
+    msgEl.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
   }
 
   try {
@@ -34,6 +36,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     const v = await response.json();
+
+    console.log('vehiculo payload =>', v);
 
     titulo.textContent = `${v.marca} ${v.modelo} (${v.anio})`;
 
@@ -52,21 +56,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         <a href="docsVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver documentos</a>
         <a href="eventosVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver eventos</a>
       </div>
-
-      <div class="mt-2">
-        <button id="btnEliminarVehiculo" class="btn btn-danger btn-sm">Eliminar vehículo</button>
-      </div>
     `;
+
+    // Dueño del vehículo según tu DTO (VehiculosDTO.idUsuario)
+    const ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null;
+
+    // Usuario logueado (desde roles.js)
+    const { userId: loggedIdRaw } = getSession();
+    const loggedId = (loggedIdRaw != null) ? Number(loggedIdRaw) : null;
+
+    let canManageImages = false;
+    if (localStorage.getItem('token')) {
+      canManageImages = isAdmin() || (isUser() && ownerId != null && loggedId === ownerId);
+    }
+
+    let acciones = document.getElementById('acciones-vehiculo');
+    if (!acciones) {
+      acciones = document.createElement('div');
+      acciones.id = 'acciones-vehiculo';
+      acciones.className = 'd-flex gap-2 flex-wrap my-3';
+      info.appendChild(acciones);
+    }
+
+    const puedeEliminar = isAdmin() || (isUser() && ownerId != null && loggedId === ownerId);
+
+    // 6) Render condicional del botón
+    acciones.innerHTML = puedeEliminar
+      ? `<button id="btnEliminarVehiculo" class="btn btn-danger">Eliminar vehículo</button>`
+      : ``;
+
+
+    const authHeaders = localStorage.getItem('token')
+      ? { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      : undefined;
 
     // Inicializa galería de imágenes
     const root = document.getElementById('imagenes-root');
     initGaleriaImagenes({
       root,
       vehiculoId: Number(vehiculoId),
-      allowUpload: true,
-      allowDelete: true,
+      allowUpload: canManageImages ,
+      allowDelete: canManageImages ,
       titulo: 'Imágenes del vehículo',
-      authHeaders: { Authorization: `Bearer ${token}` },
+      authHeaders,
     });
 
     // Handler de eliminación de vehículo
@@ -77,6 +109,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnEliminarVehiculo.disabled = true;
       const originalText = btnEliminarVehiculo.textContent;
       btnEliminarVehiculo.textContent = 'Eliminando...';
+
+      if (!token) {
+        showMsg("Sesión no válida. Iniciá sesión nuevamente.", "warning");
+        return;
+      }
 
       try {
         const del = await fetch(`${URL_API}/vehiculos/${vehiculoId}`,
