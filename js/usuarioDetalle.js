@@ -44,39 +44,53 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const usuario = await response.json();
 
-    // Render datos + botones
-    container.innerHTML = `
-      <p><strong>Nombre:</strong> ${usuario.nombre}</p>
-      <p><strong>Apellido:</strong> ${usuario.apellido}</p>
-      <p><strong>Email:</strong> ${usuario.mail}</p>
-      <div class="mt-4">
+    // rol desde el login 
+    const rol = (localStorage.getItem('rol') || '').toUpperCase();
+    const esTaller = rol === 'TALLER';
+
+    const botones = esTaller
+      ? `
+        <button class="btn btn-outline-info m-1" id="btn-eventos">Mis Eventos</button>
+      `
+      : `
         <button class="btn btn-outline-primary m-1" id="btn-compras">Mis Compras</button>
         <button class="btn btn-outline-secondary m-1" id="btn-ventas">Mis Ventas</button>
         <button class="btn btn-outline-success m-1" id="btn-vehiculos">Mis Vehículos</button>
         <button class="btn btn-outline-warning m-1" id="btn-publicaciones">Mis Publicaciones</button>
         <button class="btn btn-outline-info m-1" id="btn-eventos">Mis Eventos</button>
+      `;
+
+    container.innerHTML = `
+      <p><strong>Nombre:</strong> ${usuario.nombre}</p>
+      <p><strong>Apellido:</strong> ${usuario.apellido}</p>
+      <p><strong>Email:</strong> ${usuario.mail}</p>
+
+      <div class="mt-4">
+        ${botones}
       </div>
+
       <div class="mt-4">
         <button class="btn btn-danger" id="btn-eliminar">Eliminar Cuenta</button>
       </div>
     `;
 
-    // Navegación
-    document.getElementById('btn-compras').addEventListener('click', () => {
+    // 2) Listeners (solo si existen los botones)
+    document.getElementById('btn-compras')?.addEventListener('click', () => {
       window.location.href = `misCompras.html?usuario=${usuarioId}`;
     });
-    document.getElementById('btn-ventas').addEventListener('click', () => {
+    document.getElementById('btn-ventas')?.addEventListener('click', () => {
       window.location.href = `misVentas.html?usuario=${usuarioId}`;
     });
-    document.getElementById('btn-vehiculos').addEventListener('click', () => {
+    document.getElementById('btn-vehiculos')?.addEventListener('click', () => {
       window.location.href = `misVehiculos.html?usuario=${usuarioId}`;
     });
-    document.getElementById('btn-publicaciones').addEventListener('click', () => {
+    document.getElementById('btn-publicaciones')?.addEventListener('click', () => {
       window.location.href = `misPublicaciones.html?usuario=${usuarioId}`;
     });
-    document.getElementById('btn-eventos').addEventListener('click', () => {
+    document.getElementById('btn-eventos')?.addEventListener('click', () => {
       window.location.href = `misEventos.html?usuario=${usuarioId}`;
     });
+
 
     // Eliminar cuenta
     const btnEliminar = document.getElementById('btn-eliminar');
