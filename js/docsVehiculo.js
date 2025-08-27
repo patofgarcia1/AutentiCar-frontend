@@ -1,4 +1,5 @@
 import { URL_API } from '../constants/database.js';
+import { isAdmin, isUser, isTaller, getSession } from './roles.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
@@ -67,29 +68,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).join('');
       }
     }
+    } catch (error) {
+      console.error("Error al obtener documentos:", error);
+      contenedor.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+    }
 
-    // Botón SIEMPRE visible
-    contenedor.insertAdjacentHTML(
-      'afterend',
-      `
-      <div class="d-flex justify-content-end mt-3">
-        <a href="addDocumento.html?id=${vehiculoId}" class="btn btn-success">Agregar documento</a>
-      </div>
-      `
-    );
+    try {
+    const vResp = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
+    if (!vResp.ok) {
+      // si falla, no podemos saber el dueño => no mostramos botón
+      return;
+    }
+    const v = await vResp.json();
 
-  } catch (error) {
-    console.error("Error al obtener documentos:", error);
-    contenedor.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+    // dueño del vehículo según tu DTO (VehiculosDTO.idUsuario)
+    const ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null;
 
-    // Incluso en error, mostrar el botón
-    contenedor.insertAdjacentHTML(
-      'afterend',
-      `
-      <div class="d-flex justify-content-end mt-3">
-        <a href="addDocumento.html?id=${vehiculoId}" class="btn btn-success">Agregar documento</a>
-      </div>
-      `
-    );
+    // usuario logueado y rol
+    const { userId: loggedIdRaw } = getSession(); // lee de localStorage
+    const loggedId = (loggedIdRaw != null) ? Number(loggedIdRaw) : null;
+
+    // Reglas
+    const puedeAgregar =
+      isAdmin() || isTaller() || (isUser() && ownerId != null && loggedId === ownerId);
+
+    if (puedeAgregar) {
+      contenedor.insertAdjacentHTML(
+        'afterend',
+        `
+        <div class="d-flex justify-content-end mt-3">
+          <a href="addDocumento.html?id=${vehiculoId}" class="btn btn-success">Agregar documento</a>
+        </div>
+        `
+      );
+    }
+  } catch (e) {
+    console.warn('No se pudo evaluar permisos para el botón Agregar documento:', e);
+    // si falla esta parte, simplemente no mostramos el botón
   }
 });
