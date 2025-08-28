@@ -146,5 +146,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     container.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
     console.error("Error fetching user:", error);
   }
-  
 });
