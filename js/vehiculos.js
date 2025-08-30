@@ -69,4 +69,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error(error);
     contenedor.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
   }
+  
 });
