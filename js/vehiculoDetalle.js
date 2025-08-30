@@ -36,6 +36,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     titulo.textContent = `${v.marca} ${v.modelo} (${v.anio})`;
 
+    const { token: sessToken } = getSession();
+    const isLogged = !!sessToken;
+
+    // Links solo si está logueado
+    const linksHtml = isLogged
+      ? `
+        <div class="gap-2 mb-3">
+          <a href="docsVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver documentos</a>
+          <a href="eventosVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver eventos</a>
+        </div>
+      `
+      : '';
+
     info.innerHTML = `
       <p><strong>Kilometraje:</strong> ${v.kilometraje} km</p>
       <p><strong>Puertas:</strong> ${v.puertas}</p>
@@ -43,11 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p><strong>Color:</strong> ${v.color}</p>
       <p><strong>Combustible:</strong> ${v.tipoCombustible}</p>
       <p><strong>Transmisión:</strong> ${v.tipoTransmision}</p>
-
-      <div class="gap-2 mb-3">
-        <a href="docsVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver documentos</a>
-        <a href="eventosVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver eventos</a>
-      </div>
+      ${linksHtml}
     `;
 
     // Dueño del vehículo según tu DTO (VehiculosDTO.idUsuario)
