@@ -60,7 +60,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       <hr/>
 
+      <a href="docsEvento.html?id=${ev.idEvento}" class="btn btn-primary">Ver documentos</a>
       <div id="acciones-evento" class="d-inline-block ms-2"></div>
+  
     `;
 
     // dueño del vehículo (según tu DTO de VehiculosDTO: idUsuario)
@@ -86,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const acciones = document.getElementById('acciones-evento');
     acciones.innerHTML = [
       (puedeAdjuntar
-        ? `<a href="addDocumento.html?id=${ev.idVehiculo}&evento=${ev.idEvento}" class="btn btn-primary me-2">Agregar Documentos</a>`
+        ? `<a href="addDocumento.html?id=${ev.idVehiculo}&evento=${ev.idEvento}" class="btn btn-success me-2">Agregar Documentos</a>`
         : ''),
       (puedeEliminar
         ? `<button id="btnEliminarEvento" class="btn btn-danger">Eliminar evento</button>`
