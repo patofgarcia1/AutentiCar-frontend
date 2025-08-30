@@ -37,15 +37,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     titulo.textContent = `${v.marca} ${v.modelo} (${v.anio})`;
 
     info.innerHTML = `
-      <p><strong>VIN:</strong> ${v.vin}</p>
       <p><strong>Kilometraje:</strong> ${v.kilometraje} km</p>
       <p><strong>Puertas:</strong> ${v.puertas}</p>
       <p><strong>Motor:</strong> ${v.motor}L</p>
       <p><strong>Color:</strong> ${v.color}</p>
       <p><strong>Combustible:</strong> ${v.tipoCombustible}</p>
       <p><strong>Transmisión:</strong> ${v.tipoTransmision}</p>
-      <p><strong>Fecha de alta:</strong> ${v.fechaAlta}</p>
-      <p><strong>Estado:</strong> ${v.estado}</p>
 
       <div class="gap-2 mb-3">
         <a href="docsVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver documentos</a>
