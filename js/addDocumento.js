@@ -4,7 +4,7 @@ import { initDocumentos } from './components/documentos.js';
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const vehiculoId = params.get('id');
-  const eventoIdQS = params.get('evento');
+  const eventoId = params.get('evento');
 
   const form = document.getElementById('form-documento');
   const mensaje = document.getElementById('mensaje');
@@ -31,17 +31,27 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  aviso.innerHTML = `
-    <div class="alert alert-info">
-      <strong>Vehículo ID:</strong> ${vehiculoId ?? 'No detectado'}<br>
-      <strong>Evento ID:</strong> ${eventoIdQS ?? 'Sin evento'}
-    </div>
-  `;
+  if (!eventoId) { // ✅ ahora es obligatorio
+    // opción A: bloquear la carga y pedir volver al detalle del evento
+    showMsg('Falta el parámetro "?evento". Debés entrar desde el detalle del evento para adjuntar documentos.', 'danger');
+    if (btnSubirDoc) btnSubirDoc.disabled = true; // ✅ evita enviar sin evento
+    if (aviso) {
+      aviso.innerHTML = `
+        <div class="alert alert-warning">
+          <strong>Vehículo ID:</strong> ${vehiculoId}<br>
+          <strong>Evento ID:</strong> <em>no especificado</em>
+        </div>`;
+    }
+    return;
+  }
 
-  // const root = document.getElementById('docs-root');
-  // const docsUI = initDocumentos({
-  //   root, vehiculoId: Number(vehiculoId), allowDelete: true, titulo: 'Documentos del vehículo'
-  // });
+  if (aviso) {
+    aviso.innerHTML = `
+      <div class="alert alert-info">
+        <strong>Vehículo ID:</strong> ${vehiculoId}<br>
+        <strong>Evento ID:</strong> ${eventoId}
+      </div>`;
+  }
 
   btnVolver.href = `docsVehiculo.html?id=${vehiculoId}`;
 
@@ -98,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fd.append('tipoDoc', tipo);
     fd.append('nivelRiesgo', String(nivel));
     fd.append('validadoIA', chkIA?.checked ? 'true' : 'false');
-    if (eventoIdQS) fd.append('eventoId', eventoIdQS);
+    fd.append('eventoId', eventoId); 
 
     btnSubirDoc.disabled = true;
     btnSubirDoc.textContent = 'Subiendo...';
@@ -132,7 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
       showMsg('Documento subido con éxito.', 'success');
 
       setTimeout(() => {
-        window.location.href = `docsVehiculo.html?id=${vId}`; 
+        //window.location.href = `docsVehiculo.html?id=${vId}`; 
+        window.location.href = `eventoDetalle.html?id=${eventoId}`;
       }, 1000);
 
       form.reset();

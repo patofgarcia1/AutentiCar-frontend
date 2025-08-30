@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           <li><strong>Marca:</strong> ${vehiculo.marca}</li>
           <li><strong>Modelo:</strong> ${vehiculo.modelo}</li>
           <li><strong>Año:</strong> ${vehiculo.anio}</li>
-          <li><strong>VIN:</strong> ${vehiculo.vin}</li>
           <li><strong>Kilometraje:</strong> ${vehiculo.kilometraje} km</li>
           <li><strong>Motor:</strong> ${vehiculo.motor}L</li>
           <li><strong>Color:</strong> ${vehiculo.color}</li>
