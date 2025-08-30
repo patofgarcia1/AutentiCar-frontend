@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'afterend',
         `
         <div class="d-flex justify-content-end mt-3">
-          <a href="addDocumento.html?id=${vehiculoId}" class="btn btn-success">Agregar documento</a>
+          <a href="addEvento.html?id=${vehiculoId}" class="btn btn-success">Agregar evento</a>
         </div>
         `
       );
