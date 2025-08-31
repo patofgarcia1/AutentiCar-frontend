@@ -100,13 +100,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (puedeEliminar) {
       const btnEliminar = document.getElementById('btnEliminarEvento');
       btnEliminar.addEventListener('click', async () => {
-        if (!confirm('¿Seguro que querés eliminar este evento? Esta acción es permanente.')) return;
+        if (!confirm('¿Seguro que querés eliminar este evento?')) return;
 
         btnEliminar.disabled = true;
         const originalText = btnEliminar.textContent;
         btnEliminar.textContent = 'Eliminando...';
 
-        if (!token) {
+        if (!authToken) {
           showMsg("Sesión no válida. Iniciá sesión nuevamente.", "warning");
           btnEliminar.disabled = false;
           btnEliminar.textContent = originalText;
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const resp = await fetch(`${URL_API}/eventos/${ev.idEvento}`, 
             { method: 'DELETE',
               headers: {
-                'Authorization': `Bearer ${token}`,   
+                'Authorization': `Bearer ${authToken}`,   
                 'Accept': 'application/json'
               } 
           });

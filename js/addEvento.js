@@ -87,7 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          "Authorization": `Bearer ${token}` 
+          "Authorization": `Bearer ${token}`,
+          'Accept': 'application/json'
         },
         body: JSON.stringify(payload),
       });
@@ -103,19 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      let data = null;
-      try { data = await resp.json(); } catch {}
+      const data = await resp.json();
 
       mensaje.innerHTML = `<div class="alert alert-success">Evento creado con éxito.</div>`;
 
       // Redirigir: si el back devuelve el id del evento creado, vamos al detalle
       const idEvento = data?.idEvento ?? data?.id;
       setTimeout(() => {
-        if (idEvento) {
           window.location.href = `eventoDetalle.html?id=${idEvento}`;
-        } else {
-          window.location.href = `eventosVehiculo.html?id=${vehiculoId}`;
-        }
       }, 900);
 
     } catch (error) {
