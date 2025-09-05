@@ -108,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       mensaje.innerHTML = `<div class="alert alert-success">Evento creado con éxito.</div>`;
 
-      // Redirigir: si el back devuelve el id del evento creado, vamos al detalle
       const idEvento = data?.idEvento ?? data?.id;
       setTimeout(() => {
           window.location.href = `eventoDetalle.html?id=${idEvento}`;
