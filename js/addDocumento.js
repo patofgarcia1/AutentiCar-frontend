@@ -45,13 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  if (aviso) {
-    aviso.innerHTML = `
-      <div class="alert alert-info">
-        <strong>Vehículo ID:</strong> ${vehiculoId}<br>
-        <strong>Evento ID:</strong> ${eventoId}
-      </div>`;
-  }
+  // if (aviso) {
+  //   aviso.innerHTML = `
+  //     <div class="alert alert-info">
+  //       <strong>Vehículo ID:</strong> ${vehiculoId}<br>
+  //       <strong>Evento ID:</strong> ${eventoId}
+  //     </div>`;
+  // }
 
   btnVolver.href = `docsVehiculo.html?id=${vehiculoId}`;
 

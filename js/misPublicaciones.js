@@ -75,8 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const imgSrc = portadas[i] || PLACEHOLDER;
 
       return `
-        <div class="col-md-4 mb-4">
-          <div class="card h-100 shadow-sm" style="max-width: 300px; margin:auto">
+        <div class="col">
+          <div class="card h-100 shadow-sm">
             <a href="publicacionDetalle.html?id=${pubId}" style="display:block">
               <img
                 src="${imgSrc}"

@@ -28,12 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (grpReg) grpReg.classList.toggle('d-none', rol !== 'ROL_ADMIN');
 
   // Aviso útil
-  aviso.innerHTML = `
-    <div class="alert alert-info">
-      <strong>Vehículo ID:</strong> ${vehiculoId ?? '—'}<br>
+  // aviso.innerHTML = `
+  //   <div class="alert alert-info">
+  //     <strong>Vehículo ID:</strong> ${vehiculoId ?? '—'}<br>
       
-    </div>
-  `;
+  //   </div>
+  // `;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
