@@ -17,20 +17,23 @@ h1, h2 {
 
 #btn-agregar-vehiculo {
   position: fixed;
-  bottom: 100px;
+  bottom: 75px;
   right: 30px;
   width: 60px;
   height: 60px;
   border-radius: 50%;
   background-color: #003366;
-  color: white;
-  font-size: 32px;
-  font-weight: bold;
-  text-align: center;
-  line-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,.3);
   text-decoration: none;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   z-index: 999;
+}
+
+#btn-agregar-vehiculo img {
+  width: 35%;   /* ajustá según tu icono */
+  height: auto;
 }
 
 #btn-agregar-vehiculo:hover {
