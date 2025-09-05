@@ -36,8 +36,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     titulo.textContent = `${v.marca} ${v.modelo} (${v.anio})`;
 
-    const { token: sessToken } = getSession();
-    const isLogged = !!sessToken;
+    const { token, userId: loggedIdRaw } = getSession() || {};
+    const isLogged = !!token;
+    const loggedId = (loggedIdRaw != null) ? Number(loggedIdRaw) : null;
 
     // Links solo si está logueado
     const linksHtml = isLogged
@@ -62,14 +63,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Dueño del vehículo según tu DTO (VehiculosDTO.idUsuario)
     const ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null;
 
-    // Usuario logueado (desde roles.js)
-    const { userId: loggedIdRaw } = getSession();
-    const loggedId = (loggedIdRaw != null) ? Number(loggedIdRaw) : null;
-
-    let canManageImages = false;
-    if (localStorage.getItem('token')) {
-      canManageImages = isAdmin() || (isUser() && ownerId != null && loggedId === ownerId);
-    }
+    const canManageImages = isLogged && (isAdmin() || (isUser() && ownerId != null && loggedId === ownerId));
+    const puedeEliminar = isLogged && (isAdmin() || (isUser() && ownerId != null && loggedId === ownerId));
 
     let acciones = document.getElementById('acciones-vehiculo');
     if (!acciones) {
@@ -79,17 +74,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       info.appendChild(acciones);
     }
 
-    const puedeEliminar = isAdmin() || (isUser() && ownerId != null && loggedId === ownerId);
-
     // 6) Render condicional del botón
     acciones.innerHTML = puedeEliminar
       ? `<button id="btnEliminarVehiculo" class="btn btn-danger">Eliminar vehículo</button>`
       : ``;
 
 
-    const authHeaders = localStorage.getItem('token')
-      ? { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      : undefined;
+    const authHeaders = token ? { Authorization: `Bearer ${token}` } : undefined;
 
     // Inicializa galería de imágenes
     const root = document.getElementById('imagenes-root');
@@ -113,6 +104,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (!token) {
         showMsg("Sesión no válida. Iniciá sesión nuevamente.", "warning");
+        btnEliminarVehiculo.textContent = originalText;  
+        btnEliminarVehiculo.disabled = false;
         return;
       }
 
@@ -127,8 +120,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (del.status === 401 || del.status === 403) {
           showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
-          btnEliminar.textContent = originalText;
-          btnEliminar.disabled = false;
+          btnEliminarVehiculo.textContent = originalText;
+          btnEliminarVehiculo.disabled = false;
           return;
         }
 

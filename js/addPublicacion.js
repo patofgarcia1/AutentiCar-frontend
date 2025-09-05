@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (idPub) {
           window.location.href = `publicacionDetalle.html?id=${idPub}`;
         } else {
-          window.location.href = 'publicaciones.html';
+          window.location.href = 'index.html';
         }
       }, 1000);
     } catch (err) {
