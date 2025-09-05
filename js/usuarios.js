@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    // <a href="usuarioDetalle.html?" class="btn btn-primary">Ver detalle</a>
+
     contenedor.innerHTML = usuarios.map(u => {
       return `
         <div class="col">
@@ -45,7 +47,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="card-body">
               <h5 class="card-title">${u.nombre} ${u.apellido}</h5>
               <p class="card-text"><strong>Mail:</strong> ${u.mail}</p>
-              <a href="usuarioDetalle.html?" class="btn btn-primary">Ver detalle</a>
             </div>
           </div>
         </div>
