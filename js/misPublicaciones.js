@@ -104,5 +104,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error("Error al obtener publicaciones:", error);
     container.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
   }
-  
 });
