@@ -78,6 +78,27 @@ document.addEventListener('DOMContentLoaded', () => {
     return { file, nombre, tipo };
   }
 
+  function openIASpinner(minMs = 8000) {
+    const modalEl = document.getElementById('iaSpinnerModal');
+    const modal = new bootstrap.Modal(modalEl, {
+      backdrop: 'static',
+      keyboard: false
+    });
+
+    const started = Date.now();
+    modal.show();
+
+    // devolvemos una función que cierra la modal respetando el mínimo
+    return async function close() {
+      const elapsed = Date.now() - started;
+      const wait = Math.max(0, minMs - elapsed);
+      if (wait > 0) {
+        await new Promise(r => setTimeout(r, wait));
+      }
+      modal.hide();
+    };
+  }
+
   btnSubirDoc.addEventListener('click', async () => {
     if (!form.reportValidity()) return;
 
@@ -94,6 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnSubirDoc.disabled = true;
     btnSubirDoc.textContent = 'Subiendo...';
+
+    const closeSpinner = openIASpinner(5000);
 
     try {
       const resp = await fetch(`${URL_API}/vehiculos/${vehiculoId}/documentos`, {
@@ -120,6 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
       try { data = await resp.json(); } catch {}
 
       const vId = data?.vehiculoId ?? vehiculoId; 
+
+       await closeSpinner();
+
       //await docsUI.reload?.();
       showMsg('Documento subido con éxito.', 'success');
 

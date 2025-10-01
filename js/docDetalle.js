@@ -72,23 +72,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       ? `<a href="eventoDetalle.html?id=${doc.idEventoVehicular}" class="btn btn-warning me-2">Ver Evento</a>`
       : "";
 
+    const botonAnalisis = doc.idEventoVehicular
+      ? `<a href="analisisIA.html?id=${docId}" class="btn btn-info">Ver análisis IA</a>`
+      : "";
+
     const botonEliminar = puedeEliminar
       ? `<button id="btnEliminarDoc" class="btn btn-danger btn-sm">Eliminar documento</button>`
       : "";
+
+    const validadoIAHtml = doc.validadoIA
+      ? `
+        <div class="d-flex align-items-center gap-2">
+          <img src="img/greenBadge.png" alt="Validado por IA" width="40" height="35" />
+          <span class="fw-semibold text">Validado por IA</span>
+        </div>
+      `
+      : `
+        <span class="badge text-bg-secondary">No validado por IA</span>
+      `;
 
     // 4) Render info
     info.innerHTML = `
       <p><strong>Tipo de documento:</strong> ${doc.tipoDoc}</p>
       <p><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo} %</p>
       <p><strong>Fecha de subida:</strong> ${doc.fechaSubida ?? '—'}</p>
-      <p><strong>Validado por IA:</strong> ${doc.validadoIA ? 'Sí' : 'No'}</p>
+      <div class="mb-2">${validadoIAHtml}</div>
       <div class="mt-3 d-flex gap-2">
         ${botonEvento}
+        ${botonAnalisis}
         ${botonEliminar}
       </div>
       <hr class="my-4">
       <h5 class="mb-3">Vista previa</h5>
-      <div id="doc-preview"></div>
+      <div id="doc-preview"></div
     `;
 
     // 5) Vista previa

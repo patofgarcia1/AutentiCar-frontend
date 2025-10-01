@@ -7,6 +7,17 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="css/styles.css" rel="stylesheet"/>
 </head>
+<div class="modal fade" id="iaSpinnerModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-body text-center py-5">
+        <img src="img/spinner azul.gif" alt="Analizando..." style="width: 96px; height: 96px; object-fit: contain;" />
+        <h5 class="mt-4 mb-0">El documento está siendo analizado por la IA</h5>
+        <p class="text-muted mb-0 mt-2">Esto puede demorar unos segundos…</p>
+      </div>
+    </div>
+  </div>
+</div>
 <body class="d-flex flex-column min-vh-100">
   <div id="site-nav"></div>
 
@@ -36,19 +47,6 @@
           </select>
         </div>
 
-        <!-- <div class="col-md-4 mb-3">
-          <label class="form-label">Nivel de riesgo (0-100)</label>
-          <input type="number" class="form-control" name="nivelRiesgo" id="nivelRiesgo" min="0" max="100" step="1" required>
-        </div>
-
-        <div class="col-md-4 mb-3">
-          <label class="form-label">Validado por IA</label>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="validadoIA" name="validadoIA">
-            <label class="form-check-label" for="validadoIA">Sí</label>
-          </div>
-        </div> -->
-
         <div class="col-md-8 mb-3">
           <label class="form-label">Archivo (PDF / imagen)</label>
           <input type="file" class="form-control" id="fileDoc" accept="image/*,application/pdf" required>
@@ -76,6 +74,8 @@
       <p class="m-0">© 2025 AutentiCar. Todos los derechos reservados.</p>
     </div>
   </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script type="module" src="js/nav.js"></script>
   <script type="module" src="js/addDocumento.js"></script>
