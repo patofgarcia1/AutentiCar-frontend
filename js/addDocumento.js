@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const inputNombre = document.getElementById('nombre');
   const selTipo     = document.getElementById('tipoDoc');
-  const inputNivel  = document.getElementById('nivelRiesgo');
-  const chkIA       = document.getElementById('validadoIA');
 
   const token = localStorage.getItem("token");
 
@@ -31,10 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  if (!eventoId) { // ✅ ahora es obligatorio
+  if (!eventoId) { 
     // opción A: bloquear la carga y pedir volver al detalle del evento
     showMsg('Falta el parámetro "?evento". Debés entrar desde el detalle del evento para adjuntar documentos.', 'danger');
-    if (btnSubirDoc) btnSubirDoc.disabled = true; // ✅ evita enviar sin evento
+    if (btnSubirDoc) btnSubirDoc.disabled = true; 
     if (aviso) {
       aviso.innerHTML = `
         <div class="alert alert-warning">
@@ -64,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const file = fileInput.files?.[0];
     const nombre = (inputNombre.value || '').trim();
     const tipo = selTipo.value;
-     const nivelS = (inputNivel.value || '').trim();
 
     // HTML5 ya valida, pero reforzamos:
     if (!vehiculoId) { showMsg('Falta ?id de vehículo.', 'danger'); return null; }
@@ -72,26 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!nombre)     { showMsg('Ingresá un nombre para el documento.', 'warning'); return null; }
     if (!tipo)       { showMsg('Seleccioná un tipo de documento.', 'warning'); return null; }
 
-    if (nivelS === '') {
-    showMsg('Ingresá el nivel de riesgo.', 'warning');
-    return null;
-    }
-    if (!/^\d{1,3}$/.test(nivelS)) {
-      showMsg('El nivel de riesgo debe ser un número entero.', 'warning');
-      return null;
-    }
-    const n = parseInt(nivelS, 10);
-    if (n < 0 || n > 100) {
-      showMsg('El nivel de riesgo debe estar entre 0 y 100.', 'warning');
-      return null;
-    }
 
     if (!(file.type.startsWith('image/') || file.type === 'application/pdf')) {
       const ok = confirm('No es imagen/PDF. Se subirá como RAW (sin vista previa). ¿Continuar?');
       if (!ok) return null;
     }
 
-    return { file, nombre, tipo, nivel: n };
+    return { file, nombre, tipo };
   }
 
   btnSubirDoc.addEventListener('click', async () => {
@@ -100,14 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const vals = validar();
     if (!vals) return;
 
-    const { file, nombre, tipo, nivel } = vals;
+    const { file, nombre, tipo } = vals;
 
     const fd = new FormData();
     fd.append('file', file);
-    fd.append('nombre', nombre);                 // ← sin defaults
+    fd.append('nombre', nombre);               
     fd.append('tipoDoc', tipo);
-    fd.append('nivelRiesgo', String(nivel));
-    fd.append('validadoIA', chkIA?.checked ? 'true' : 'false');
     fd.append('eventoId', eventoId); 
 
     btnSubirDoc.disabled = true;

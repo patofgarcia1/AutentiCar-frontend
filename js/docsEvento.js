@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="card-body">
               <h5 class="card-title mb-2">${safeNombre}</h5>
               <p class="mb-1"><strong>Tipo:</strong> ${doc.tipoDoc ?? '-'}</p>
-              <p class="mb-3"><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo ?? '-'}</p>
+              <p class="mb-3"><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo ?? '-'}%</p>
               <div class="d-flex gap-2">
                 <a href="docDetalle.html?id=${doc.idDocVehiculo}" class="btn btn-primary btn-sm">Ver detalle</a>
               </div>
