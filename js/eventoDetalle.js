@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p><strong>Descripción:</strong> ${ev.descripcion || '—'}</p>
       <p><strong>Kilometraje:</strong> ${ev.kilometrajeEvento ?? '—'} Km</p>
       <p><strong>Tipo de evento:</strong> ${ev.tipoEvento ?? '—'}</p>
-      <p><strong>Validado por tercero:</strong> ${ev.validadoPorTercero ? 'Sí' : 'No'}</p>
       <p><strong>Fecha del evento:</strong> ${ev.fechaEvento ?? '—'}</p>
       <hr/>
 

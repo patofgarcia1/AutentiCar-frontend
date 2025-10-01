@@ -60,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
       titulo: datos.titulo,
       descripcion: datos.descripcion,
       kilometrajeEvento: parseInt(datos.kilometrajeEvento, 10),
-      validadoPorTercero: datos.validadoPorTercero === 'on',
       tipoEvento: String(datos.tipoEvento).toUpperCase(), 
       //usuarioId: parseInt(usuarioId, 10),
       vehiculoId: parseInt(vehiculoId, 10),
