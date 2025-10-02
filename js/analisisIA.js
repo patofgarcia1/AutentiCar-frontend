@@ -107,4 +107,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error(e);
     msg.innerHTML = `<div class="alert alert-danger">No se pudo cargar el análisis.</div>`;
   }
+  
 });
