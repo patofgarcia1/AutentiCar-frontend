@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const vId = data?.vehiculoId ?? vehiculoId; 
 
-       await closeSpinner();
+      await closeSpinner();
 
       //await docsUI.reload?.();
       showMsg('Documento subido con éxito.', 'success');
