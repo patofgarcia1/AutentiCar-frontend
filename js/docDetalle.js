@@ -187,4 +187,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     titulo.textContent = "Error";
     info.innerHTML = `<div class="alert alert-danger">No se pudo conectar con el servidor.</div>`;
   }
+  
 });
