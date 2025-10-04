@@ -48,13 +48,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const rol = (localStorage.getItem('rol') || '').toUpperCase();
     const esTaller = rol === 'TALLER';
 
+    //<button class="btn btn-outline-primary m-1" id="btn-compras">Mis Compras</button>
+    //<button class="btn btn-outline-secondary m-1" id="btn-ventas">Mis Ventas</button>
+
     const botones = esTaller
       ? `
         <button class="btn btn-outline-info m-1" id="btn-eventos">Mis Eventos</button>
       `
       : `
-        <button class="btn btn-outline-primary m-1" id="btn-compras">Mis Compras</button>
-        <button class="btn btn-outline-secondary m-1" id="btn-ventas">Mis Ventas</button>
         <button class="btn btn-outline-success m-1" id="btn-vehiculos">Mis Vehículos</button>
         <button class="btn btn-outline-warning m-1" id="btn-publicaciones">Mis Publicaciones</button>
         <button class="btn btn-outline-info m-1" id="btn-eventos">Mis Eventos</button>
