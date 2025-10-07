@@ -46,7 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
       motor: parseFloat(datos.motor),
       color: datos.color,
       tipoCombustible: datos.tipoCombustible,
-      tipoTransmision: datos.tipoTransmision
+      tipoTransmision: datos.tipoTransmision,
+      allowedToSee: datos.allowedToSee
       // NO ponemos usuarioId acá por defecto
     };
 

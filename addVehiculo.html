@@ -54,6 +54,17 @@
           <label class="form-label">Transmisión</label>
           <input type="text" class="form-control" name="tipoTransmision" required>
         </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label d-block">¿Quien puede ver el historial del auto?</label>
+          <div class="btn-group" role="group">
+            <input class="btn-check" type="radio" name="allowedToSee" id="usuarioRegistrado" value="REGISTRADO" checked>
+            <label class="btn btn-outline-primary" for="usuarioRegistrado">Usuarios Registrados</label>
+
+            <input class="btn-check" type="radio" name="allowedToSee" id="usuarioValidado" value="VALIDADO">
+            <label class="btn btn-outline-primary" for="usuarioValidado">Usuarios Validados</label>
+          </div>
+        </div>
       </div>
       <div id="grp-usuario-destino" class="mb-3 d-none">
         <label for="usuarioIdDestino" class="form-label">Usuario destino (ID)</label>
