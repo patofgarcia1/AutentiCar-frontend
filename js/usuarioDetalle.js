@@ -83,7 +83,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       ` : ''}
 
       ${nivel === 'RECHAZADO' ? `
-        <div class="alert alert-danger mt-3">Usuario rechazado.</div>
+        <div class="alert alert-danger mt-3">
+          Usuario rechazado. Valídate nuevamente <a href="validacionUsuario.html" class="alert-link">acá</a>.
+        </div>
       ` : ''}
 
       <div class="mt-4">
