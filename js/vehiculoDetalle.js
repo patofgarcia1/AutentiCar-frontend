@@ -2,13 +2,15 @@ import { URL_API } from '../constants/database.js';
 import { initGaleriaImagenes } from './components/imagenes.js';
 import { isAdmin, isUser, getSession } from './roles.js';
 
+// Regla de visibilidad SIN dueño
+
+
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const vehiculoId = params.get('id');
   const titulo = document.getElementById('titulo');
   const info = document.getElementById('info');
-  //const token = localStorage.getItem("token");
-
+  const usuarioId = localStorage.getItem('usuarioId');
 
   if (!vehiculoId) {
     titulo.textContent = "Error";
@@ -32,16 +34,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     const v = await response.json();
 
-    console.log('vehiculo payload =>', v);
-
     titulo.textContent = `${v.marca} ${v.modelo} (${v.anio})`;
 
-    const { token, userId: loggedIdRaw } = getSession() || {};
+    const allowed = ((v.allowedToSee || 'REGISTRADO') + '').toUpperCase();
+
+    const token = localStorage.getItem('token');
     const isLogged = !!token;
-    const loggedId = (loggedIdRaw != null) ? Number(loggedIdRaw) : null;
+
+    const ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null;
+    const userIdStr = localStorage.getItem('usuarioId');
+    const userIdNum = userIdStr != null ? Number(userIdStr) : null;
+    const isOwner = isLogged && ownerId != null && userIdNum === ownerId;
+
+    let nivelUsuarioLog = 'REGISTRADO';
+    if (isLogged && userIdNum != null) {
+      try {
+        const resp = await fetch(`${URL_API}/usuarios/publico/${userIdNum}`, {
+          headers: { 
+            'Accept': 'application/json', 
+            'Cache-Control': 'no-cache' 
+          },
+          cache: 'no-store'
+        });
+        if (resp.ok) {
+          const pub = await resp.json();
+          if (pub?.nivelUsuario) nivelUsuarioLog = norm(pub.nivelUsuario);
+        }
+      } catch (e) {
+        console.warn('No se pudo obtener nivelUsuario público:', e);
+      }
+    }
+
+    function canSee(allowedVal, nivelVal) {
+      const a = (allowedVal || 'REGISTRADO').toString().toUpperCase();
+      const n = (nivelVal || 'REGISTRADO').toString().toUpperCase();
+      if (a === 'VALIDADO') return n === 'VALIDADO';
+      return n === 'REGISTRADO' || n === 'VALIDADO'; // allowed = REGISTRADO
+    }
+
+    const puedeVerHistorial = isLogged && (isOwner || canSee(allowed, nivelUsuarioLog));
 
     // Links solo si está logueado
-    const linksHtml = isLogged
+    const linksHtml = puedeVerHistorial
       ? `
         <div class="gap-2 mb-3">
           <a href="docsVehiculo.html?id=${v.idVehiculo}" class="btn btn-primary flex-fill">Ver documentos</a>
@@ -60,11 +94,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       ${linksHtml}
     `;
 
-    // Dueño del vehículo según tu DTO (VehiculosDTO.idUsuario)
-    const ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null;
-
-    const canManageImages = isLogged && (isAdmin() || (isUser() && ownerId != null && loggedId === ownerId));
-    const puedeEliminar = isLogged && (isAdmin() || (isUser() && ownerId != null && loggedId === ownerId));
+    const canManageImages = isLogged && (isAdmin() || (isUser() && ownerId != null && userIdNum === ownerId));
+    const puedeEliminar = isLogged && (isAdmin() || (isUser() && ownerId != null && userIdNum === ownerId));
 
     let acciones = document.getElementById('acciones-vehiculo');
     if (!acciones) {
@@ -82,7 +113,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const authHeaders = token ? { Authorization: `Bearer ${token}` } : undefined;
 
-    // Inicializa galería de imágenes
     const root = document.getElementById('imagenes-root');
     initGaleriaImagenes({
       root,
@@ -93,7 +123,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       authHeaders,
     });
 
-    // Handler de eliminación de vehículo
     const btnEliminarVehiculo = document.getElementById('btnEliminarVehiculo');
     btnEliminarVehiculo?.addEventListener('click', async () => {
       if (!confirm('¿Seguro que querés eliminar este vehículo?')) return;
@@ -132,7 +161,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         showMsg('Vehículo eliminado.', 'success');
-        // alert('Vehículo eliminado.');
         setTimeout(() => {
             window.location.href = 'misVehiculos.html';
         }, 1000);
