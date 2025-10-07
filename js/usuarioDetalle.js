@@ -44,6 +44,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const usuario = await response.json();
 
+    const nivel = (usuario.nivelUsuario || 'REGISTRADO').toUpperCase();
+
+
     // rol desde el login 
     const rol = (localStorage.getItem('rol') || '').toUpperCase();
     const esTaller = rol === 'TALLER';
@@ -64,6 +67,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p><strong>Nombre:</strong> ${usuario.nombre}</p>
       <p><strong>Apellido:</strong> ${usuario.apellido}</p>
       <p><strong>Email:</strong> ${usuario.mail}</p>
+
+      ${nivel === 'REGISTRADO' ? `
+        <div class="alert alert-warning mt-3" role="alert">
+          Usuario no validado. Valídate <a href="validacionUsuario.html" class="alert-link">acá</a>.
+        </div>
+      ` : ''}
+
+      ${nivel === 'PENDIENTE' ? `
+        <div class="alert alert-info mt-3">Tu verificación está en revisión.</div>
+      ` : ''}
+
+      ${nivel === 'VALIDADO' ? `
+        <div class="alert alert-success mt-3">Usuario validado.</div>
+      ` : ''}
+
+      ${nivel === 'RECHAZADO' ? `
+        <div class="alert alert-danger mt-3">Usuario rechazado.</div>
+      ` : ''}
 
       <div class="mt-4">
         ${botones}
