@@ -115,8 +115,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderBotones(estadoActual) {
 
-      console.log({ loggedId, ownerId, roleToken: sess?.role, localRole: localStorage.getItem('rol') });
-
       const btnToggleHtml =
         (puedeToggle && (estadoActual === 'ACTIVA' || estadoActual === 'PAUSADA'))
           ? (estadoActual === 'ACTIVA'

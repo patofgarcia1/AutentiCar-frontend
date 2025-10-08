@@ -6,11 +6,128 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const PLACEHOLDER = 'https://dummyimage.com/600x400/efefef/aaaaaa&text=Sin+foto';
 
-  // Mostrar/ocultar botón "Agregar vehículo"
-  const btnAdd = document.getElementById('btn-agregar-vehiculo');
-  showIf(btnAdd, isAdmin() || isUser()); // visitors y taller NO lo ven
+  function ensureLimitModals() {
+    if (!document.getElementById('limitModal')) {
+      document.body.insertAdjacentHTML('beforeend', `
+        <!-- Modal 1: aviso límite -->
+        <div class="modal fade" id="limitModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Límite alcanzado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <p class="mb-0">
+                  No podés realizar más publicaciones. 
+                  Chequeá nuestras <a href="#" id="linkOfertas" class="link-primary">ofertas</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-  // Mismo helper que usás en misVehiculos.js para achicar/optimizar la imagen de Cloudinary
+        <!-- Modal 2: ofertas -->
+        <div class="modal fade" id="ofertasModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Planes disponibles</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                      <h5 class="mb-1">Plan Plus</h5>
+                      <p class="text-muted mb-2">$precio</p>
+                      <p class="mb-3">Incluye hasta <strong>20 publicaciones</strong>.</p>
+                      <button class="btn btn-primary w-100" id="btnPlanPlus">Suscribirme</button>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="border rounded p-3 h-100">
+                      <h5 class="mb-1">Plan Premium</h5>
+                      <p class="text-muted mb-2">$precio</p>
+                      <p class="mb-3">Incluye hasta <strong>100 publicaciones</strong>.</p>
+                      <button class="btn btn-primary w-100" id="btnPlanPremium">Suscribirme</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `);
+
+      // wire del link "ofertas": cerrar la primera y abrir la segunda
+      document.getElementById('linkOfertas')?.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        const m1 = bootstrap.Modal.getOrCreateInstance(document.getElementById('limitModal'));
+        const m2 = bootstrap.Modal.getOrCreateInstance(document.getElementById('ofertasModal'), { backdrop: 'static' });
+        m1.hide();
+        // mostrar la segunda después de un pequeño delay para evitar solapado de backdrops
+        setTimeout(() => m2.show(), 200);
+      });
+    }
+  }
+
+  const btnAdd = document.getElementById('btn-agregar-vehiculo');
+  showIf(btnAdd, isAdmin() || isUser()); 
+
+  ensureLimitModals();
+
+  btnAdd?.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    const usuarioId = localStorage.getItem('usuarioId');
+    if (!usuarioId) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    try {
+      const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/publicaciones/count`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        },
+        cache: 'no-store'
+      });
+
+      if (!resp.ok) {
+        window.location.href = 'addVehiculo.html';
+        return;
+      }
+
+      const data = await resp.json();
+      const count  = Number(data?.count);
+      const limit  = Number(data?.limit ?? 5);
+      const reached = (typeof data?.reached === 'boolean') ? data.reached : (count >= limit);
+
+      if (Number.isNaN(count)) {
+        // respuesta rara => dejamos pasar
+        window.location.href = 'addVehiculo.html';
+        return;
+      }
+
+      if (reached) {
+        // mostrar la modal de límite
+        const modalEl = document.getElementById('limitModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl, { backdrop: 'static' });
+        modal.show();
+      } else {
+        window.location.href = 'addVehiculo.html';
+      }
+    } catch (err) {
+      console.warn('Error al contar publicaciones:', err);
+      // si hay error de red, dejamos pasar
+      window.location.href = 'addVehiculo.html';
+    }
+  });
+
+
   const toThumb = (url) =>
     url ? url.replace('/upload/', '/upload/w_500,h_250,c_fill,f_auto,q_auto/') : null;
 
@@ -65,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const monedaKey = (pub.moneda || 'PESOS').toUpperCase();
       const simbolo = SIMBOLOS[monedaKey] || '$';
       const precioStr = (typeof pub.precio === 'number')
-        ? pub.precio.toLocaleString('es-AR')   // 30.000, 1.200.000, etc.
+        ? pub.precio.toLocaleString('es-AR')  
         : (pub.precio ?? '—');
 
       return `

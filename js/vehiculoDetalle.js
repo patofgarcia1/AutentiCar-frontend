@@ -2,15 +2,11 @@ import { URL_API } from '../constants/database.js';
 import { initGaleriaImagenes } from './components/imagenes.js';
 import { isAdmin, isUser, getSession } from './roles.js';
 
-// Regla de visibilidad SIN dueño
-
-
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const vehiculoId = params.get('id');
   const titulo = document.getElementById('titulo');
   const info = document.getElementById('info');
-  const usuarioId = localStorage.getItem('usuarioId');
 
   if (!vehiculoId) {
     titulo.textContent = "Error";
@@ -69,12 +65,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const a = (allowedVal || 'REGISTRADO').toString().toUpperCase();
       const n = (nivelVal || 'REGISTRADO').toString().toUpperCase();
       if (a === 'VALIDADO') return n === 'VALIDADO';
-      return n === 'REGISTRADO' || n === 'VALIDADO'; // allowed = REGISTRADO
+      return n === 'REGISTRADO' || n === 'VALIDADO'; 
     }
 
     const puedeVerHistorial = isLogged && (isOwner || canSee(allowed, nivelUsuarioLog));
 
-    // Links solo si está logueado
     const linksHtml = puedeVerHistorial
       ? `
         <div class="gap-2 mb-3">
