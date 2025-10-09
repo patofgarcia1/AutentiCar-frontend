@@ -3,8 +3,14 @@ import { isAdmin, isUser, showIf } from './roles.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('lista-publicaciones');
+  const inputQ = document.getElementById('search-q');
+  const form = document.getElementById('search-form');
+  const btnClear = document.getElementById('btn-clear');
+  const chipsMarcas = document.getElementById('chips-marcas');
+  const chipsColores = document.getElementById('chips-colores');
 
   const PLACEHOLDER = 'https://dummyimage.com/600x400/efefef/aaaaaa&text=Sin+foto';
+  const SIMBOLOS = { PESOS: '$', DOLARES: 'U$D' };
 
   function ensureLimitModals() {
     if (!document.getElementById('limitModal')) {
@@ -131,11 +137,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toThumb = (url) =>
     url ? url.replace('/upload/', '/upload/w_500,h_250,c_fill,f_auto,q_auto/') : null;
 
-  // Saca el id del vehículo venga plano o anidado
   const resolveVehiculoId = (pub) =>
     pub?.vehiculoId ?? pub?.vehiculo?.idVehiculo ?? pub?.idVehiculo ?? null;
 
-  // Trae el detalle del vehículo y devuelve la portada en miniatura (o null si no hay)
   async function fetchPortadaVehiculo(vehiculoId) {
     try {
       const vResp = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
@@ -147,22 +151,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  try {
-    const response = await fetch(`${URL_API}/publicaciones`);
-    if (!response.ok) {
-      const errorMsg = await response.text();
-      container.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
-      return;
-    }
-
-    const publicaciones = await response.json();
-
+  // ---------- NUEVO: render separado ----------
+  async function renderPublicaciones(publicaciones) {
     if (!Array.isArray(publicaciones) || publicaciones.length === 0) {
       container.innerHTML = `<div class="alert alert-info">No hay publicaciones disponibles.</div>`;
       return;
     }
 
-    // Traemos en paralelo la portada (si existe) de cada vehículo
+    // Traer portadas en paralelo (si tu backend no las expone ya en el DTO)
     const portadas = await Promise.all(
       publicaciones.map(async (pub) => {
         const vehiculoId = resolveVehiculoId(pub);
@@ -171,31 +167,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       })
     );
 
-    const SIMBOLOS = { PESOS: '$', DOLARES: 'U$D' };
-
-    // Render de tarjetas con imagen (portada o placeholder)
     container.innerHTML = publicaciones.map((pub, i) => {
       const vehiculoId = resolveVehiculoId(pub);
       const imgSrc = portadas[i] || PLACEHOLDER;
       const pubId = pub.idPublicacion ?? pub.id ?? '';
-
       const monedaKey = (pub.moneda || 'PESOS').toUpperCase();
       const simbolo = SIMBOLOS[monedaKey] || '$';
       const precioStr = (typeof pub.precio === 'number')
-        ? pub.precio.toLocaleString('es-AR')  
+        ? pub.precio.toLocaleString('es-AR')
         : (pub.precio ?? '—');
 
       return `
         <div class="col-md-4">
           <div class="card h-100 shadow-sm" style="max-width: 400px; margin:auto">
-          <a href="publicacionDetalle.html?id=${pubId}"> 
-            <img
-              src="${imgSrc}"
-              class="card-img-top"
-              alt="Imagen del vehículo"
-              onerror="this.onerror=null;this.src='${PLACEHOLDER}'"
-            >
-          </a>
+            <a href="publicacionDetalle.html?id=${pubId}">
+              <img
+                src="${imgSrc}"
+                class="card-img-top"
+                alt="Imagen del vehículo"
+                onerror="this.onerror=null;this.src='${PLACEHOLDER}'"
+              >
+            </a>
             <div class="card-body">
               <h5 class="card-title">${pub.titulo ?? 'Publicación'}</h5>
               <p class="card-text">${pub.descripcion ?? ''}</p>
@@ -209,10 +201,106 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       `;
     }).join('');
-
-  } catch (error) {
-    console.error("Error al obtener publicaciones:", error);
-    container.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
   }
-  
+
+  // ---------- NUEVO: función para cargar y renderizar con manejo de errores ----------
+  async function loadPublicaciones(url, { showLoading = true } = {}) {
+    try {
+      if (showLoading) {
+        container.innerHTML = `<div class="text-center py-5">Cargando...</div>`;
+      }
+      const resp = await fetch(url, { headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache' }, cache: 'no-store' });
+      if (!resp.ok) {
+        const errorMsg = await resp.text();
+        container.innerHTML = `<div class="alert alert-danger">${errorMsg || 'Error de servidor'}</div>`;
+        return;
+      }
+      const data = await resp.json();
+      await renderPublicaciones(data);
+    } catch (e) {
+      console.error(e);
+      container.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+    }
+  }
+
+  // ---------- NUEVO: router de búsqueda ----------
+  function endpointFromQuery(q) {
+    const clean = (q || '').trim();
+    if (!clean) return `${URL_API}/publicaciones`;                 // default: listado
+    // Para texto libre, usamos /publicaciones/buscar?q=...
+    return `${URL_API}/publicaciones/buscar?q=${encodeURIComponent(clean)}`;
+  }
+
+  // Submit del form
+  form?.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const q = inputQ?.value || '';
+    loadPublicaciones(endpointFromQuery(q), { showLoading: true });
+  });
+
+  // Botón limpiar
+  btnClear?.addEventListener('click', () => {
+    inputQ.value = '';
+    loadPublicaciones(`${URL_API}/publicaciones`, { showLoading: true });
+  });
+
+  // ---------- (Opcional) Chips de Marcas y Colores ----------
+  async function drawChips() {
+    try {
+      const [mResp, cResp] = await Promise.all([
+        fetch(`${URL_API}/publicaciones/filtros/marcas`),
+        fetch(`${URL_API}/publicaciones/filtros/colores`)
+      ]);
+      const marcas = mResp.ok ? await mResp.json() : [];
+      const colores = cResp.ok ? await cResp.json() : [];
+
+      chipsMarcas.innerHTML = marcas.map(m =>
+        `<button class="btn btn-sm btn-outline-primary" data-marca="${m}">${m}</button>`
+      ).join('');
+
+      chipsColores.innerHTML = colores.map(c =>
+        `<button class="btn btn-sm btn-outline-secondary" data-color="${c}">${c}</button>`
+      ).join('');
+
+      chipsMarcas.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-marca]');
+        if (!b) return;
+        const marca = b.dataset.marca;
+        inputQ.value = ''; // limpiar query libre para que se entienda que está filtrando por chip
+        loadPublicaciones(`${URL_API}/publicaciones/marca/${encodeURIComponent(marca)}`);
+      });
+
+      chipsColores.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-color]');
+        if (!b) return;
+        const color = b.dataset.color;
+        inputQ.value = '';
+        loadPublicaciones(`${URL_API}/publicaciones/color/${encodeURIComponent(color)}`);
+      });
+
+    } catch (err) {
+      console.warn('No se pudieron cargar chips de filtros', err);
+    }
+  }
+
+  // ---------- Carga inicial por defecto ----------
+  // Si venís con ?q= en la URL, lo respeta; si no, lista general
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialQ = urlParams.get('q');
+  if (initialQ) {
+    inputQ.value = initialQ;
+    await loadPublicaciones(endpointFromQuery(initialQ), { showLoading: true });
+  } else {
+    await loadPublicaciones(`${URL_API}/publicaciones`, { showLoading: true });
+  }
+
+  // Cargar chips (opcional)
+  drawChips();
+
+  // ------- (Tu botón agregar vehículo se mantiene igual) -------
+  const btnAddEl = document.getElementById('btn-agregar-vehiculo');
+  btnAddEl?.addEventListener('click', async (e) => {
+    /* ... tu lógica de límite, igual que ya tenías ... */
+  });
+
 });
