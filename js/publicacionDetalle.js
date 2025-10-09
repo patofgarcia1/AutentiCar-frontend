@@ -1,5 +1,13 @@
 import { URL_API } from '../constants/database.js';
-import { isAdmin, isUser, getSession } from './roles.js';
+import { isAdmin, isUser } from './roles.js';
+
+// function getLoggedUserId() {
+//   // tu roles.js ya expone getSession(); lo usás más abajo, pero dejo fallback
+//   const sess = getSession();
+//   if (sess?.userId != null) return Number(sess.userId);
+//   const ui = localStorage.getItem('usuarioId');
+//   return ui != null ? Number(ui) : null;
+// }
 
 // util para mensajes (usa el contenedor global #mensaje)
 function showMsg(html, type = 'info') {
@@ -12,7 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const publicacionId = params.get('id');
   const container = document.getElementById('detalle-publicacion');
-  const token = localStorage.getItem("token");
 
   const simbolos = {
     PESOS: "$",
@@ -85,17 +92,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const acciones = document.getElementById('acciones-publicacion');
     const estadoSpan = document.getElementById('estado-publicacion');
 
+    const token = localStorage.getItem('token');
+    const isLogged = !!token;
+    const usuarioIdStr = localStorage.getItem('usuarioId');
+    const usuarioId = usuarioIdStr != null ? Number(usuarioIdStr) : null;
+
     // === Reglas de visibilidad para Pausar/Activar usando roles.js ===
-    const sess = getSession();
+    //const sess = getSession();
 
     // loggedId: primero del token, si no, del localStorage (compat)
-    let loggedId = null;
-    if (sess?.userId != null) {
-      loggedId = Number(sess.userId);
-    } else {
-      const ui = localStorage.getItem('usuarioId');
-      if (ui != null) loggedId = Number(ui);
-    }
+    // let loggedId = null;
+    // if (sess?.userId != null) {
+    //   loggedId = Number(sess.userId);
+    // } else {
+    //   const ui = localStorage.getItem('usuarioId');
+    //   if (ui != null) loggedId = Number(ui);
+    // }
 
     // ownerId: primero desde la publicación, luego fallback del vehículo
     let ownerId = null;
@@ -108,10 +120,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Puede pausar/activar si es ADMIN o si es USER (particular/concesionaria) y dueño
-    const puedeToggle = isAdmin() || (isUser() && ownerId != null && loggedId === ownerId);
+    const puedeToggle = isAdmin() || (isUser() && ownerId != null && usuarioId  === ownerId);
 
     // Puede eliminar si es ADMIN o dueño del auto
-    const puedeEliminar = isAdmin() || (ownerId != null && loggedId === ownerId);
+    const puedeEliminar = isAdmin() || (ownerId != null && usuarioId  === ownerId);
 
     function renderBotones(estadoActual) {
 
@@ -222,8 +234,86 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
+    async function renderFavorito(publicacionId) {
+      if (!acciones) return;
+
+      const logged = isLogged;
+      let esFav = false;
+
+      if (logged && usuarioId != null) {
+        try {
+          const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/favoritos/check/${publicacionId}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json',
+              'Cache-Control': 'no-cache'
+            },
+            cache: 'no-store'
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            esFav = !!data?.favorito;
+          }
+        } catch (e) {
+          console.warn('No se pudo verificar favorito:', e);
+        }
+      }
+
+      const btnId = 'btn-favorito';
+      acciones.insertAdjacentHTML('afterbegin', `
+        <button id="${btnId}" class="btn ${esFav ? 'btn-danger' : 'btn-outline-danger'}">
+          <span class="me-1" aria-hidden="true">${esFav ? '❤' : '♡'}</span>
+          <span class="fav-label">${esFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}</span>
+        </button>
+      `);
+
+      const btnFav = document.getElementById(btnId);
+      btnFav.addEventListener('click', async () => {
+        if (!logged || usuarioId == null) {
+          window.location.href = 'login.html';
+          return;
+        }
+        btnFav.disabled = true;
+        const wasFav = esFav;
+        try {
+          const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/favoritos/${publicacionId}`, {
+            method: wasFav ? 'DELETE' : 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json'
+            }
+          });
+
+          if (resp.status === 401 || resp.status === 403) {
+            showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
+            return;
+          }
+          if (!resp.ok) {
+            const txt = await resp.text();
+            showMsg(txt || 'No se pudo actualizar favoritos', 'danger');
+            return;
+          }
+
+          esFav = !wasFav;
+          btnFav.querySelector('.fav-label').textContent = esFav ? 'Quitar de favoritos' : 'Agregar a favoritos';
+          btnFav.classList.toggle('btn-danger', esFav);
+          btnFav.classList.toggle('btn-outline-danger', !esFav);
+          btnFav.querySelector('span[aria-hidden="true"]').textContent = esFav ? '❤' : '♡';
+          showMsg(esFav ? 'Agregado a favoritos' : 'Quitado de favoritos', 'success');
+        } catch (e) {
+          console.error('Favoritos error:', e);
+          showMsg('Error al actualizar favoritos', 'danger');
+        } finally {
+          btnFav.disabled = false;
+        }
+      });
+    }
+
     // Primer render de botones
     renderBotones(publicacion.estadoPublicacion);
+
+    await renderFavorito(publicacionId);
 
   } catch (error) {
     console.error("Error al obtener detalles de la publicación:", error);
