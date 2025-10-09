@@ -39,17 +39,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="row g-3">
                   <div class="col-md-6">
                     <div class="border rounded p-3 h-100">
-                      <h5 class="mb-1">Plan Plus</h5>
-                      <p class="text-muted mb-2">$precio</p>
-                      <p class="mb-3">Incluye hasta <strong>20 publicaciones</strong>.</p>
+                      <h5 class="mb-1">Plan Premium Mensual</h5>
+                      <p class="text-muted mb-2">usd 10</p>
+                      <p class="mb-3">Incluye: <strong>Publicaciones ilimitadas</strong>.</p>
                       <button class="btn btn-primary w-100" id="btnPlanPlus">Suscribirme</button>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="border rounded p-3 h-100">
-                      <h5 class="mb-1">Plan Premium</h5>
-                      <p class="text-muted mb-2">$precio</p>
-                      <p class="mb-3">Incluye hasta <strong>100 publicaciones</strong>.</p>
+                      <h5 class="mb-1">Plan Premium Anual</h5>
+                      <p class="text-muted mb-2">usd 110</p>
+                      <p class="mb-3">Incluye: <strong>Publicaciones ilimitadas</strong>.</p>
                       <button class="btn btn-primary w-100" id="btnPlanPremium">Suscribirme</button>
                     </div>
                   </div>
