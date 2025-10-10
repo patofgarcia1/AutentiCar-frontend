@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadPublicaciones(`${URL_API}/publicaciones`, { showLoading: true });
   });
 
-  // ---------- (Opcional) Chips de Marcas y Colores ----------
+  // Chips de Marcas y Colores ----------
   async function drawChips() {
     try {
       const [mResp, cResp] = await Promise.all([
