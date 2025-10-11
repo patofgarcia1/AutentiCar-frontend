@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const liPerfil   = document.getElementById('nav-perfil');
   const liLogout   = document.getElementById('nav-logout');
   const logoutLink = document.getElementById('logoutLink');
+  const liFavoritos = document.getElementById('nav-favoritos');
 
   const liAdminUsuarios  = document.getElementById('nav-admin-usuarios');
   const liAdminVehiculos = document.getElementById('nav-admin-vehiculos');
@@ -31,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (hasSession) {
     liLogin?.classList.add('d-none');
     liRegister?.classList.add('d-none');
+    liFavoritos?.classList.remove('d-none');
     liPerfil?.classList.remove('d-none');
     liLogout?.classList.remove('d-none');
 
@@ -49,6 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     liLogout?.classList.add('d-none');
     liAdminUsuarios?.classList.add('d-none');
     liAdminVehiculos?.classList.add('d-none');
+    liFavoritos?.classList.add('d-none');
   }
 
   // Logout
