@@ -313,6 +313,51 @@ header.bg-primary {
   opacity: 0.95;
 }
 
+/* REGISTRO */
+
+.register-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  padding: 2.5rem 3rem;
+  width: 100%;
+  max-width: 640px; /* más ancha que el login */
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.register-card select.login-input {
+  background-color: #fff;
+  color: #111827;
+  appearance: none;
+}
+
 /* 
 responsive */
 
@@ -321,5 +366,11 @@ responsive */
   .input-group .btn {
     border-radius: 0.5rem !important;
     margin-top: .5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    flex-direction: column;
   }
 }
