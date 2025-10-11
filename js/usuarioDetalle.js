@@ -1,7 +1,14 @@
 import { URL_API } from '../constants/database.js';
 
 const mensaje = document.getElementById("mensaje");
-function showMsg(html, type='info') {
+const avatar = document.querySelector('.profile-avatar-circle');
+const userNombre = document.getElementById('user-nombre');
+const userEmail = document.getElementById('user-email');
+const userTel = document.getElementById('user-tel');
+const nivelContainer = document.getElementById('nivel-container');
+const accionesContainer = document.getElementById('acciones-container');
+
+function showMsg(html, type = 'info') {
   if (!mensaje) return;
   mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
 }
@@ -9,15 +16,13 @@ function showMsg(html, type='info') {
 document.addEventListener('DOMContentLoaded', async () => {
   const usuarioId = localStorage.getItem("usuarioId");
   const token = localStorage.getItem("token");
-  const container = document.getElementById('usuario-detalle');
 
   if (!usuarioId) {
-    container.innerHTML = `<div class="alert alert-warning">No se encontró un usuario logueado.</div>`;
+    showMsg("No se encontró un usuario logueado.", "warning");
     return;
   }
   if (!token) {
-    container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
-    // opcional: window.location.href = 'login.html';
+    showMsg("Sesión no válida. Iniciá sesión nuevamente.", "warning");
     return;
   }
 
@@ -31,79 +36,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     if (response.status === 401 || response.status === 403) {
-      container.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
-      // opcional: window.location.href = 'login.html';
+      showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
       return;
     }
-    
+
     if (!response.ok) {
       const errorMsg = await response.text();
-      container.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
+      showMsg(errorMsg || "Error al obtener datos del usuario", "danger");
       return;
     }
 
     const usuario = await response.json();
 
     const nivel = (usuario.nivelUsuario || 'REGISTRADO').toUpperCase();
-
-
-    // rol desde el login 
     const rol = (localStorage.getItem('rol') || '').toUpperCase();
     const esTaller = rol === 'TALLER';
 
-    const botones = esTaller
-      ? `
-        <button class="btn btn-outline-info m-1" id="btn-eventos">Mis Eventos</button>
-      `
-      : `
-        <button class="btn btn-outline-primary m-1" id="btn-compras">Mis Compras</button>
-        <button class="btn btn-outline-secondary m-1" id="btn-ventas">Mis Ventas</button>
-        <button class="btn btn-outline-success m-1" id="btn-vehiculos">Mis Vehículos</button>
-        <button class="btn btn-outline-warning m-1" id="btn-publicaciones">Mis Publicaciones</button>
-        <button class="btn btn-outline-info m-1" id="btn-eventos">Mis Eventos</button>
-      `;
+    // Mostrar datos
+    userNombre.textContent = `${usuario.nombre} ${usuario.apellido}`;
+    userEmail.textContent = usuario.mail;
+    if (usuario.telefonoCelular) {
+      userTel.textContent = usuario.telefonoCelular;
+    }
 
-    container.innerHTML = `
-      <p><strong>Nombre:</strong> ${usuario.nombre}</p>
-      <p><strong>Apellido:</strong> ${usuario.apellido}</p>
-      <p><strong>Email:</strong> ${usuario.mail}</p>
+    // Imagen (placeholder, por ahora)
+    avatar.style.backgroundImage = 'url("img/avatar-placeholder.png")'; // imagen de prueba
 
-      ${nivel === 'REGISTRADO' ? `
+    // Mostrar nivel de usuario
+    if (nivel === 'REGISTRADO') {
+      nivelContainer.innerHTML = `
         <div class="alert alert-warning mt-3" role="alert">
           Usuario no validado. Valídate <a href="validacionUsuario.html" class="alert-link">acá</a>.
         </div>
-      ` : ''}
-
-      ${nivel === 'PENDIENTE' ? `
-        <div class="alert alert-info mt-3">Tu verificación está en revisión.</div>
-      ` : ''}
-
-      ${nivel === 'VALIDADO' ? `
-        <div class="alert alert-success mt-3">Usuario validado.</div>
-      ` : ''}
-
-      ${nivel === 'RECHAZADO' ? `
+      `;
+    } else if (nivel === 'PENDIENTE') {
+      nivelContainer.innerHTML = `<div class="alert alert-info mt-3">Tu verificación está en revisión.</div>`;
+    } else if (nivel === 'VALIDADO') {
+      nivelContainer.innerHTML = `<div class="alert alert-success mt-3">Usuario validado.</div>`;
+    } else if (nivel === 'RECHAZADO') {
+      nivelContainer.innerHTML = `
         <div class="alert alert-danger mt-3">
           Usuario rechazado. Valídate nuevamente <a href="validacionUsuario.html" class="alert-link">acá</a>.
         </div>
-      ` : ''}
+      `;
+    }
 
-      <div class="mt-4">
-        ${botones}
-      </div>
+    // Botones dinámicos
+    const botonesHTML = esTaller
+      ? `
+        <button id="btn-eventos" class="btn-primary-full">Mis Eventos</button>
+      `
+      : `
+        <button id="btn-vehiculos" class="btn-primary-full">Mis Vehículos</button>
+        <button id="btn-publicaciones" class="btn-primary-full">Mis Publicaciones</button>
+        <button id="btn-eventos" class="btn-primary-full">Mis Eventos</button>
+      `;
+    accionesContainer.innerHTML = botonesHTML;
 
-      <div class="mt-4">
-        <button class="btn btn-danger" id="btn-eliminar">Eliminar Cuenta</button>
-      </div>
-    `;
-
-    // 2) Listeners (solo si existen los botones)
-    document.getElementById('btn-compras')?.addEventListener('click', () => {
-      window.location.href = `misCompras.html?usuario=${usuarioId}`;
-    });
-    document.getElementById('btn-ventas')?.addEventListener('click', () => {
-      window.location.href = `misVentas.html?usuario=${usuarioId}`;
-    });
+    // Listeners
     document.getElementById('btn-vehiculos')?.addEventListener('click', () => {
       window.location.href = `misVehiculos.html?usuario=${usuarioId}`;
     });
@@ -114,39 +104,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       window.location.href = `misEventos.html?usuario=${usuarioId}`;
     });
 
-
     // Eliminar cuenta
     const btnEliminar = document.getElementById('btn-eliminar');
     btnEliminar.addEventListener('click', async () => {
-      const confirmDelete = confirm("¿Seguro quieres eliminar tu cuenta?");
+      const confirmDelete = confirm("¿Seguro querés eliminar tu cuenta?");
       if (!confirmDelete) return;
 
       btnEliminar.textContent = "Eliminando...";
       btnEliminar.disabled = true;
 
       try {
-        const deleteResp = await fetch(`${URL_API}/usuarios/${usuarioId}`, 
-          { method: 'DELETE',
-            headers: {
-              'Authorization': `Bearer ${token}`,   
-              'Accept': 'application/json'
-            } 
-          });
-        const txt = await deleteResp.text();           // <— lee SIEMPRE el body
+        const deleteResp = await fetch(`${URL_API}/usuarios/${usuarioId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+
+        const txt = await deleteResp.text();
 
         if (deleteResp.status === 401 || deleteResp.status === 403) {
           showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
-          btnEliminar.textContent = "Eliminar Cuenta";
+          btnEliminar.textContent = "Eliminar cuenta";
           btnEliminar.disabled = false;
           return;
         }
 
         if (!deleteResp.ok) {
-            console.error('Eliminar cuenta falló:', txt);
-            showMsg(txt || "Error al eliminar usuario", "danger");
-            btnEliminar.textContent = "Eliminar Cuenta";
-            btnEliminar.disabled = false;
-            return;
+          showMsg(txt || "Error al eliminar usuario", "danger");
+          btnEliminar.textContent = "Eliminar cuenta";
+          btnEliminar.disabled = false;
+          return;
         }
 
         showMsg("Usuario eliminado correctamente", "success");
@@ -155,18 +144,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         setTimeout(() => {
           window.location.href = "index.html";
-        }, 2000);   
-
+        }, 2000);
       } catch (err) {
         console.error("Error al eliminar usuario:", err);
         showMsg("Error de conexión con el servidor", "danger");
-        btnEliminar.textContent = "Eliminar Cuenta";
+        btnEliminar.textContent = "Eliminar cuenta";
         btnEliminar.disabled = false;
       }
     });
 
   } catch (error) {
-    container.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
     console.error("Error fetching user:", error);
+    showMsg("Error al conectar con el servidor.", "danger");
   }
 });
