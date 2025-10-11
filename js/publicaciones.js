@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('lista-publicaciones');
   const inputQ = document.getElementById('search-q');
   const form = document.getElementById('search-form');
-  const btnClear = document.getElementById('btn-clear');
   const chipsMarcas = document.getElementById('chips-marcas');
   const chipsColores = document.getElementById('chips-colores');
 
@@ -178,23 +177,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         : (pub.precio ?? '—');
 
       return `
-        <div class="col-md-4">
-          <div class="card h-100 shadow-sm" style="max-width: 400px; margin:auto">
+        <div class="col">
+          <div class="card card-auto h-100 border-0 shadow-sm">
             <a href="publicacionDetalle.html?id=${pubId}">
-              <img
-                src="${imgSrc}"
-                class="card-img-top"
-                alt="Imagen del vehículo"
-                onerror="this.onerror=null;this.src='${PLACEHOLDER}'"
-              >
+              <img src="${imgSrc}" class="card-img-top rounded-top" alt="Imagen del vehículo"
+                onerror="this.onerror=null;this.src='${PLACEHOLDER}'" />
             </a>
-            <div class="card-body">
-              <h5 class="card-title">${pub.titulo ?? 'Publicación'}</h5>
-              <p class="card-text">${pub.descripcion ?? ''}</p>
-              <p class="card-text"><strong>Precio:</strong> ${simbolo} ${precioStr}</p>
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title text-dark fw-bold">${pub.titulo ?? 'Publicación'}</h5>
+              <p class="card-text text-muted small">${pub.descripcion ?? ''}</p>
+              <p class="precio mt-auto mb-3">${simbolo} ${precioStr}</p>
               <div class="d-flex gap-2">
                 <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
-                ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ``}
+                ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ''}
               </div>
             </div>
           </div>
@@ -206,9 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------- NUEVO: función para cargar y renderizar con manejo de errores ----------
   async function loadPublicaciones(url, { showLoading = true } = {}) {
     try {
-      if (showLoading) {
-        container.innerHTML = `<div class="text-center py-5">Cargando...</div>`;
-      }
+      if (showLoading) container.innerHTML = `<div class="text-center py-5">Cargando...</div>`;
       const resp = await fetch(url, { headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache' }, cache: 'no-store' });
       if (!resp.ok) {
         const errorMsg = await resp.text();
@@ -226,22 +219,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------- NUEVO: router de búsqueda ----------
   function endpointFromQuery(q) {
     const clean = (q || '').trim();
-    if (!clean) return `${URL_API}/publicaciones`;                 // default: listado
-    // Para texto libre, usamos /publicaciones/buscar?q=...
+    if (!clean) return `${URL_API}/publicaciones`;                 
     return `${URL_API}/publicaciones/buscar?q=${encodeURIComponent(clean)}`;
   }
 
   // Submit del form
   form?.addEventListener('submit', (ev) => {
     ev.preventDefault();
-    const q = inputQ?.value || '';
-    loadPublicaciones(endpointFromQuery(q), { showLoading: true });
-  });
-
-  // Botón limpiar
-  btnClear?.addEventListener('click', () => {
-    inputQ.value = '';
-    loadPublicaciones(`${URL_API}/publicaciones`, { showLoading: true });
+    loadPublicaciones(endpointFromQuery(inputQ?.value), { showLoading: true });
   });
 
   // Chips de Marcas y Colores ----------
@@ -254,19 +239,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       const marcas = mResp.ok ? await mResp.json() : [];
       const colores = cResp.ok ? await cResp.json() : [];
 
-      chipsMarcas.innerHTML = marcas.map(m =>
-        `<button class="btn btn-sm btn-outline-primary" data-marca="${m}">${m}</button>`
-      ).join('');
+      // === NUEVO: render tipo "brand card" ===
+      chipsMarcas.classList.add('brand-grid');
+      chipsMarcas.innerHTML = marcas.map(m => {
+        const safeName = m.replace(/\s+/g, '').toLowerCase();
+        const imgSrc = `img/${safeName}.png`; // ej: img/mercedesbenz.png
+        return `
+          <div class="brand-card" data-marca="${m}">
+            <img src="${imgSrc}" alt="${m}" onerror="this.src='img/default_brand.png'">
+            <span>${m}</span>
+          </div>
+        `;
+      }).join('');
 
+      // Mantener chips de colores normales
       chipsColores.innerHTML = colores.map(c =>
-        `<button class="btn btn-sm btn-outline-secondary" data-color="${c}">${c}</button>`
+        `<button class="chip chip-secondary" data-color="${c}">${c}</button>`
       ).join('');
 
+      // Listeners de click
       chipsMarcas.addEventListener('click', (e) => {
-        const b = e.target.closest('button[data-marca]');
-        if (!b) return;
-        const marca = b.dataset.marca;
-        inputQ.value = ''; // limpiar query libre para que se entienda que está filtrando por chip
+        const card = e.target.closest('.brand-card');
+        if (!card) return;
+        const marca = card.dataset.marca;
+        inputQ.value = ''; 
         loadPublicaciones(`${URL_API}/publicaciones/marca/${encodeURIComponent(marca)}`);
       });
 
@@ -282,6 +278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.warn('No se pudieron cargar chips de filtros', err);
     }
   }
+
 
   // ---------- Carga inicial por defecto ----------
   // Si venís con ?q= en la URL, lo respeta; si no, lista general
