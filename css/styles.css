@@ -522,3 +522,7 @@ responsive */
     padding: 2rem;
   }
 }
+
+@media (max-width: 480px) {
+  .icono-dni { width: 65%; height: 65%; }
+}
