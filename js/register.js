@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
-            // intento parsear JSON; si viene texto plano, lo muestro igual
             const readBody = async (res) => {
                 const text = await res.text();
                 try { return JSON.parse(text); } catch { return { ok: res.ok, mensaje: text }; }
@@ -45,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await readBody(response);
 
             if (response.ok && (data.ok === true || data.ok === undefined)) {
-                // éxito
                 mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje || 'Usuario registrado con éxito'}</div>`;
 
                 const usuario = data.usuario || {};
@@ -64,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
             } else {
-                // error controlado del backend
                 const errMsg = data?.mensaje || 'Error en el registro';
                 mensaje.innerHTML = `<div class="alert alert-danger">${errMsg}</div>`;
             }
