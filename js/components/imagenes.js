@@ -27,18 +27,16 @@ export function initGaleriaImagenes({
 
   // Estructura base
   root.innerHTML = `
-    <section class="mt-4">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h2 class="h5 m-0">${titulo}</h2>
-        ${allowUpload ? `
-          <div>
-            <input id="fileInput" type="file" accept="image/*" multiple hidden />
-            <button id="btnSubir" class="btn btn-outline-primary btn-sm">Agregar imágenes</button>
-          </div>` : ``}
-      </div>
+    <section class="mt-4 text-center">
+      <p id="galeriaLeyenda" class="text-gray-700 mb-1">Sube aquí las fotos del vehículo.</p>
+      <p id="imagenesEstado" class="text-gray-500 text-sm mb-3">0/30 imágenes</p>
 
-      <div id="galeria" class="row g-2"></div>
-      <div id="imagenesEstado" class="text-muted small mt-2"></div>
+      ${allowUpload ? `
+        <input id="fileInput" type="file" accept="image/*" multiple hidden />
+        <button id="btnSubir" class="btn btn-outline-primary btn-sm">Agregar imágenes</button>
+      ` : ``}
+
+      <div id="galeria" class="row g-2 mt-4"></div>
     </section>
 
     <div id="slideshow" class="position-fixed top-0 start-0 w-100 h-100 d-none"
@@ -48,18 +46,6 @@ export function initGaleriaImagenes({
       <img id="imagen-slideshow" class="img-fluid" alt="Imagen vehículo" style="max-height: 90vh;"/>
       <button type="button" class="btn btn-light position-absolute end-0 me-3" id="btnNext">›</button>
     </div>
-
-    <style>
-      .gal-item { position: relative; }
-      .btn-del {
-        position: absolute; top: 8px; right: 12px; z-index: 2;
-        border: none; background: rgba(0,0,0,.55); color: #fff; border-radius: 20px;
-        width: 28px; height: 28px; line-height: 28px; text-align: center; cursor: pointer;
-      }
-      #galeria img {
-        width: 100%; height: 180px; object-fit: cover; cursor: pointer; border-radius: .5rem;
-      }
-    </style>
   `;
 
   // Refs
@@ -115,11 +101,19 @@ export function initGaleriaImagenes({
   // --- Render ---
   function renderGrid() {
     galeria.innerHTML = '';
+    const leyenda = root.querySelector('#galeriaLeyenda');
+    const estado = root.querySelector('#imagenesEstado');
+    const contenedor = root.querySelector('section.mt-4');
+
     if (!imagenes.length) {
-      galeria.innerHTML = `<div class="text-muted">Aún no hay imágenes.</div>`;
+     leyenda.style.display = 'block';
       estado.textContent = `0/30 imágenes`;
+      contenedor.appendChild(document.querySelector('#btnSubir'));
       return;
     }
+
+    leyenda.style.display = 'none';
+
     imagenes.forEach((img, i) => {
       const col = document.createElement('div');
       col.className = 'col-6 col-md-4 col-lg-3';
@@ -159,6 +153,9 @@ export function initGaleriaImagenes({
       galeria.appendChild(col);
     });
     estado.textContent = `${imagenes.length}/30 imágenes`;
+
+    contenedor.appendChild(estado);
+    contenedor.appendChild(document.querySelector('#btnSubir'));
   }
 
   // --- Slideshow ---

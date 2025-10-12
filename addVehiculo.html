@@ -66,8 +66,7 @@
             <input type="text" name="tipoTransmision" class="form-input" required />
           </div>
         </div>
-
-        <!-- Quién puede ver -->
+        
         <div class="mt-4">
           <label class="block text-sm font-medium text-gray-700 mb-2">¿Quién puede ver el historial del auto?</label>
           <div class="flex flex-wrap gap-3">
@@ -82,7 +81,6 @@
           </div>
         </div>
 
-        <!-- Solo admin -->
         <div id="grp-usuario-destino" class="hidden">
           <label for="usuarioIdDestino" class="block text-sm font-medium text-gray-700 mb-1 mt-2">Usuario destino (ID)</label>
           <input type="number" min="1" step="1" id="usuarioIdDestino" class="form-input" />
@@ -91,7 +89,6 @@
 
         <div id="mensaje" class="mt-2"></div>
 
-        <!-- Botones -->
         <div class="flex justify-end gap-3 pt-4">
           <button type="button" class="btn-cancel" onclick="window.location.href='index.html'">Cancelar</button>
           <button type="submit" class="btn-success-full">Guardar Vehículo</button>

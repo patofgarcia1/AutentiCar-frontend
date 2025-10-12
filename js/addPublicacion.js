@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     vehiculoId: Number(vehiculoId),
     allowUpload: true,
     allowDelete: true, // o false si no querés borrar acá
-    titulo: 'Imágenes para la publicación',
+    titulo: '',
     authHeaders: { Authorization: `Bearer ${token}` },
     onChange: (imgs) => {
       // opcional: feedback, contador, etc.
