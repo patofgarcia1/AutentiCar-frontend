@@ -609,6 +609,43 @@ header.bg-primary {
 }
 
 
+/* --- Mis Favoritos --- */
+.favorito-card {
+  border-radius: 16px !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  margin-bottom: 20px; 
+}
+
+.favorito-card:hover {
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+  transform: translateY(-1px);
+  transition: box-shadow .25s ease, transform .25s ease;
+}
+
+.favorito-thumb {
+  width: 280px;         
+  height: 140px;        
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.favorito-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    
+  display: block;
+}
+
+.favorito-item {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.favorito-item:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+
 /* 
 responsive */
 
@@ -634,4 +671,11 @@ responsive */
 
 @media (max-width: 480px) {
   .icono-dni { width: 65%; height: 65%; }
+}
+
+@media (max-width: 767.98px) {
+  .favorito-thumb {
+    width: 100%;
+    height: 200px;
+  }
 }

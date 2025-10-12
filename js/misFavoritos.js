@@ -87,28 +87,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         ? pub.precio.toLocaleString('es-AR')
         : (pub.precio ?? '—');
 
-
       return `
-        <div class="col">
-          <div class="card h-100 shadow-sm">
-            <a href="publicacionDetalle.html?id=${pubId}" style="display:block">
-              <img
-                src="${imgSrc}"
-                class="card-img-top"
-                alt="Imagen del vehículo"
-                onerror="this.onerror=null;this.src='${PLACEHOLDER}'"
-              >
-            </a>
-            <div class="card-body">
-              <h5 class="card-title">${pub.titulo ?? 'Publicación'}</h5>
-              <p class="card-text">${pub.descripcion ?? ''}</p>
-              <p class="card-text"><strong>Precio:</strong> ${simbolo} ${precioStr}</p>
-              <div class="d-flex gap-2">
-                <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
-                ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ``}
-              </div>
+        <div class="favorito-card d-flex flex-column flex-md-row align-items-stretch gap-3 p-4 bg-white border rounded-3 shadow-sm">
+          
+          <div class="favorito-thumb flex-shrink-0">
+            <img src="${imgSrc}" alt="Imagen del vehículo"
+              class="w-100 h-100"
+              onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+          </div>
+
+          <div class="d-flex flex-column justify-content-between flex-grow-1">
+            <div>
+              <h4 class="mb-1 text-dark fw-semibold">${pub.titulo ?? 'Publicación sin título'}</h4>
+              ${pub.descripcion ? `<p class="text-muted mb-2 small">${pub.descripcion}</p>` : ''}
+              <p class="text-primary fw-semibold fs-5 mb-3">${simbolo} ${precioStr}</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
+              ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ``}
             </div>
           </div>
+
         </div>
       `;
     }).join('');
