@@ -11,6 +11,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  const ICONOS = {
+    SERVICIO: "img/servicioIcono.png",
+    REPARACION: "img/reparacionIcono.png",
+    SINIESTRO: "img/siniestroIcono.png",
+    VTV: "img/vtvIcono.png",
+    TRANSFERENCIA: "img/transferIcono.png",
+    DOCUMENTACION: "img/docIcono.png",
+    OTRO: "img/otroIcono.png"
+  };
+
   try {
     const response = await fetch(`${URL_API}/vehiculos/${vehiculoId}/eventos`);
     if (!response.ok) {
@@ -22,18 +32,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!Array.isArray(eventos) || eventos.length === 0) {
         contenedor.innerHTML = `<div class="alert alert-info">No hay eventos asociados a este vehículo.</div>`;
       } else {
-        contenedor.innerHTML = eventos.map(ev => `
-          <div class="col">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body">
-                <h5 class="card-title">${ev.titulo}</h5>
-                <p><strong>Descripción:</strong> ${ev.descripcion}</p>
-                <p><strong>Tipo:</strong> ${ev.tipoEvento}</p>
-                <a href="eventoDetalle.html?id=${ev.idEvento}" class="btn btn-primary">Ver detalle</a>
+        contenedor.innerHTML = eventos.map(ev => {
+          const tipo = (ev.tipoEvento || 'OTRO').toUpperCase();
+          const iconoSrc = ICONOS[tipo] || ICONOS['OTRO'];
+
+          return `
+            <div class="evento-card">
+              <div class="evento-icono">
+                <img src="${iconoSrc}" alt="${tipo}">
+              </div>
+              <div class="evento-info">
+                <h5>${ev.titulo ?? 'Evento'}</h5>
+                ${ev.descripcion ? `<p><strong>Descripción:</strong> ${ev.descripcion}</p>` : ''}
+                <p><strong>Tipo:</strong> ${tipo}</p>
+                ${ev.fecha ? `<p><strong>Fecha:</strong> ${new Date(ev.fecha).toLocaleDateString('es-AR')}</p>` : ''}
+                <a href="eventoDetalle.html?id=${ev.idEvento}" class="btn btn-sm btn-primary mt-2">Ver detalle</a>
               </div>
             </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
     }
     } catch (error) {
@@ -67,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'afterend',
         `
         <div class="d-flex justify-content-end mt-3">
-          <a href="addEvento.html?id=${vehiculoId}" class="btn btn-success">Agregar evento</a>
+          <a href="addEvento.html?id=${vehiculoId}" class="btn btn-agregar-evento">Agregar evento</a>
         </div>
         `
       );
