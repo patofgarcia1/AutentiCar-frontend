@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const response = await fetch(`${URL_API}/vehiculos/${vehiculoId}/eventos`);
     if (!response.ok) {
       const errorMsg = await response.text();
-      contenedor.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
+      contenedor.innerHTML = `<div class="alert alert-info">${errorMsg}</div>`;
     } else {
       const eventos = await response.json();
 

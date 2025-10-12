@@ -14,6 +14,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  const ICONOS = {
+    SERVICIO: "img/servicioIcono.png",
+    REPARACION: "img/reparacionIcono.png",
+    SINIESTRO: "img/siniestroIcono.png",
+    VTV: "img/vtvIcono.png",
+    TRANSFERENCIA: "img/transferIcono.png",
+    DOCUMENTACION: "img/docIcono.png",
+    OTRO: "img/otroIcono.png"
+  };
+
   try {
     const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/eventos`, {
       method: 'GET',
@@ -30,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!resp.ok) {
       const errorMsg = await resp.text();
-      container.innerHTML = `<div class="alert alert-danger">${errorMsg || 'No se pudieron obtener tus eventos.'}</div>`;
+      container.innerHTML = `<div class="alert alert-info">${errorMsg || 'No se pudieron obtener tus eventos.'}</div>`;
       return;
     }
 
@@ -41,18 +51,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    container.innerHTML = eventos.map(ev => `
-      <div class="col">
-        <div class="card h-100 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">${ev.titulo ?? 'Evento'}</h5>
-            <p><strong>Descripción:</strong> ${ev.descripcion ?? '—'}</p>
-            <p><strong>Tipo:</strong> ${ev.tipoEvento ?? '—'}</p>
-            <a href="eventoDetalle.html?id=${ev.idEvento ?? ev.id}" class="btn btn-primary">Ver detalle</a>
+    container.innerHTML = eventos.map(ev => {
+      const tipo = (ev.tipoEvento || 'OTRO').toUpperCase();
+      const iconoSrc = ICONOS[tipo] || ICONOS['OTRO'];
+
+      return `
+        <div class="evento-card">
+          <div class="evento-icono">
+            <img src="${iconoSrc}" alt="${tipo}">
+          </div>
+          <div class="evento-info">
+            <h5>${ev.titulo ?? 'Evento'}</h5>
+            ${ev.descripcion ? `<p><strong>Descripción:</strong> ${ev.descripcion}</p>` : ''}
+            <p><strong>Tipo:</strong> ${tipo}</p>
+            ${ev.fecha ? `<p><strong>Fecha:</strong> ${new Date(ev.fecha).toLocaleDateString('es-AR')}</p>` : ''}
+            <a href="eventoDetalle.html?id=${ev.idEvento ?? ev.id}" class="btn btn-sm btn-primary mt-2">Ver detalle</a>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
   } catch (error) {
     console.error("Error al obtener eventos:", error);
