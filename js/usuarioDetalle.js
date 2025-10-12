@@ -107,11 +107,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       window.location.href = `misEventos.html?usuario=${usuarioId}`;
     });
 
-    btnSubirFoto.addEventListener('click', () => {
-      inputFoto.click(); 
+    const editIcon = document.getElementById('avatar-edit');
+    const avatarCircle = document.querySelector('.profile-avatar-circle');
+
+    editIcon?.addEventListener('click', (e) => {
+      e.preventDefault();
+      inputFoto.click();
     });
 
-    inputFoto.addEventListener('change', async (event) => {
+    inputFoto?.addEventListener('change', async (event) => {
       const file = event.target.files[0];
       if (!file) return;
 
@@ -120,35 +124,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       try {
         showMsg("Subiendo foto de perfil...", "info");
-        btnSubirFoto.disabled = true;
-        btnSubirFoto.textContent = "Subiendo...";
 
         const uploadResponse = await fetch(`${URL_API}/usuarios/${usuarioId}/fotoPerfil`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
+          headers: { 'Authorization': `Bearer ${token}` },
           body: formData
         });
 
         if (!uploadResponse.ok) {
           const errorMsg = await uploadResponse.text();
           showMsg(errorMsg || "Error al subir la foto de perfil.", "danger");
-          btnSubirFoto.disabled = false;
-          btnSubirFoto.textContent = "Cambiar foto";
           return;
         }
 
-        const nuevaUrl = await uploadResponse.text(); 
-        avatar.style.backgroundImage = `url("${nuevaUrl}")`;
+        const nuevaUrl = await uploadResponse.text();
+        avatarCircle.style.backgroundImage = `url("${nuevaUrl}")`;
         showMsg("Foto de perfil actualizada correctamente", "success");
 
       } catch (error) {
         console.error("Error al subir foto:", error);
         showMsg("Error de conexión con el servidor.", "danger");
-      } finally {
-        btnSubirFoto.disabled = false;
-        btnSubirFoto.textContent = "Cambiar foto";
       }
     });
 

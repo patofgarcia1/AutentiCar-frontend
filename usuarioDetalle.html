@@ -11,39 +11,37 @@
 </head>
 <body class="bg-gray-100 font-['Spline_Sans']">
 
-  <!-- Navbar -->
   <div id="site-nav"></div>
 
   <main class="profile-wrapper">
     <section class="profile-card">
-      <!-- Imagen de perfil -->
-      <!-- <div class="profile-avatar">
-        <div class="profile-avatar-circle"></div>
-      </div> -->
 
       <div class="profile-avatar">
         <div class="profile-avatar-circle"></div>
-        <input type="file" id="file-fotoPerfil" accept="image/*" style="display:none;" />
-        <button id="btn-subir-foto" class="btn btn-secondary mt-2">Cambiar foto</button>
+        <input type="file" id="file-fotoPerfil" accept="image/*" hidden  />
+        <img
+            src="img/iconoEditar.png"
+            id="avatar-edit"
+            class="avatar-edit"
+            alt="Cambiar foto de perfil"
+            title="Cambiar foto"
+            role="button"
+            tabindex="0"
+          />
       </div>
 
-      <!-- Info del usuario -->
       <h2 id="user-nombre" class="profile-name"></h2>
       <p id="user-email" class="profile-subtext"></p>
       <p id="user-tel" class="profile-subtext"></p>
 
-      <!-- Nivel -->
-      <div id="nivel-container" class="mt-3"></div>
+      <div id="nivel-container" class="nivel-container"></div>
 
-      <!-- Botones dinámicos -->
       <div id="acciones-container" class="profile-actions"></div>
 
-      <!-- Botón eliminar -->
       <div class="pt-4 border-t border-gray-200 mt-4 w-full">
         <button id="btn-eliminar" class="btn-danger-full">Eliminar cuenta</button>
       </div>
 
-      <!-- Mensajes -->
       <div id="mensaje" class="mt-3 w-full"></div>
     </section>
   </main>

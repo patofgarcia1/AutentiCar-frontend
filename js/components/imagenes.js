@@ -33,9 +33,9 @@ export function initGaleriaImagenes({
 
       ${allowUpload ? `
         <input id="fileInput" type="file" accept="image/*" multiple hidden />
-        <button id="btnSubir" class="btn btn-outline-primary btn-sm">Agregar imágenes</button>
+        <button type="button" id="btnSubir" class="btn btn-outline-primary btn-sm">Agregar imágenes</button>
       ` : ``}
-
+ 
       <div id="galeria" class="row g-2 mt-4"></div>
     </section>
 
@@ -132,6 +132,7 @@ export function initGaleriaImagenes({
 
       if (allowDelete) {
         const b = document.createElement('button');
+        b.type = 'button';
         b.className = 'btn-del';
         b.title = 'Eliminar';
         b.textContent = '🗑';
@@ -185,7 +186,11 @@ export function initGaleriaImagenes({
   overlay?.addEventListener('click', (e) => { if (e.target === overlay) cerrarSlideshow(); });
 
   // --- Upload ---
-  btnSubir?.addEventListener('click', () => fileInput.click());
+  btnSubir?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    fileInput.click();
+  });
   fileInput?.addEventListener('change', async () => {
     const files = Array.from(fileInput.files || []);
     if (!files.length) return;
