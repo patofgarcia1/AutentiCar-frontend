@@ -281,7 +281,8 @@ header.bg-primary {
 }
 
 .login-btn:hover {
-  background-color: #1d4ed8;
+  background-color: #3865df;
+  transform: translateY(-1px);
 }
 
 .login-register {
@@ -749,6 +750,70 @@ header.bg-primary {
   background-color: #5979af;
   color: #fff;
 }
+
+/* eventos vehiculos */
+
+/* .evento-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 3rem 3.5rem;
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; 
+  margin: 0 auto;
+}
+
+.evento-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.evento-label {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.evento-input {
+  border-radius: 0.6rem;
+  border: 1px solid #d1d5db;
+  padding: 0.9rem 1rem; 
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea.evento-input {
+  min-height: 130px; 
+  resize: vertical;
+}
+
+.evento-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+.evento-btn {
+  background-color: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  padding: 1rem;
+  font-size: 1.05rem;
+  border: none;
+  border-radius: 0.75rem;
+  transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.evento-btn:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+} */
 
 
 /* 
