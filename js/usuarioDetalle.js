@@ -7,6 +7,8 @@ const userEmail = document.getElementById('user-email');
 const userTel = document.getElementById('user-tel');
 const nivelContainer = document.getElementById('nivel-container');
 const accionesContainer = document.getElementById('acciones-container');
+const btnSubirFoto = document.getElementById('btn-subir-foto');
+const inputFoto = document.getElementById('file-fotoPerfil');
 
 function showMsg(html, type = 'info') {
   if (!mensaje) return;
@@ -59,10 +61,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       userTel.textContent = usuario.telefonoCelular;
     }
 
-    // Imagen (placeholder, por ahora)
-    avatar.style.backgroundImage = 'url("img/avatar-placeholder.png")'; // imagen de prueba
+    if (usuario.profilePicUrl) {
+      avatar.style.backgroundImage = `url("${usuario.profilePicUrl}")`;
+    } else {
+      avatar.style.backgroundImage = 'url("img/avatar-placeholder.png")';
+    }
 
-    // Mostrar nivel de usuario
     if (nivel === 'REGISTRADO') {
       nivelContainer.innerHTML = `
         <div class="alert alert-warning mt-3" role="alert">
@@ -81,7 +85,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
     }
 
-    // Botones dinámicos
     const botonesHTML = esTaller
       ? `
         <button id="btn-eventos" class="btn-primary-full">Mis Eventos</button>
@@ -102,6 +105,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     document.getElementById('btn-eventos')?.addEventListener('click', () => {
       window.location.href = `misEventos.html?usuario=${usuarioId}`;
+    });
+
+    btnSubirFoto.addEventListener('click', () => {
+      inputFoto.click(); 
+    });
+
+    inputFoto.addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        showMsg("Subiendo foto de perfil...", "info");
+        btnSubirFoto.disabled = true;
+        btnSubirFoto.textContent = "Subiendo...";
+
+        const uploadResponse = await fetch(`${URL_API}/usuarios/${usuarioId}/fotoPerfil`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        if (!uploadResponse.ok) {
+          const errorMsg = await uploadResponse.text();
+          showMsg(errorMsg || "Error al subir la foto de perfil.", "danger");
+          btnSubirFoto.disabled = false;
+          btnSubirFoto.textContent = "Cambiar foto";
+          return;
+        }
+
+        const nuevaUrl = await uploadResponse.text(); 
+        avatar.style.backgroundImage = `url("${nuevaUrl}")`;
+        showMsg("Foto de perfil actualizada correctamente", "success");
+
+      } catch (error) {
+        console.error("Error al subir foto:", error);
+        showMsg("Error de conexión con el servidor.", "danger");
+      } finally {
+        btnSubirFoto.disabled = false;
+        btnSubirFoto.textContent = "Cambiar foto";
+      }
     });
 
     // Eliminar cuenta

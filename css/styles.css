@@ -388,14 +388,32 @@ header.bg-primary {
   margin-bottom: 1rem;
 }
 
+/* .profile-avatar-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #e5e7eb; 
+  background-position: center;
+  background-size: cover;
+  border: 4px solid rgba(37, 99, 235, 0.3);
+} */
+
 .profile-avatar-circle {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background-color: #e5e7eb; /* gris claro */
-  background-position: center;
+  background-color: #e9ecef;
   background-size: cover;
-  border: 4px solid rgba(37, 99, 235, 0.3);
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0 auto;
+  border: 2px solid #ccc;
+  transition: all 0.3s ease;
+}
+
+.profile-avatar-circle:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
 }
 
 .profile-name {
