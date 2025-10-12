@@ -637,7 +637,7 @@ header.bg-primary {
 .favorito-card {
   border-radius: 16px !important;
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-  margin-bottom: 20px; 
+  margin-bottom: 15px; 
 }
 
 .favorito-card:hover {
@@ -669,7 +669,14 @@ header.bg-primary {
   transform: translateY(-2px);
 }
 
-
+.publicaciones-thumb{
+  width: 280px;         
+  height: 140px;        
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f3f4f6;
+  margin-top: 20px;
+}
 /* 
 responsive */
 

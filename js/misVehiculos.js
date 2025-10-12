@@ -12,13 +12,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (!token) {
     contenedor.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
-    // opcional: window.location.href = 'login.html';
     return;
   }
 
   const PLACEHOLDER = 'https://dummyimage.com/600x400/efefef/aaaaaa&text=Sin+foto';
 
-  // genera un thumb de Cloudinary si hay portada
   const toThumb = (url) =>
     url ? url.replace('/upload/', '/upload/w_500,h_250,c_fill,f_auto,q_auto/') : null;
 
@@ -33,7 +31,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (response.status === 401 || response.status === 403) {
       contenedor.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
-      // opcional: window.location.href = 'login.html';
       return;
     }
     
@@ -50,23 +47,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    contenedor.innerHTML = vehiculos.map(v => {
+    contenedor.innerHTML = vehiculos.map((v) => {
       const thumb = toThumb(v.portadaUrl);
+      const imgSrc = thumb || PLACEHOLDER;
+
       return `
-        <div class="col">
-          <div class="card h-100 shadow-sm">
-            ${
-              thumb
-                ? `<img src="${thumb}" class="card-img-top" alt="Imagen de ${v.marca} ${v.modelo}"
-                     onerror="this.onerror=null;this.src='${PLACEHOLDER}'">`
-                : `<img src="${PLACEHOLDER}" class="card-img-top" alt="Sin foto"`
-            }
-            <div class="card-body">
-              <h5 class="card-title">${v.marca} ${v.modelo}</h5>
-              <p class="card-text"><strong>Año:</strong> ${v.anio}</p>
-              <a href="vehiculoDetalle.html?id=${v.idVehiculo}" class="btn btn-primary">Ver detalle</a>
+        <div class="favorito-card d-flex flex-column flex-md-row align-items-stretch gap-3 p-4 bg-white border rounded-3 shadow-sm">
+          
+          <div class="favorito-thumb flex-shrink-0">
+            <img src="${imgSrc}" alt="Imagen de ${v.marca} ${v.modelo}"
+              onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+          </div>
+
+          <div class="d-flex flex-column justify-content-between flex-grow-1">
+            <div>
+              <h4 class="mb-1 text-dark fw-semibold">${v.marca} ${v.modelo}</h4>
+              <p class="text-muted mb-2 small">${v.version ?? ''}</p>
+              <p class="mb-1"><strong>Año:</strong> ${v.anio ?? '—'}</p>
+              ${v.kilometraje ? `<p class="mb-3"><strong>Kilometraje:</strong> ${v.kilometraje.toLocaleString('es-AR')} km</p>` : ''}
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              <a href="vehiculoDetalle.html?id=${v.idVehiculo}" class="btn btn-primary btn-sm">Ver detalle</a>
             </div>
           </div>
+
         </div>
       `;
     }).join('');

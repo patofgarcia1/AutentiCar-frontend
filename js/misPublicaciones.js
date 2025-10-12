@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const PLACEHOLDER = 'https://dummyimage.com/600x400/efefef/aaaaaa&text=Sin+foto';
+  const SIMBOLOS = { PESOS: '$', DOLARES: 'U$D' };
+
   const toThumb = (url) =>
     url ? url.replace('/upload/', '/upload/w_500,h_250,c_fill,f_auto,q_auto/') : null;
 
@@ -44,7 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (response.status === 401 || response.status === 403) {
       container.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
-      // opcional: window.location.href = 'login.html';
       return;
     }
 
@@ -74,28 +75,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       const pubId = pub.idPublicacion ?? pub.id ?? '';
       const imgSrc = portadas[i] || PLACEHOLDER;
 
+      const monedaKey = (pub.moneda || 'PESOS').toUpperCase();
+      const simbolo = SIMBOLOS[monedaKey] || '$';
+      const precioStr = (typeof pub.precio === 'number')
+        ? pub.precio.toLocaleString('es-AR')
+        : (pub.precio ?? '—');
+
       return `
-        <div class="col">
-          <div class="card h-100 shadow-sm">
-            <a href="publicacionDetalle.html?id=${pubId}" style="display:block">
-              <img
-                src="${imgSrc}"
-                class="card-img-top"
-                alt="Vehículo"
-                onerror="this.onerror=null;this.src='${PLACEHOLDER}'"
-              >
-            </a>
-            <div class="card-body">
-              <h5 class="card-title">${pub.titulo ?? 'Publicación'}</h5>
-              <p class="card-text">${pub.descripcion ?? ''}</p>
-              <p class="card-text"><strong>Precio:</strong> $${pub.precio ?? '—'}</p>
-              <p class="card-text"><strong>Estado:</strong> ${pub.estadoPublicacion}</p>
-              <div class="d-flex gap-2">
-                <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
-                ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ``}
-              </div>
+        <div class="favorito-card d-flex flex-column flex-md-row align-items-stretch gap-3 p-4 bg-white border rounded-3 shadow-sm">
+          
+          <div class="publicaciones-thumb flex-shrink-0">
+            <img src="${imgSrc}" alt="Imagen del vehículo"
+              class="w-100 h-100"
+              onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+          </div>
+
+          <div class="d-flex flex-column justify-content-between flex-grow-1">
+            <div>
+              <h4 class="mb-1 text-dark fw-semibold">${pub.titulo ?? 'Publicación sin título'}</h4>
+              ${pub.descripcion ? `<p class="text-muted mb-2 small">${pub.descripcion}</p>` : ''}
+              <p class="text-primary fw-semibold fs-5 mb-2">${simbolo} ${precioStr}</p>
+              <p class="text-muted"><strong>Estado:</strong> ${pub.estadoPublicacion}</p>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
+              ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ``}
             </div>
           </div>
+
         </div>
       `;
     }).join('');
