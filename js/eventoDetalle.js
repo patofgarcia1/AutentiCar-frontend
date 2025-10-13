@@ -7,6 +7,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const titulo = document.getElementById('titulo');
   const info = document.getElementById('info');
   const mensaje = document.getElementById('mensaje');
+  const tipoTag = document.getElementById('tipoEventoTag');
+
+  if (!info) {
+    console.error('Elemento #info no encontrado');
+    return;
+  }
 
   function showMsg(html, type = 'info') {
     if (!mensaje) return;
@@ -44,24 +50,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       veh = vResp.ok ? await vResp.json() : null;
     } catch {}
 
+    if (tipoTag) tipoTag.textContent = ev.tipoEvento ?? '—';
+
     // 3) Render
     titulo.textContent = ev.titulo || 'Evento';
     info.innerHTML = `
-      <p><strong>Descripción:</strong> ${ev.descripcion || '—'}</p>
-      <p><strong>Kilometraje:</strong> ${ev.kilometrajeEvento ?? '—'} Km</p>
-      <p><strong>Tipo de evento:</strong> ${ev.tipoEvento ?? '—'}</p>
-      <p><strong>Fecha del evento:</strong> ${ev.fechaEvento ?? '—'}</p>
-      <hr/>
-
-      <p><strong>Usuario (que registro el evento):</strong> ${usuario ? `
-        <p>${usuario.nombre || ''} ${usuario.apellido || ''}</p>
-      ` : `<p class="text-muted">No se pudo cargar información del dueño.</p>`} </p>
-      
-      <hr/>
-
-      <a href="docsEvento.html?id=${ev.idEvento}" class="btn btn-primary">Ver documentos</a>
-      <div id="acciones-evento" class="d-inline-block ms-2"></div>
-  
+      <div class="evento-info-item">
+        <img src="img/docIcono.png" alt="Descripción">
+        <div>
+          <p class="evento-info-label">Descripción</p>
+          <p class="evento-info-value">${ev.descripcion || '—'}</p>
+        </div>
+      </div>
+      <div class="evento-info-item">
+        <img src="img/kilometrajeIcono.png" alt="Kilometraje">
+        <div>
+          <p class="evento-info-label">Kilometraje</p>
+          <p class="evento-info-value">${ev.kilometrajeEvento ?? '—'} km</p>
+        </div>
+      </div>
+      <div class="evento-info-item">
+        <img src="img/calendarioIcono.png" alt="Fecha">
+        <div>
+          <p class="evento-info-label">Fecha</p>
+          <p class="evento-info-value">${ev.fechaEvento ?? '—'}</p>
+        </div>
+      </div>
+      <div class="evento-info-item">
+        <img src="img/usuarioIcono.png" alt="Usuario">
+        <div>
+          <p class="evento-info-label">Registrado por</p>
+          <p class="evento-info-value">${usuario ? `${usuario.nombre ?? ''} ${usuario.apellido ?? ''}` : '—'}</p>
+        </div>
+      </div>
     `;
 
     // dueño del vehículo (según tu DTO de VehiculosDTO: idUsuario)
@@ -84,15 +105,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const puedeAdjuntar = puedeEliminar;
 
-    const acciones = document.getElementById('acciones-evento');
-    acciones.innerHTML = [
-      (puedeAdjuntar
-        ? `<a href="addDocumento.html?id=${ev.idVehiculo}&evento=${ev.idEvento}" class="btn btn-success me-2">Agregar Documentos</a>`
-        : ''),
-      (puedeEliminar
-        ? `<button id="btnEliminarEvento" class="btn btn-danger">Eliminar evento</button>`
-        : '')
-    ].join('');
+    const btnAddDocs = document.getElementById('btnAddDocs');
+    const btnEliminar = document.getElementById('btnEliminarEvento');
+    const btnVerDocs = document.getElementById('btnVerDocs');
+
+    // asignar href correcto
+    if (btnVerDocs) btnVerDocs.href = `docsEvento.html?id=${ev.idEvento}`;
+    if (btnAddDocs) btnAddDocs.href = `addDocumento.html?id=${ev.idVehiculo}&evento=${ev.idEvento}`;
+
+    if (!puedeAdjuntar && btnAddDocs) btnAddDocs.style.display = 'none';
+    if (!puedeEliminar && btnEliminar) btnEliminar.style.display = 'none';
+
+    // const acciones = document.getElementById('acciones-evento');
+    // acciones.innerHTML = [
+    //   (puedeAdjuntar
+    //     ? `<a href="addDocumento.html?id=${ev.idVehiculo}&evento=${ev.idEvento}" class="btn btn-success me-2">Agregar Documentos</a>`
+    //     : ''),
+    //   (puedeEliminar
+    //     ? `<button id="btnEliminarEvento" class="btn btn-danger">Eliminar evento</button>`
+    //     : '')
+    // ].join('');
 
 
     // 4) Handler: eliminar evento

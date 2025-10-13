@@ -6,16 +6,38 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Detalle del Evento - AutentiCar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-</head>
-<body>
+    <link href="css/styles.css" rel="stylesheet"/>
+  </head>
+<body class="bg-gray-100 font-['Spline_Sans'] d-flex flex-column min-vh-100">
   <div id="site-nav"></div>
 
-  <main class="container my-5">
-    <h1 class="mb-4" id="titulo"></h1>
-    <div class="bg-light p-4 rounded shadow-sm" id="info"></div>
-    <div id="mensaje" class="container mt-3"></div>
-  </main>
+  <main class="flex-grow-1 py-5">
+    <section class="evento-detalle-card">
+      <div class="evento-header">
+        <h2 id="titulo" class="evento-titulo">Detalle del Evento</h2>
+        <span id="tipoEventoTag" class="evento-tipo-tag">—</span>
+      </div>
 
+      <div id="info" class="evento-info"></div>
+
+      <div class="evento-acciones">
+        <a id="btnVerDocs" class="evento-btn primary-btn" href="#">
+          <img src="img/ojoIcono.png" alt="Ver" class="evento-icon"/>
+          Ver documentos
+        </a>
+        <a id="btnAddDocs" class="evento-btn secondary-btn" href="#">
+          <img src="img/plusIcono.png" alt="Agregar" class="evento-icon"/>
+          Agregar documentos
+        </a>
+        <button id="btnEliminarEvento" class="evento-btn danger-btn">
+          <img src="img/tachoIcono.png" alt="Eliminar" class="evento-icon"/>
+          Eliminar evento
+        </button>
+      </div>
+
+      <div id="mensaje" class="mt-3"></div>
+    </section>
+  </main>
 
   <footer class="site-footer bg-dark text-white text-center py-3">
     <div class="container">
@@ -25,6 +47,5 @@
 
   <script type="module" src="js/nav.js"></script>
   <script type="module" src="js/eventoDetalle.js"></script>
-  
 </body>
 </html>
