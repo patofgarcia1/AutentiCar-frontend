@@ -45,8 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <h5>${ev.titulo ?? 'Evento'}</h5>
                 ${ev.descripcion ? `<p><strong>Descripción:</strong> ${ev.descripcion}</p>` : ''}
                 <p><strong>Tipo:</strong> ${tipo}</p>
-                ${ev.fecha ? `<p><strong>Fecha:</strong> ${new Date(ev.fecha).toLocaleDateString('es-AR')}</p>` : ''}
-                <a href="eventoDetalle.html?id=${ev.idEvento}" class="btn btn-sm btn-primary mt-2">Ver detalle</a>
+                <a href="eventoDetalle.html?id=${ev.idEvento}" class="btn btn-sm btn-primary mt-2 btn-ver-detalle">Ver detalle</a>
               </div>
             </div>
           `;

@@ -690,7 +690,7 @@ header.bg-primary {
   border-radius: 16px;
   background: #fff;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.09);
-  padding: 15px;
+  padding: 10px;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -716,6 +716,8 @@ header.bg-primary {
 
 .evento-info {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .evento-info h5 {
@@ -724,9 +726,10 @@ header.bg-primary {
 }
 
 .evento-info p {
-  margin-bottom: 4px;
   color: #4b5563;
   font-size: 0.9rem;
+  margin-top: 0px;
+  margin-bottom: 5px;
 }
 
 
@@ -749,6 +752,14 @@ header.bg-primary {
 .btn-agregar-evento:hover {
   background-color: #5979af;
   color: #fff;
+}
+
+.evento-card .btn-sm {
+  font-size: 14px;
+  padding: 4px 10px;
+  width: fit-content;
+  border-radius: 8px;
+  align-self: flex-start;
 }
 
 /* detalle eventos  */
@@ -794,11 +805,11 @@ header.bg-primary {
   text-transform: uppercase;
 }
 
-.evento-info {
+/* .evento-info {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-}
+} */
 
 /* Bloques de información */
 .evento-info-item {
