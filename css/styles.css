@@ -896,6 +896,11 @@ header.bg-primary {
 }
 
 
+/* Docs de un evento */
+#docs-lista .card-text.text-muted {
+  font-size: 15px !important;
+}
+
 /* 
 responsive */
 

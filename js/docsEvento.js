@@ -34,11 +34,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   //skeleton de carga
   contenedor.innerHTML = `
-    <div class="col"><div class="card placeholder-wave"><div class="card-body">
-      <span class="placeholder col-12" style="height:180px"></span>
-      <span class="placeholder col-8 mt-3"></span>
-      <span class="placeholder col-6 mt-2"></span>
-    </div></div></div>`.repeat(3);
+    <div class="col">
+      <div class="card placeholder-wave border-0 shadow-sm h-100">
+        <div class="card-body">
+          <span class="placeholder col-12" style="height:180px"></span>
+          <span class="placeholder col-8 mt-3"></span>
+          <span class="placeholder col-6 mt-2"></span>
+        </div>
+      </div>
+    </div>
+  `.repeat(3);
 
   try {
     const response = await fetch(`${URL_API}/eventos/${eventoId}/documentos`, {
@@ -69,30 +74,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     contenedor.innerHTML = documentos.map(doc => {
       const thumb = cloudThumb(doc.urlDoc, doc.mimeType);
       const safeNombre = doc.nombre || 'Documento';
-      const imgTag = `
-        <a href="${doc.urlDoc}" target="_blank" rel="noopener noreferrer">
-          <img
-            class="card-img-top"
-            alt="${safeNombre}"
-            src="${thumb || PLACEHOLDER}"
-            onerror="this.onerror=null;this.src='${PLACEHOLDER}';"
-          />
-        </a>`;
+      const tipo = doc.tipoDoc ?? '-';
+      const riesgo = (doc.nivelRiesgo != null) ? `${doc.nivelRiesgo}%` : '-';
 
       return `
         <div class="col">
-          <div class="card h-100 shadow-sm">
-            ${imgTag}
-            <div class="card-body">
-              <h5 class="card-title mb-2">${safeNombre}</h5>
-              <p class="mb-1"><strong>Tipo:</strong> ${doc.tipoDoc ?? '-'}</p>
-              <p class="mb-3"><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo ?? '-'}%</p>
-              <div class="d-flex gap-2">
+          <div class="card card-auto h-100 border-0 shadow-sm">
+            <a href="${doc.urlDoc}" target="_blank" rel="noopener noreferrer">
+              <img src="${thumb || PLACEHOLDER}" 
+                alt="${safeNombre}" 
+                class="card-img-top rounded-top" 
+                onerror="this.onerror=null;this.src='${PLACEHOLDER}'" />
+            </a>
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title text-dark fw-bold">${safeNombre}</h5>
+              <p class="card-text text-muted small mb-1">
+                <strong>Tipo:</strong> ${tipo}
+              </p>
+              <p class="card-text text-muted small mb-3">
+                <strong>Nivel de riesgo:</strong> ${riesgo}
+              </p>
+              <div class="mt-auto d-flex gap-2">
                 <a href="docDetalle.html?id=${doc.idDocVehiculo}" class="btn btn-primary btn-sm">Ver detalle</a>
               </div>
             </div>
           </div>
-        </div>`;
+        </div>
+      `;
     }).join('');
 
   } catch (error) {
