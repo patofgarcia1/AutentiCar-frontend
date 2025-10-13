@@ -5,78 +5,84 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>Cargar Documento - AutentiCar</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
   <link href="css/styles.css" rel="stylesheet"/>
 </head>
-<div class="modal fade" id="iaSpinnerModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow">
-      <div class="modal-body text-center py-5">
-        <img src="img/spinner azul.gif" alt="Analizando..." style="width: 96px; height: 96px; object-fit: contain;" />
-        <h5 class="mt-4 mb-0">El documento está siendo analizado por la IA</h5>
-        <p class="text-muted mb-0 mt-2">Esto puede demorar unos segundos…</p>
-      </div>
-    </div>
-  </div>
-</div>
-<body class="d-flex flex-column min-vh-100">
+<body class="login-body">
   <div id="site-nav"></div>
 
-  <main class="container flex-grow-1 py-5">
-    <h2 class="mb-4">Cargar Documento</h2>
+  <main class="login-wrapper">
+    <section class="register-card">
+      <h2 class="login-title">Cargar Documento</h2>
 
-    <div id="aviso-ids" class="mb-3"></div>
+      <form id="form-documento" class="register-form">
 
-    <form id="form-documento">
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Nombre</label>
-          <input type="text" class="form-control" name="nombre" id="nombre" required>
+        <div class="form-group">
+          <label class="form-label" for="nombre">Nombre</label>
+          <input 
+            type="text" 
+            id="nombre"
+            name="nombre"
+            placeholder="Ej: VTV 2025" 
+            required 
+            class="login-input"
+          />
         </div>
 
-        <div class="col-md-4 mb-3">
-          <label class="form-label">Tipo de documento</label>
-          <select class="form-select" name="tipoDoc" id="tipoDoc" required>
-            <option value="" selected disabled>Seleccione un tipo…</option>
-            <option value="TITULO">TÍTULO</option>
-            <option value="CEDULA">CÉDULA</option>
+        <div class="form-group">
+          <label class="form-label" for="tipoDoc">Tipo de documento</label>
+          <select id="tipoDoc" name="tipoDoc" required class="login-input">
+            <option value="" disabled selected>Seleccione un tipo…</option>
+            <option value="TITULO">Título</option>
+            <option value="CEDULA">Cédula</option>
             <option value="VTV">VTV</option>
-            <option value="SEGURO">SEGURO</option>
-            <option value="INFORME">INFORME</option>
-            <option value="SERVICE">SERVICE</option>
-            <option value="OTRO">OTRO</option>
+            <option value="SEGURO">Seguro</option>
+            <option value="INFORME">Informe</option>
+            <option value="SERVICE">Service</option>
+            <option value="OTRO">Otro</option>
           </select>
         </div>
 
-        <div class="col-md-8 mb-3">
-          <label class="form-label">Archivo (PDF / imagen)</label>
-          <input type="file" class="form-control" id="fileDoc" accept="image/*,application/pdf" required>
+        <div class="form-group">
+          <label class="form-label" for="fileDoc">Archivo (PDF / imagen)</label>
+          <input 
+            type="file" 
+            id="fileDoc"
+            name="fileDoc"
+            accept="image/*,application/pdf"
+            required 
+            class="login-input"
+          />
           <div class="form-text">Tamaño sugerido ≤ 15 MB.</div>
         </div>
-      </div>
 
-      <div class="mt-3 d-flex gap-2">
-        <button id="btnSubirDoc" type="button" class="btn btn-primary">Subir documento</button>
-        <a id="btnVolver" class="btn btn-secondary" href="#">Volver al listado</a>
-      </div>
-    </form>
+        <button id="btnSubirDoc" type="button" class="login-btn">Subir documento</button>
 
-    <!-- <hr class="my-4">
-
-    <h5>Documentos del vehículo</h5>
-    <div id="docs-root"></div> -->
-
-    <div id="mensaje" class="mt-3"></div>
-
+        <div id="mensaje" class="text-center mt-3"></div>
+      </form>
+    </section>
   </main>
 
-  <footer class="site-footer bg-dark text-white text-center py-3">
+  <footer class="site-footer text-white text-center py-3 bg-dark">
     <div class="container">
       <p class="m-0">© 2025 AutentiCar. Todos los derechos reservados.</p>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Modal IA (igual que antes) -->
+  <div class="modal fade" id="iaSpinnerModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-body text-center py-5">
+          <img src="img/spinner azul.gif" alt="Analizando..." style="width: 96px; height: 96px; object-fit: contain;" />
+          <h5 class="mt-4 mb-0">El documento está siendo analizado por la IA</h5>
+          <p class="text-muted mb-0 mt-2">Esto puede demorar unos segundos…</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module" src="js/nav.js"></script>
   <script type="module" src="js/addDocumento.js"></script>
 </body>

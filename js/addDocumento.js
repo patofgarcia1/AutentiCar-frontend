@@ -8,10 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const form = document.getElementById('form-documento');
   const mensaje = document.getElementById('mensaje');
-  const aviso = document.getElementById('aviso-ids');
   const fileInput = document.getElementById('fileDoc');
   const btnSubirDoc = document.getElementById('btnSubirDoc');
-  const btnVolver = document.getElementById('btnVolver');
 
   const inputNombre = document.getElementById('nombre');
   const selTipo     = document.getElementById('tipoDoc');
@@ -42,16 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return;
   }
-
-  // if (aviso) {
-  //   aviso.innerHTML = `
-  //     <div class="alert alert-info">
-  //       <strong>Vehículo ID:</strong> ${vehiculoId}<br>
-  //       <strong>Evento ID:</strong> ${eventoId}
-  //     </div>`;
-  // }
-
-  btnVolver.href = `docsVehiculo.html?id=${vehiculoId}`;
 
   function showMsg(html, type='info') {
     if (!mensaje) return;
