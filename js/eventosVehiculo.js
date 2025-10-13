@@ -41,11 +41,22 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="evento-icono">
                 <img src="${iconoSrc}" alt="${tipo}">
               </div>
+
               <div class="evento-info">
-                <h5>${ev.titulo ?? 'Evento'}</h5>
-                ${ev.descripcion ? `<p><strong>Descripción:</strong> ${ev.descripcion}</p>` : ''}
-                <p><strong>Tipo:</strong> ${tipo}</p>
-                <a href="eventoDetalle.html?id=${ev.idEvento}" class="btn btn-sm btn-primary mt-2 btn-ver-detalle">Ver detalle</a>
+                <h5 class="mb-2">${ev.titulo ?? 'Evento'}</h5>
+
+                ${ev.descripcion ? `
+                  <div class="evento-line">
+                    <span class="evento-info-label"> <strong> Descripción: </strong></span>
+                    <span class="evento-info-value">${ev.descripcion}</span>
+                  </div>` : ''}
+
+                <div class="evento-line">
+                  <span class="evento-info-label"> <strong> Tipo: </strong></span>
+                  <span class="evento-info-value">${tipo}</span>
+                </div>
+
+                <a href="eventoDetalle.html?id=${ev.idEvento ?? ev.id}" class="btn btn-sm btn-primary mt-2">Ver detalle</a>
               </div>
             </div>
           `;
