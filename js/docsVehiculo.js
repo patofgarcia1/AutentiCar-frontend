@@ -1,5 +1,5 @@
 import { URL_API } from '../constants/database.js';
-import { isAdmin, isUser, isTaller, getSession } from './roles.js';
+//import { isAdmin, isUser, isTaller, getSession } from './roles.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
@@ -27,83 +27,91 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    const response = await fetch(`${URL_API}/vehiculos/${vehiculoId}/documentos`);
+    const response = await fetch(`${URL_API}/vehiculos/${vehiculoId}/documentos`, {
+      headers: { 'Accept': 'application/json' }
+    });
+
     if (!response.ok) {
       const errorMsg = await response.text();
       contenedor.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
-    } else {
-      const documentos = await response.json();
-
-      if (!documentos.length) {
-        contenedor.innerHTML = `<div class="alert alert-danger">No hay documentos asociados a este vehículo.</div>`;
-      } else {
-        contenedor.innerHTML = documentos.map(doc => {
-          const thumb = cloudThumb(doc.urlDoc, doc.mimeType);
-          const imgTag = `
-            <a href="${doc.urlDoc}" target="_blank" rel="noopener">
-              <img
-                class="card-img-top"
-                alt="${doc.nombre || 'Documento'}"
-                src="${thumb || PLACEHOLDER}"
-                onerror="this.onerror=null;this.src='${PLACEHOLDER}';"
-              />
-            </a>
-          `;
-
-          return `
-            <div class="col-md-4">
-              <div class="card h-100 shadow-sm">
-                ${imgTag}
-                <div class="card-body">
-                  <h5 class="card-title mb-2">${doc.nombre}</h5>
-                  <p class="mb-1"><strong>Tipo:</strong> ${doc.tipoDoc}</p>
-                  <p class="mb-3"><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo}%</p>
-                  <div class="d-flex gap-2">
-                    <a href="docDetalle.html?id=${doc.idDocVehiculo}" class="btn btn-primary btn-sm">Ver detalle</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-    }
-    } catch (error) {
-      console.error("Error al obtener documentos:", error);
-      contenedor.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
-    }
-
-    try {
-    const vResp = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
-    if (!vResp.ok) {
-      // si falla, no podemos saber el dueño => no mostramos botón
       return;
     }
-    const v = await vResp.json();
 
-    // dueño del vehículo según tu DTO (VehiculosDTO.idUsuario)
-    const ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null;
+    const documentos = await response.json();
 
-    // usuario logueado y rol
-    const { userId: loggedIdRaw } = getSession(); // lee de localStorage
-    const loggedId = (loggedIdRaw != null) ? Number(loggedIdRaw) : null;
-
-    // Reglas
-    const puedeAgregar =
-      isAdmin() || isTaller() || (isUser() && ownerId != null && loggedId === ownerId);
-
-    if (puedeAgregar) {
-      contenedor.insertAdjacentHTML(
-        'afterend',
-        `
-        <div class="d-flex justify-content-end mt-3">
-          <a href="addEvento.html?id=${vehiculoId}" class="btn btn-success">Agregar evento</a>
-        </div>
-        `
-      );
+    if (!Array.isArray(documentos) || documentos.length === 0) {
+      contenedor.innerHTML = `<div class="alert alert-info">No hay documentos asociados a este vehículo.</div>`;
+      return;
     }
-  } catch (e) {
-    console.warn('No se pudo evaluar permisos para el botón Agregar documento:', e);
-    // si falla esta parte, simplemente no mostramos el botón
+
+    contenedor.innerHTML = documentos.map(doc => {
+      const thumb = cloudThumb(doc.urlDoc, doc.mimeType);
+      const safeNombre = doc.nombre || 'Documento';
+      const tipo = doc.tipoDoc ?? '-';
+      const riesgo = (doc.nivelRiesgo != null) ? `${doc.nivelRiesgo}%` : '-';
+
+      return `
+        <div class="col">
+          <div class="card card-auto h-100 border-0 shadow-sm">
+            <a href="${doc.urlDoc}" target="_blank" rel="noopener noreferrer">
+              <img src="${thumb || PLACEHOLDER}" 
+                   alt="${safeNombre}" 
+                   class="card-img-top rounded-top" 
+                   onerror="this.onerror=null;this.src='${PLACEHOLDER}'" />
+            </a>
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title text-dark fw-bold">${safeNombre}</h5>
+              <p class="card-text text-muted small mb-1">
+                <strong>Tipo:</strong> ${tipo}
+              </p>
+              <p class="card-text text-muted small mb-3">
+                <strong>Nivel de riesgo:</strong> ${riesgo}
+              </p>
+              <div class="mt-auto d-flex gap-2">
+                <a href="docDetalle.html?id=${doc.idDocVehiculo}" class="btn btn-primary btn-sm">Ver detalle</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } catch (error) {
+    console.error("Error al obtener documentos:", error);
+    contenedor.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
   }
+
+  //   try {
+  //   const vResp = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
+  //   if (!vResp.ok) {
+  //     // si falla, no podemos saber el dueño => no mostramos botón
+  //     return;
+  //   }
+  //   const v = await vResp.json();
+
+  //   // dueño del vehículo según tu DTO (VehiculosDTO.idUsuario)
+  //   const ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null;
+
+  //   // usuario logueado y rol
+  //   const { userId: loggedIdRaw } = getSession(); // lee de localStorage
+  //   const loggedId = (loggedIdRaw != null) ? Number(loggedIdRaw) : null;
+
+  //   // Reglas
+  //   const puedeAgregar =
+  //     isAdmin() || isTaller() || (isUser() && ownerId != null && loggedId === ownerId);
+
+  //   if (puedeAgregar) {
+  //     contenedor.insertAdjacentHTML(
+  //       'afterend',
+  //       `
+  //       <div class="d-flex justify-content-end mt-3">
+  //         <a href="addEvento.html?id=${vehiculoId}" class="btn btn-success">Agregar evento</a>
+  //       </div>
+  //       `
+  //     );
+  //   }
+  // } catch (e) {
+  //   console.warn('No se pudo evaluar permisos para el botón Agregar documento:', e);
+  //   // si falla esta parte, simplemente no mostramos el botón
+  // }
 });
