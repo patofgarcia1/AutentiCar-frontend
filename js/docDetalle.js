@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const info = document.getElementById('info');
   const mensaje = document.getElementById('mensaje'); // <- para showMsg
   const localToken = localStorage.getItem("token");
+  const tipoTag = document.getElementById('tipoDocTag');
+  const PLACEHOLDER = 'https://dummyimage.com/800x500/efefef/aaaaaa&text=Documento';
 
   if (!docId) {
     titulo.textContent = "Error";
@@ -15,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const PLACEHOLDER = 'https://dummyimage.com/800x500/efefef/aaaaaa&text=Documento';
+  
 
   function showMsg(html, type='info') {
     if (!mensaje) return;
@@ -45,6 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     const doc = await response.json();
     titulo.textContent = doc.nombre || "Documento sin nombre";
+    if (tipoTag) tipoTag.textContent = doc.tipoDoc ?? '—';
 
     // 2) Resolver si se puede eliminar (ADMIN o USER dueño del vehículo)
     //    Necesitamos conocer el dueño del vehículo
@@ -67,44 +70,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     const puedeEliminar =
       !!authToken && ( isAdmin() || (isUser() && ownerId != null && loggedId === ownerId) );
 
-    // 3) Botones dinámicos
-    const botonEvento = doc.idEventoVehicular
-      ? `<a href="eventoDetalle.html?id=${doc.idEventoVehicular}" class="btn btn-warning me-2">Ver Evento</a>`
-      : "";
+    const btnVerEvento = document.getElementById('btnVerEvento');
+    const btnAnalisisIA = document.getElementById('btnAnalisisIA');
+    const btnEliminar = document.getElementById('btnEliminarDoc');
 
-    const botonAnalisis = doc.idEventoVehicular
-      ? `<a href="analisisIA.html?id=${docId}" class="btn btn-info">Ver análisis IA</a>`
-      : "";
+    if (doc.idEventoVehicular) {
+      btnVerEvento.href = `eventoDetalle.html?id=${doc.idEventoVehicular}`;
+      btnAnalisisIA.href = `analisisIA.html?id=${docId}`;
+    } else {
+      btnVerEvento.style.display = 'none';
+      btnAnalisisIA.style.display = 'none';
+    }
+    if (!puedeEliminar) btnEliminar.style.display = 'none';
 
-    const botonEliminar = puedeEliminar
-      ? `<button id="btnEliminarDoc" class="btn btn-danger btn-sm">Eliminar documento</button>`
-      : "";
+    // 4) Render del detalle (similar a eventoDetalle)
+    const validadoIA = doc.validadoIA
+      ? `<span class="badge bg-success-subtle text-success fw-semibold px-3 py-2 rounded-pill">Validado por IA</span>`
+      : `<span class="badge bg-secondary px-3 py-2 rounded-pill">No validado por IA</span>`;
 
-    const validadoIAHtml = doc.validadoIA
-      ? `
-        <div class="d-flex align-items-center gap-2">
-          <img src="img/greenBadge.png" alt="Validado por IA" width="40" height="35" />
-          <span class="fw-semibold text">Validado por IA</span>
-        </div>
-      `
-      : `
-        <span class="badge text-bg-secondary">No validado por IA</span>
-      `;
-
-    // 4) Render info
     info.innerHTML = `
-      <p><strong>Tipo de documento:</strong> ${doc.tipoDoc}</p>
-      <p><strong>Nivel de riesgo:</strong> ${doc.nivelRiesgo} %</p>
-      <p><strong>Fecha de subida:</strong> ${doc.fechaSubida ?? '—'}</p>
-      <div class="mb-2">${validadoIAHtml}</div>
-      <div class="mt-3 d-flex gap-2">
-        ${botonEvento}
-        ${botonAnalisis}
-        ${botonEliminar}
+      <div class="evento-info-row">
+        <div class="evento-info-item">
+          <img src="img/riesgoIcono.png" alt="Riesgo">
+          <div>
+            <p class="evento-info-label">Nivel de riesgo</p>
+            <p class="evento-info-value"><strong>${doc.nivelRiesgo ?? '—'}%</strong></p>
+          </div>
+        </div>
+        <div class="evento-info-item">
+          <img src="img/calendarioIcono.png" alt="Fecha subida">
+          <div>
+            <p class="evento-info-label">Fecha de subida</p>
+            <p class="evento-info-value"><strong>${doc.fechaSubida ?? '—'}</strong></p>
+          </div>
+        </div>
       </div>
-      <hr class="my-4">
+
+      <div class="ia-badge-wrap text-center">
+        ${validadoIA}
+      </div>
+
+      <hr class="evento-sep">
+
       <h5 class="mb-3">Vista previa</h5>
-      <div id="doc-preview"></div
+      <div id="doc-preview" class="doc-preview text-center"></div>
     `;
 
     // 5) Vista previa
@@ -126,7 +135,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     preview.appendChild(a);
 
     // 6) Handler de eliminación (solo si hay botón)
-    const btnEliminar = document.getElementById('btnEliminarDoc');
     btnEliminar?.addEventListener('click', async () => {
       if (!confirm('¿Seguro que querés eliminar este documento? Esta acción es permanente.')) return;
 

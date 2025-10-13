@@ -901,6 +901,22 @@ header.bg-primary {
   font-size: 15px !important;
 }
 
+/* Docs detalle */
+
+.ia-badge-wrap {
+  margin-top: 5px;      
+  margin-bottom: 10px;  
+}
+
+.evento-sep {
+  margin-top: 5px;    
+  margin-bottom: 10px;     
+}
+
+.doc-preview {
+  margin-bottom: 25px;   
+}
+
 /* 
 responsive */
 
