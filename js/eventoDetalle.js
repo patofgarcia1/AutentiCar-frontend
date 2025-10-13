@@ -59,28 +59,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         <img src="img/docIcono.png" alt="Descripción">
         <div>
           <p class="evento-info-label">Descripción</p>
-          <p class="evento-info-value">${ev.descripcion || '—'}</p>
+          <p class="evento-info-value"><strong>${ev.descripcion || '—'}</strong></p>
         </div>
       </div>
-      <div class="evento-info-item">
-        <img src="img/kilometrajeIcono.png" alt="Kilometraje">
-        <div>
-          <p class="evento-info-label">Kilometraje</p>
-          <p class="evento-info-value">${ev.kilometrajeEvento ?? '—'} km</p>
+
+      <div class="evento-info-row">
+        <div class="evento-info-item">
+          <img src="img/kilometrajeIcono.png" alt="Kilometraje">
+          <div>
+            <p class="evento-info-label">Kilometraje</p>
+            <p class="evento-info-value"> <strong> ${ev.kilometrajeEvento ?? '—'} Km </strong></p>
+          </div>
+        </div>
+
+        <div class="evento-info-item">
+          <img src="img/calendarioIcono.png" alt="Fecha">
+          <div>
+            <p class="evento-info-label">Fecha</p>
+            <p class="evento-info-value"> <strong>${ev.fechaEvento ?? '—'}</strong></p>
+          </div>
         </div>
       </div>
-      <div class="evento-info-item">
-        <img src="img/calendarioIcono.png" alt="Fecha">
-        <div>
-          <p class="evento-info-label">Fecha</p>
-          <p class="evento-info-value">${ev.fechaEvento ?? '—'}</p>
-        </div>
-      </div>
+
       <div class="evento-info-item">
         <img src="img/usuarioIcono.png" alt="Usuario">
         <div>
           <p class="evento-info-label">Registrado por</p>
-          <p class="evento-info-value">${usuario ? `${usuario.nombre ?? ''} ${usuario.apellido ?? ''}` : '—'}</p>
+          <p class="evento-info-value"> <strong>${usuario ? `${usuario.nombre ?? ''} ${usuario.apellido ?? ''}` : '—'}</strong></p>
         </div>
       </div>
     `;
@@ -115,16 +120,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!puedeAdjuntar && btnAddDocs) btnAddDocs.style.display = 'none';
     if (!puedeEliminar && btnEliminar) btnEliminar.style.display = 'none';
-
-    // const acciones = document.getElementById('acciones-evento');
-    // acciones.innerHTML = [
-    //   (puedeAdjuntar
-    //     ? `<a href="addDocumento.html?id=${ev.idVehiculo}&evento=${ev.idEvento}" class="btn btn-success me-2">Agregar Documentos</a>`
-    //     : ''),
-    //   (puedeEliminar
-    //     ? `<button id="btnEliminarEvento" class="btn btn-danger">Eliminar evento</button>`
-    //     : '')
-    // ].join('');
 
 
     // 4) Handler: eliminar evento

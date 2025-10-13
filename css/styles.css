@@ -702,6 +702,20 @@ header.bg-primary {
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
 }
 
+.evento-info-label {
+  font-weight: 400;
+  font-size: 16px;
+  margin-bottom: 0px;
+  color: #676869;
+}
+
+.evento-info-value {
+  font-size: 16px;
+  font-weight: 400;
+  color: #111827;
+  margin-bottom: 5px ;
+}
+
 .evento-icono {
   width: 50px;
   height: 50px;
@@ -712,6 +726,7 @@ header.bg-primary {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  top:-30px;
 }
 
 .evento-info {
@@ -724,14 +739,6 @@ header.bg-primary {
   font-weight: 600;
   color: #111827;
 }
-
-.evento-info p {
-  color: #4b5563;
-  font-size: 0.9rem;
-  margin-top: 0px;
-  margin-bottom: 5px;
-}
-
 
 #eventos-lista {
   display: grid;
@@ -762,6 +769,13 @@ header.bg-primary {
   align-self: flex-start;
 }
 
+.evento-line{
+  display: flex;
+  align-items: baseline;   
+  gap: .4rem;
+  flex-wrap: wrap;         
+}
+
 /* detalle eventos  */
 
 .evento-detalle-card {
@@ -778,14 +792,6 @@ header.bg-primary {
   flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 2rem;
-}
-
-@media (min-width: 576px) {
-  .evento-header {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
 }
 
 .evento-titulo {
@@ -805,50 +811,32 @@ header.bg-primary {
   text-transform: uppercase;
 }
 
-/* .evento-info {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-} */
-
-/* Bloques de información */
 .evento-info-item {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
   background: #f6f7f8;
-  border-radius: 0.75rem;
-  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  padding: 8px 20px;
+  margin-bottom: 15px;
 }
 
 .evento-info-item img {
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
+  position: relative;
+  top: 12px;
   filter: brightness(0) saturate(100%) invert(36%) sepia(96%) saturate(2639%) hue-rotate(204deg) brightness(97%) contrast(97%);
 }
 
-.evento-info-label {
-  font-weight: 500;
-  color: #6b7280;
-  font-size: 0.9rem;
-  margin-bottom: 0.1rem;
-}
-
-.evento-info-value {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-/* Acciones */
 .evento-acciones {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 15px;
   justify-content: center;
   border-top: 1px solid #e5e7eb;
-  margin-top: 2rem;
-  padding-top: 2rem;
+  margin-top: 20px;
+  padding-top: 10px;
 }
 
 .evento-btn {
@@ -869,24 +857,43 @@ header.bg-primary {
   height: 20px;
 }
 
-/* Botones */
-.primary-btn {
-  background-color: #137fec;
-  color: #fff;
+.evento-info-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
 }
-.primary-btn:hover { background-color: #0e6ed3; }
 
+/* Botones */
+.primary-btn { color: #fff; background-color: #137fec; }
+.primary-btn:hover { background-color: #0e6ed3; }
+.primary-btn .evento-icon {
+  /* convierte a blanco */
+  filter: invert(100%) brightness(105%);
+}
+
+/* Secundario: texto azul => ícono azul */
 .secondary-btn {
   background-color: #e5f0ff;
   color: #137fec;
 }
 .secondary-btn:hover { background-color: #d4e7ff; }
+.secondary-btn .evento-icon {
+  /* mismo filtro azul que las tarjetas */
+  filter: brightness(0) saturate(100%) invert(36%) sepia(96%)
+          saturate(2639%) hue-rotate(204deg) brightness(97%) contrast(97%);
+}
 
+/* Peligro: texto rojo => ícono rojo */
 .danger-btn {
   background-color: #ffe5e5;
   color: #ef4444;
 }
 .danger-btn:hover { background-color: #ffd6d6; }
+.danger-btn .evento-icon {
+  /* rojo */
+  filter: invert(28%) sepia(86%) saturate(3975%)
+          hue-rotate(352deg) brightness(94%) contrast(87%);
+}
 
 
 /* 
@@ -920,5 +927,19 @@ responsive */
   .favorito-thumb {
     width: 100%;
     height: 200px;
+  }
+}
+
+@media (min-width: 576px) {
+  .evento-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+@media (min-width: 576px) {
+  .evento-info-row {
+    grid-template-columns: 1fr 1fr;
   }
 }
