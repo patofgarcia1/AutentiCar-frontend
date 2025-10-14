@@ -1006,11 +1006,6 @@ header.bg-primary {
   border-color: #dc3545 !important;
 }
 
-.portada-vehiculo {
-  max-height: 380px;
-  object-fit: cover;
-}
-
 /* Carrusel de galería */
 .carousel-inner img {
   border-radius: 1rem;

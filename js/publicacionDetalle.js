@@ -1,6 +1,6 @@
 import { URL_API } from '../constants/database.js';
 import { isAdmin, isUser } from './roles.js';
-import { initGaleriaImagenes } from './components/imagenes.js';
+import { initGaleriaDetalle } from './components/galeriaDetalle.js';
 
 function showMsg(html, type = 'info') {
   const mensaje = document.getElementById('mensaje');
@@ -39,15 +39,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const usuarioIdStr = localStorage.getItem('usuarioId');
     const usuarioId = usuarioIdStr != null ? Number(usuarioIdStr) : null;
     const isLogged = !!token;
-
     const ownerId = vehiculo?.idUsuario ? Number(vehiculo.idUsuario) : null;
     const isOwner = isLogged && ownerId != null && usuarioId === ownerId;
 
     // === 5) DATOS ===
     const simbolo = publicacion.moneda === 'DOLARES' ? 'U$D' : '$';
-    const portada = vehiculo?.portadaUrl || 'img/defaultCar.jpg';
-    const galeria = vehiculo?.imagenes || [];
-    const todasLasFotos = [portada, ...galeria.filter(f => f !== portada)];
 
     // === 6) HTML ===
     container.innerHTML = `
@@ -59,30 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
 
           <!-- Galería principal -->
-          <div id="carouselFotos" class="carousel slide card-autoplat overflow-hidden mb-4" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              ${todasLasFotos
-                .map(
-                  (img, idx) => `
-                <div class="carousel-item ${idx === 0 ? 'active' : ''}">
-                  <img src="${img}" class="d-block w-100 portada-vehiculo" alt="Imagen vehículo ${idx + 1}">
-                </div>`
-                )
-                .join('')}
-            </div>
-            ${
-              todasLasFotos.length > 1
-                ? `
-              <button class="carousel-control-prev" type="button" data-bs-target="#carouselFotos" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Anterior</span>
-              </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#carouselFotos" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Siguiente</span>
-              </button>` : ''
-            }
-          </div>
+          <div id="galeria-root" class="card card-autoplat overflow-hidden mb-4"></div>
 
           <!-- Datos del vehículo -->
           <div class="card card-autoplat overflow-hidden mb-4">
@@ -165,26 +138,40 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
 
-    // === GALERÍA “INVISIBLE” PARA SUBIR IMÁGENES ===
+    // === GALERÍA DETALLE (NUEVA) ===
     const canManageImages = isLogged && (isAdmin() || (isUser() && isOwner));
-    const tempDiv = document.createElement('div'); // No se agrega al DOM visible
+    const galeriaRoot = document.getElementById('galeria-root');
 
-    const authHeaders = token ? { Authorization: `Bearer ${token}` } : undefined;
-    initGaleriaImagenes({
-      root: tempDiv,
-      vehiculoId: Number(vehiculo.idVehiculo),
-      allowUpload: canManageImages,
-      allowDelete: canManageImages,
-      titulo: 'Galería del vehículo',
-      authHeaders,
-      hidden: true, // 👈 clave: el componente no se renderiza visualmente
-      onChange: async (imagenes) => {
-        const nuevasFotos = imagenes.map(i => i.urlImagen);
-        const portadaActual = vehiculo.portadaUrl || 'img/defaultCar.jpg';
-        const todasLasFotos = [portadaActual, ...nuevasFotos.filter(f => f !== portadaActual)];
-        actualizarCarousel(todasLasFotos);
+    if (galeriaRoot) {
+      const authHeaders = token ? { Authorization: `Bearer ${token}` } : undefined;
+      const galeria = initGaleriaDetalle({
+        root: galeriaRoot,
+        vehiculoId: Number(vehiculo.idVehiculo),
+        allowUpload: canManageImages,
+        authHeaders,
+        onChange: (imagenes) => {
+          const nuevasFotos = imagenes.map(i => i.urlImagen);
+          actualizarCarousel(nuevasFotos);
+        }
+      });
+
+      // Vincular el botón de "Agregar imágenes"
+      const btnAddImgs = document.getElementById('btnAgregarImgs');
+      if (btnAddImgs) {
+        btnAddImgs.addEventListener('click', async () => {
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = 'image/*';
+          input.multiple = true;
+          input.onchange = async () => {
+            const files = Array.from(input.files || []);
+            if (!files.length) return;
+            await galeria.upload(files);
+          };
+          input.click();
+        });
       }
-    });
+    }
 
     // === FAVORITOS ===
     initFavoritos(publicacionId);
@@ -212,23 +199,7 @@ function renderSpec(icon, label, value) {
 }
 
 function actualizarCarousel(fotos) {
-  const carousel = document.getElementById('carouselFotos');
-  if (!carousel) return;
-  const inner = carousel.querySelector('.carousel-inner');
-  if (!inner) return;
-
-  inner.innerHTML = fotos
-    .map((img, idx) => `
-      <div class="carousel-item ${idx === 0 ? 'active' : ''}">
-        <img src="${img}" class="d-block w-100 portada-vehiculo" alt="Imagen ${idx + 1}">
-      </div>
-    `)
-    .join('');
-
-  const hasControls = fotos.length > 1;
-  carousel.querySelectorAll('.carousel-control-prev, .carousel-control-next').forEach(btn => {
-    btn.style.display = hasControls ? 'block' : 'none';
-  });
+  // opcional: refrescar portada si querés mantener sincronía visual
 }
 
 function initFavoritos(publicacionId) {
@@ -287,12 +258,6 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
   const token = localStorage.getItem('token');
   const btnEliminar = document.getElementById('btnEliminarPublicacion');
   const btnToggle = document.getElementById('btnToggleEstado');
-  const btnAddImgs = document.getElementById('btnAgregarImgs');
-
-  btnAddImgs?.addEventListener('click', () => {
-    const fileInput = document.querySelector('input[type="file"]');
-    if (fileInput) fileInput.click();
-  });
 
   btnToggle?.addEventListener('click', async () => {
     if (!token) return showMsg('Sesión no válida.', 'warning');

@@ -166,6 +166,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       })
     );
 
+    // <div class="d-flex gap-2">
+    //   <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
+    //   ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ''}
+    // </div>
+
     container.innerHTML = publicaciones.map((pub, i) => {
       const vehiculoId = resolveVehiculoId(pub);
       const imgSrc = portadas[i] || PLACEHOLDER;
@@ -187,10 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <h5 class="card-title text-dark fw-bold">${pub.titulo ?? 'Publicación'}</h5>
               <p class="card-text text-muted small">${pub.descripcion ?? ''}</p>
               <p class="precio mt-auto mb-3">${simbolo} ${precioStr}</p>
-              <div class="d-flex gap-2">
-                <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
-                ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ''}
-              </div>
+              
             </div>
           </div>
         </div>
