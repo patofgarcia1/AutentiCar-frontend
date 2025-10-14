@@ -1,10 +1,10 @@
-// js/components/galeriaDetalle.js
 import { URL_API } from '../../constants/database.js';
 
 export function initGaleriaDetalle({
   root,
   vehiculoId,
   allowUpload = false,
+  allowDelete = false, // nuevo
   authHeaders,
   onChange,
 }) {
@@ -21,8 +21,10 @@ export function initGaleriaDetalle({
   let indiceActual = 0;
 
   root.innerHTML = `
-    <div class="galeria-detalle text-center">
-      <img id="imgPortada" class="img-fluid rounded shadow-sm portada-galeria" style="cursor:pointer; max-height:500px; object-fit:cover;" alt="Portada vehículo"/>
+    <div class="galeria-detalle text-center galeria-card card card-autoplat position-relative">
+      <div class="img-wrapper d-inline-block position-relative">
+        <img id="imgPortada" class="img-fluid portada-galeria" alt="Portada vehículo"/>
+      </div>
     </div>
 
     <div id="slideshowDetalle" class="position-fixed top-0 start-0 w-100 h-100 d-none"
@@ -31,16 +33,24 @@ export function initGaleriaDetalle({
       <button type="button" class="btn btn-light position-absolute start-0 ms-3" id="btnPrevSlide">‹</button>
       <img id="imagen-slide" class="img-fluid" alt="Imagen vehículo" style="max-height: 90vh; max-width:90vw;"/>
       <button type="button" class="btn btn-light position-absolute end-0 me-3" id="btnNextSlide">›</button>
+      ${
+        allowDelete
+          ? `<button type="button" id="btnDelSlide" class="btn-del-img position-absolute m-5">Eliminar Imágen</button>`
+          : ''
+      }
     </div>
   `;
 
   const portada = root.querySelector('#imgPortada');
+  const btnDelImg = root.querySelector('#btnDelImg');
   const overlay = root.querySelector('#slideshowDetalle');
   const imgSlide = root.querySelector('#imagen-slide');
   const btnPrev = root.querySelector('#btnPrevSlide');
   const btnNext = root.querySelector('#btnNextSlide');
   const btnCerrar = root.querySelector('#btnCerrarSlide');
+  const btnDelSlide = root.querySelector('#btnDelSlide');
 
+  // ==== API CALLS ====
   async function getImagenes() {
     const res = await fetch(`${URL_API}/vehiculos/${vehiculoId}/imagenes`);
     if (!res.ok) return [];
@@ -59,12 +69,24 @@ export function initGaleriaDetalle({
     return res.json();
   }
 
+  async function deleteImagen(imagenId) {
+    const res = await fetch(`${URL_API}/vehiculos/imagenes/${imagenId}`, {
+      method: 'DELETE',
+      headers: { ...resolvedAuthHeaders }
+    });
+    if (!res.ok) throw new Error(await res.text());
+  }
+
+  // ==== RENDER ====
   function renderPortada() {
     if (!imagenes.length) {
       portada.src = 'img/defaultCar.jpg';
+      if (btnDelImg) btnDelImg.style.display = 'none';
       return;
     }
+
     portada.src = imagenes[0].urlImagen;
+    if (btnDelImg) btnDelImg.style.display = 'block';
   }
 
   function abrirSlide(i) {
@@ -96,6 +118,31 @@ export function initGaleriaDetalle({
   btnCerrar.addEventListener('click', cerrarSlide);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) cerrarSlide(); });
 
+  // ==== ELIMINAR ====
+  if (btnDelSlide) {
+    btnDelSlide.addEventListener('click', async (ev) => {
+      ev.stopPropagation();
+      if (!imagenes.length) return;
+      if (!confirm('¿Eliminar esta imagen?')) return;
+
+      try {
+        const imgAEliminar = imagenes[indiceActual];
+        await deleteImagen(imgAEliminar.idImagen);
+        await cargarImagenes();
+        if (imagenes.length) {
+          indiceActual = Math.min(indiceActual, imagenes.length - 1);
+          mostrarSlide();
+        } else {
+          cerrarSlide();
+        }
+        onChange?.(imagenes);
+      } catch (err) {
+        alert(err.message || 'No se pudo eliminar la imagen');
+      }
+    });
+  }
+
+  // ==== CARGA ====
   async function cargarImagenes() {
     try {
       imagenes = await getImagenes();
@@ -106,7 +153,6 @@ export function initGaleriaDetalle({
     return imagenes;
   }
 
-  // Subida pública
   async function subir(files) {
     await postImagenes(files);
     await cargarImagenes();

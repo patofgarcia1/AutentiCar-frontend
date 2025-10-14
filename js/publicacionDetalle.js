@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         root: galeriaRoot,
         vehiculoId: Number(vehiculo.idVehiculo),
         allowUpload: canManageImages,
+        allowDelete: canManageImages,
         authHeaders,
         onChange: (imagenes) => {
           const nuevasFotos = imagenes.map(i => i.urlImagen);

@@ -925,13 +925,6 @@ header.bg-primary {
   border: none;
 }
 
-/* Imagen de portada */
-.portada-vehiculo {
-  max-height: 390px;
-  object-fit: cover;
-}
-
-/* Íconos de especificaciones */
 .spec-item {
   display: flex;
   align-items: center;
@@ -944,12 +937,10 @@ header.bg-primary {
   object-fit: contain;
 }
 
-/* Íconos azules como en detalle de evento */
 .spec-icon-blue {
   filter: invert(34%) sepia(85%) saturate(5082%) hue-rotate(206deg) brightness(97%) contrast(95%);
 }
 
-/* Card del vendedor */
 .card-header-vendedor h6 {
   font-size: 15px;
   color: #0d6efd; 
@@ -962,13 +953,12 @@ header.bg-primary {
   object-fit: cover;
 }
 
-/* Mantenimiento */
 .card-autoplat h6 {
   font-weight: 600;
 }
 
 .precio-publicacion {
-  margin-right: 1.5rem; /* mueve un poco el precio a la izquierda */
+  margin-right: 1.5rem; 
 }
 
 .btn-favorito {
@@ -1006,18 +996,56 @@ header.bg-primary {
   border-color: #dc3545 !important;
 }
 
-/* Carrusel de galería */
-.carousel-inner img {
-  border-radius: 1rem;
+.portada-galeria {
+  max-height: 290px;       /* antes 500px */
+  object-fit: cover;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  background-color: rgba(0, 0, 0, 0.4);
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
+.portada-galeria:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
+
+/* Contenedor de la galería */
+.card.card-autoplat.galeria-card {
+  padding: 0.75rem 0.75rem; /* achica el padding interno */
+  overflow: visible !important;
+}
+
+/* ==== ICONO DE ELIMINAR ==== */
+.btn-del-img {
+  background:rgb(118, 18, 18);
+  border: none;
+  color: #fff;
+  border-radius: 10px;
+  width: 90px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  z-index: 9999;
+  top:30px;
+  right: 30px;
+}
+
+.btn-del-img:hover {
+  background: rgb(138, 54, 54);
+}
+
+.img-wrapper {
+  position: relative;  
+  display: inline-block;
+}
+
+.img-wrapper:hover .btn-del-img {
+  opacity: 1;
+}
+
 
 /* 
 responsive */
