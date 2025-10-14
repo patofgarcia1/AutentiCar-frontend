@@ -1,323 +1,123 @@
 import { URL_API } from '../constants/database.js';
 import { isAdmin, isUser } from './roles.js';
 
-// function getLoggedUserId() {
-//   // tu roles.js ya expone getSession(); lo usás más abajo, pero dejo fallback
-//   const sess = getSession();
-//   if (sess?.userId != null) return Number(sess.userId);
-//   const ui = localStorage.getItem('usuarioId');
-//   return ui != null ? Number(ui) : null;
-// }
-
-// util para mensajes (usa el contenedor global #mensaje)
-function showMsg(html, type = 'info') {
-  const mensaje = document.getElementById('mensaje');
-  if (!mensaje) return;
-  mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const publicacionId = params.get('id');
   const container = document.getElementById('detalle-publicacion');
 
-  const simbolos = {
-    PESOS: "$",
-    DOLARES: "U$D"
-  };
-
   if (!publicacionId) {
-    container.innerHTML = `<div class="alert alert-danger">ID de publicación no especificado.</div>`;
+    container.innerHTML = `<div class="alert alert-danger text-center">ID de publicación no especificado.</div>`;
     return;
   }
 
-  // if (!token) {
-  //   container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
-  //   // opcional: window.location.href = 'login.html';
-  //   return;
-  // }
-
   try {
-    // 1) Obtener publicación
+    // 1️⃣ Publicación
     const pubResp = await fetch(`${URL_API}/publicaciones/${publicacionId}`);
-    if (!pubResp.ok) {
-      const error = await pubResp.text();
-      container.innerHTML = `<div class="alert alert-danger">${error}</div>`;
-      return;
-    }
+    if (!pubResp.ok) throw new Error(await pubResp.text());
     const publicacion = await pubResp.json();
 
-    // 2) Obtener datos del vehículo
-    const vehiculoResp = await fetch(`${URL_API}/vehiculos/${publicacion.vehiculoId}`);
-    const vehiculo = vehiculoResp.ok ? await vehiculoResp.json() : null;
+    // 2️⃣ Vehículo
+    const vehResp = await fetch(`${URL_API}/vehiculos/${publicacion.vehiculoId}`);
+    const vehiculo = vehResp.ok ? await vehResp.json() : null;
 
-    // 3) Obtener datos del usuario
-    const usuarioResp = await fetch(`${URL_API}/usuarios/publico/${publicacion.usuarioId}`);
-    const usuario = usuarioResp.ok ? await usuarioResp.json() : null;
+    // 3️⃣ Dueño
+    const userResp = vehiculo?.idUsuario
+      ? await fetch(`${URL_API}/usuarios/publico/${vehiculo.idUsuario}`)
+      : null;
+    const usuario = userResp?.ok ? await userResp.json() : null;
 
-    // 4) Render base
+    const simbolo = publicacion.moneda === 'DOLARES' ? 'U$D' : '$';
+    const portada = vehiculo?.portadaUrl || 'img/defaultCar.jpg';
+
     container.innerHTML = `
-      <h3>${publicacion.titulo}</h3>
-      <p><strong>Descripción:</strong> ${publicacion.descripcion}</p>
-      <p><strong>Precio:</strong> ${simbolos[publicacion.moneda]} ${publicacion.precio}</p>
-      <p><strong>Fecha de publicación:</strong> ${publicacion.fechaPublicacion}</p>
-      <p><strong>Estado:</strong> <span id="estado-publicacion">${publicacion.estadoPublicacion}</span></p>
-      <div id="acciones-publicacion" class="d-flex gap-2 mb-3 flex-wrap"></div>
-      <hr/>
+      <div class="row g-4">
+        <!-- Columna izquierda -->
+        <div class="col-lg-8">
+          <div class="card card-autoplat overflow-hidden mb-4">
+            <img src="${portada}" class="w-100" style="max-height: 420px; object-fit: cover;" alt="Portada vehículo"/>
 
-      <h5>Datos del Vehículo</h5>
-      ${vehiculo ? `
-        <ul>
-          <li><strong>Marca:</strong> ${vehiculo.marca}</li>
-          <li><strong>Modelo:</strong> ${vehiculo.modelo}</li>
-          <li><strong>Año:</strong> ${vehiculo.anio}</li>
-          <li><strong>Kilometraje:</strong> ${vehiculo.kilometraje} km</li>
-          <li><strong>Motor:</strong> ${vehiculo.motor}L</li>
-          <li><strong>Color:</strong> ${vehiculo.color}</li>
-          <li><strong>Combustible:</strong> ${vehiculo.tipoCombustible}</li>
-          <li><strong>Transmisión:</strong> ${vehiculo.tipoTransmision}</li>
-        </ul>
-      ` : `<p class="text-muted">No se pudo cargar información del vehículo.</p>`}
+            <div class="card-body">
+              <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3">
+                <div>
+                  <h2 class="fw-bold mb-1">${publicacion.titulo}</h2>
+                  <p class="text-muted mb-0">
+                    ${vehiculo?.marca || ''} • ${vehiculo?.modelo || ''} • ${vehiculo?.anio || ''} • ${vehiculo?.tipoTransmision || ''} • ${vehiculo?.tipoCombustible || ''}
+                  </p>
+                </div>
+                <h3 class="text-primary fw-bold mt-3 mt-sm-0">${simbolo} ${publicacion.precio}</h3>
+              </div>
 
-      <a href="vehiculoDetalle.html?id=${publicacion.vehiculoId}" class="btn btn-primary mb-3">Ver más del vehículo</a>
+              <hr/>
 
-      <hr/>
-      <h5>Dueño</h5>
-      ${usuario ? `
-        <p>${usuario.nombre || ''} ${usuario.apellido || ''}</p>
-      ` : `<p class="text-muted">No se pudo cargar información del dueño.</p>`}
+              <!-- Especificaciones -->
+              <h5 class="fw-bold mb-3">Especificaciones</h5>
+              <div class="row row-cols-2 row-cols-md-3 g-3">
+                ${renderSpec('motorIcono.png', 'Motor', vehiculo?.motor + 'L')}
+                ${renderSpec('transmisionIcono.png', 'Transmisión', vehiculo?.tipoTransmision)}
+                ${renderSpec('kilometrajeIcono.png', 'Kilometraje', vehiculo?.kilometraje + ' km')}
+                ${renderSpec('combustibleIcono.png', 'Combustible', vehiculo?.tipoCombustible)}
+                ${renderSpec('colorIcono.png', 'Color', vehiculo?.color)}
+                ${renderSpec('puertasIcono.png', 'Puertas', vehiculo?.puertas)}
+                ${renderSpec('anioIcono.png', 'Año', vehiculo?.anio)}
+              </div>
+
+              <hr class="my-4"/>
+
+              <!-- Descripción -->
+              <h5 class="fw-bold mb-3">Características Destacadas</h5>
+              <p class="text-secondary">${publicacion.descripcion || 'Sin descripción disponible.'}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="col-lg-4">
+          <!-- Card vendedor -->
+          ${usuario ? `
+            <div class="card card-autoplat mb-4">
+              <div class="card-body d-flex align-items-center gap-3">
+                <img src="${usuario.fotoPerfilUrl || 'img/defaultProfile.png'}" 
+                     class="rounded-circle border" width="70" height="70" style="object-fit:cover" alt="Vendedor">
+                <div>
+                  <h6 class="fw-bold mb-0">${usuario.nombre || ''} ${usuario.apellido || ''}</h6>
+                  <p class="text-muted mb-1 small">${usuario.email || ''}</p>
+                  <p class="text-muted mb-0 small">${usuario.telefono || ''}</p>
+                </div>
+              </div>
+            </div>
+          ` : `
+            <div class="card card-autoplat mb-4 p-3 text-muted text-center">
+              No se pudo cargar información del vendedor.
+            </div>
+          `}
+
+          <!-- Card mantenimiento -->
+          <div class="card card-autoplat p-4">
+            <h6 class="fw-bold mb-3">Historial de Mantenimiento</h6>
+            <p class="text-muted small mb-2">
+              Incluye registros de documentos y eventos del vehículo.
+            </p>
+            <a href="docsVehiculo.html?id=${vehiculo?.idVehiculo}" class="btn btn-outline-primary w-100 mb-2">Ver Documentos</a>
+            <a href="eventosVehiculo.html?id=${vehiculo?.idVehiculo}" class="btn btn-outline-primary w-100">Ver Eventos</a>
+          </div>
+        </div>
+      </div>
     `;
-
-    // 5) Render dinámico de botones según estado
-    const acciones = document.getElementById('acciones-publicacion');
-    const estadoSpan = document.getElementById('estado-publicacion');
-
-    const token = localStorage.getItem('token');
-    const isLogged = !!token;
-    const usuarioIdStr = localStorage.getItem('usuarioId');
-    const usuarioId = usuarioIdStr != null ? Number(usuarioIdStr) : null;
-
-    // === Reglas de visibilidad para Pausar/Activar usando roles.js ===
-    //const sess = getSession();
-
-    // loggedId: primero del token, si no, del localStorage (compat)
-    // let loggedId = null;
-    // if (sess?.userId != null) {
-    //   loggedId = Number(sess.userId);
-    // } else {
-    //   const ui = localStorage.getItem('usuarioId');
-    //   if (ui != null) loggedId = Number(ui);
-    // }
-
-    // ownerId: primero desde la publicación, luego fallback del vehículo
-    let ownerId = null;
-    if (publicacion?.usuarioId != null) {
-      ownerId = Number(publicacion.usuarioId);
-    } else if (vehiculo?.usuarioId != null) {
-      ownerId = Number(vehiculo.usuarioId);
-    } else if (vehiculo?.usuario?.idUsuario != null) {
-      ownerId = Number(vehiculo.usuario.idUsuario);
-    }
-
-    // Puede pausar/activar si es ADMIN o si es USER (particular/concesionaria) y dueño
-    const puedeToggle = isAdmin() || (isUser() && ownerId != null && usuarioId  === ownerId);
-
-    // Puede eliminar si es ADMIN o dueño del auto
-    const puedeEliminar = isAdmin() || (ownerId != null && usuarioId  === ownerId);
-
-    function renderBotones(estadoActual) {
-
-      const btnToggleHtml =
-        (puedeToggle && (estadoActual === 'ACTIVA' || estadoActual === 'PAUSADA'))
-          ? (estadoActual === 'ACTIVA'
-              ? `<button id="btnToggleEstado" class="btn btn-warning">Pausar publicación</button>`
-              : `<button id="btnToggleEstado" class="btn btn-success">Activar publicación</button>`)
-          : ``;
-
-      const btnEliminarHtml = puedeEliminar
-          ? `<button id="btnEliminarPublicacion" class="btn btn-danger">Eliminar publicación</button>` : ``;
-      
-      acciones.innerHTML = `${btnToggleHtml} ${btnEliminarHtml}`.trim();
-
-      // Toggle handler
-      const btnToggle = document.getElementById('btnToggleEstado');
-      btnToggle?.addEventListener('click', async () => {
-        btnToggle.disabled = true;
-        const original = btnToggle.textContent;
-        btnToggle.textContent = 'Actualizando...';
-
-        const token = localStorage.getItem('token');
-
-        if (!token) {
-          container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
-          btnToggle.disabled = false;
-          btnToggle.textContent = original;
-          return;
-        }
-
-        try {
-          const resp = await fetch(`${URL_API}/publicaciones/${publicacionId}/estado`, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${token}`,   
-              'Accept': 'application/json'
-            } 
-          });
-
-          if (resp.status === 401 || resp.status === 403) {
-            showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
-            btnEliminar.textContent = original;
-            btnEliminar.disabled = false;
-            return;
-          }
-
-          if (!resp.ok) {
-            const txt = await resp.text();
-            alert(`No se pudo actualizar el estado: ${txt}`);
-            btnToggle.disabled = false;
-            btnToggle.textContent = original;
-            return;
-          }
-
-          // Alternamos en el front en base al texto actual
-          const nuevo = (estadoActual === 'ACTIVA') ? 'PAUSADA' : 'ACTIVA';
-          estadoSpan.textContent = nuevo;
-          renderBotones(nuevo);
-          showMsg('Publicación actualizada', 'success');
-        } catch (e) {
-          console.error('Error al actualizar estado:', e);
-          alert('Error al actualizar el estado de la publicación');
-          btnToggle.disabled = false;
-          btnToggle.textContent = original;
-        }
-      });
-
-      // Eliminar handler (opcional, si querés tenerlo acá también)
-      const btnEliminar = document.getElementById('btnEliminarPublicacion');
-      btnEliminar?.addEventListener('click', async () => {
-        if (!confirm('¿Seguro que querés eliminar esta publicación? El vehículo asociado NO se eliminará.')) return;
-
-        btnEliminar.disabled = true;
-        const originalText = btnEliminar.textContent;
-        btnEliminar.textContent = 'Eliminando...';
-
-        try {
-          const del = await fetch(`${URL_API}/publicaciones/${publicacionId}`, { 
-            method: 'DELETE',
-            headers: {
-              'Authorization': `Bearer ${token}`,   
-              'Accept': 'application/json'
-            } 
-          });
-
-          if (del.status === 401 || del.status === 403) {
-            showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
-            btnEliminar.textContent = originalText;
-            btnEliminar.disabled = false;
-            return;
-          }
-
-          if (!del.ok) {
-            const txt = await del.text();
-            alert(`Error al eliminar: ${txt}`);
-            return;
-          }
-          showMsg('Publicación eliminada', 'success');
-          window.location.href = `vehiculoDetalle.html?id=${publicacion.vehiculoId}`;
-        } catch (e) {
-          console.error('Error al eliminar la publicación:', e);
-          alert('No se pudo eliminar la publicación');
-        } finally {
-          btnEliminar.disabled = false;
-          btnEliminar.textContent = originalText;
-        }
-      });
-    }
-
-    async function renderFavorito(publicacionId) {
-      if (!acciones) return;
-
-      const logged = isLogged;
-      let esFav = false;
-
-      if (logged && usuarioId != null) {
-        try {
-          const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/favoritos/check/${publicacionId}`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Accept': 'application/json',
-              'Cache-Control': 'no-cache'
-            },
-            cache: 'no-store'
-          });
-          if (resp.ok) {
-            const data = await resp.json();
-            esFav = !!data?.favorito;
-          }
-        } catch (e) {
-          console.warn('No se pudo verificar favorito:', e);
-        }
-      }
-
-      const btnId = 'btn-favorito';
-      acciones.insertAdjacentHTML('afterbegin', `
-        <button id="${btnId}" class="btn ${esFav ? 'btn-danger' : 'btn-outline-danger'}">
-          <span class="me-1" aria-hidden="true">${esFav ? '❤' : '♡'}</span>
-          <span class="fav-label">${esFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}</span>
-        </button>
-      `);
-
-      const btnFav = document.getElementById(btnId);
-      btnFav.addEventListener('click', async () => {
-        if (!logged || usuarioId == null) {
-          window.location.href = 'login.html';
-          return;
-        }
-        btnFav.disabled = true;
-        const wasFav = esFav;
-        try {
-          const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/favoritos/${publicacionId}`, {
-            method: wasFav ? 'DELETE' : 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Accept': 'application/json'
-            }
-          });
-
-          if (resp.status === 401 || resp.status === 403) {
-            showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
-            return;
-          }
-          if (!resp.ok) {
-            const txt = await resp.text();
-            showMsg(txt || 'No se pudo actualizar favoritos', 'danger');
-            return;
-          }
-
-          esFav = !wasFav;
-          btnFav.querySelector('.fav-label').textContent = esFav ? 'Quitar de favoritos' : 'Agregar a favoritos';
-          btnFav.classList.toggle('btn-danger', esFav);
-          btnFav.classList.toggle('btn-outline-danger', !esFav);
-          btnFav.querySelector('span[aria-hidden="true"]').textContent = esFav ? '❤' : '♡';
-          showMsg(esFav ? 'Agregado a favoritos' : 'Quitado de favoritos', 'success');
-        } catch (e) {
-          console.error('Favoritos error:', e);
-          showMsg('Error al actualizar favoritos', 'danger');
-        } finally {
-          btnFav.disabled = false;
-        }
-      });
-    }
-
-    // Primer render de botones
-    renderBotones(publicacion.estadoPublicacion);
-
-    await renderFavorito(publicacionId);
-
-  } catch (error) {
-    console.error("Error al obtener detalles de la publicación:", error);
-    const container = document.getElementById('detalle-publicacion');
-    container.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+  } catch (err) {
+    console.error('Error al cargar:', err);
+    container.innerHTML = `<div class="alert alert-danger text-center">No se pudo conectar con el servidor.</div>`;
   }
 });
+
+function renderSpec(icon, label, value) {
+  return `
+    <div class="col spec-item">
+      <img src="img/iconos/${icon}" alt="${label}" class="spec-icon"/>
+      <div>
+        <p class="fw-semibold mb-0">${label}</p>
+        <p class="text-muted small mb-0">${value || '-'}</p>
+      </div>
+    </div>
+  `;
+}

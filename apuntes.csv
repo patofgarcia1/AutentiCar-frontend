@@ -1,128 +1,361 @@
-REGISTER.JS
+publicacionDetalle.js:
 
 import { URL_API } from '../constants/database.js';
+import { isAdmin, isUser } from './roles.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('registerForm');
-    const btnSubmit = form.querySelector('button[type="submit"]');
+// function getLoggedUserId() {
+//   // tu roles.js ya expone getSession(); lo usás más abajo, pero dejo fallback
+//   const sess = getSession();
+//   if (sess?.userId != null) return Number(sess.userId);
+//   const ui = localStorage.getItem('usuarioId');
+//   return ui != null ? Number(ui) : null;
+// }
 
-    form.addEventListener('submit', async function (e) {
-        e.preventDefault();
+// util para mensajes (usa el contenedor global #mensaje)
+function showMsg(html, type = 'info') {
+  const mensaje = document.getElementById('mensaje');
+  if (!mensaje) return;
+  mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
+}
 
-        const originalText = btnSubmit.textContent;
-        btnSubmit.textContent = 'Creando...';
-        btnSubmit.disabled = true;
+document.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const publicacionId = params.get('id');
+  const container = document.getElementById('detalle-publicacion');
 
-        const nombre = document.getElementById('nombre').value;
-        const apellido = document.getElementById('apellido').value;
-        const dni = document.getElementById('dni').value;
-        const mail = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const rol = document.getElementById('rol').value;
+  const simbolos = {
+    PESOS: "$",
+    DOLARES: "U$D"
+  };
+
+  if (!publicacionId) {
+    container.innerHTML = `<div class="alert alert-danger">ID de publicación no especificado.</div>`;
+    return;
+  }
+
+  // if (!token) {
+  //   container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+  //   // opcional: window.location.href = 'login.html';
+  //   return;
+  // }
+
+  try {
+    // 1) Obtener publicación
+    const pubResp = await fetch(`${URL_API}/publicaciones/${publicacionId}`);
+    if (!pubResp.ok) {
+      const error = await pubResp.text();
+      container.innerHTML = `<div class="alert alert-danger">${error}</div>`;
+      return;
+    }
+    const publicacion = await pubResp.json();
+
+    // 2) Obtener datos del vehículo
+    const vehiculoResp = await fetch(`${URL_API}/vehiculos/${publicacion.vehiculoId}`);
+    const vehiculo = vehiculoResp.ok ? await vehiculoResp.json() : null;
+
+    // 3) Obtener datos del usuario
+    const usuarioResp = await fetch(`${URL_API}/usuarios/publico/${publicacion.usuarioId}`);
+    const usuario = usuarioResp.ok ? await usuarioResp.json() : null;
+
+    // 4) Render base
+    container.innerHTML = `
+      <h3>${publicacion.titulo}</h3>
+      <p><strong>Descripción:</strong> ${publicacion.descripcion}</p>
+      <p><strong>Precio:</strong> ${simbolos[publicacion.moneda]} ${publicacion.precio}</p>
+      <p><strong>Fecha de publicación:</strong> ${publicacion.fechaPublicacion}</p>
+      <p><strong>Estado:</strong> <span id="estado-publicacion">${publicacion.estadoPublicacion}</span></p>
+      <div id="acciones-publicacion" class="d-flex gap-2 mb-3 flex-wrap"></div>
+      <hr/>
+
+      <h5>Datos del Vehículo</h5>
+      ${vehiculo ? `
+        <ul>
+          <li><strong>Marca:</strong> ${vehiculo.marca}</li>
+          <li><strong>Modelo:</strong> ${vehiculo.modelo}</li>
+          <li><strong>Año:</strong> ${vehiculo.anio}</li>
+          <li><strong>Kilometraje:</strong> ${vehiculo.kilometraje} km</li>
+          <li><strong>Motor:</strong> ${vehiculo.motor}L</li>
+          <li><strong>Color:</strong> ${vehiculo.color}</li>
+          <li><strong>Combustible:</strong> ${vehiculo.tipoCombustible}</li>
+          <li><strong>Transmisión:</strong> ${vehiculo.tipoTransmision}</li>
+        </ul>
+      ` : `<p class="text-muted">No se pudo cargar información del vehículo.</p>`}
+
+      <a href="vehiculoDetalle.html?id=${publicacion.vehiculoId}" class="btn btn-primary mb-3">Ver más del vehículo</a>
+
+      <hr/>
+      <h5>Dueño</h5>
+      ${usuario ? `
+        <p>${usuario.nombre || ''} ${usuario.apellido || ''}</p>
+      ` : `<p class="text-muted">No se pudo cargar información del dueño.</p>`}
+    `;
+
+    // 5) Render dinámico de botones según estado
+    const acciones = document.getElementById('acciones-publicacion');
+    const estadoSpan = document.getElementById('estado-publicacion');
+
+    const token = localStorage.getItem('token');
+    const isLogged = !!token;
+    const usuarioIdStr = localStorage.getItem('usuarioId');
+    const usuarioId = usuarioIdStr != null ? Number(usuarioIdStr) : null;
+
+    // === Reglas de visibilidad para Pausar/Activar usando roles.js ===
+    //const sess = getSession();
+
+    // loggedId: primero del token, si no, del localStorage (compat)
+    // let loggedId = null;
+    // if (sess?.userId != null) {
+    //   loggedId = Number(sess.userId);
+    // } else {
+    //   const ui = localStorage.getItem('usuarioId');
+    //   if (ui != null) loggedId = Number(ui);
+    // }
+
+    // ownerId: primero desde la publicación, luego fallback del vehículo
+    let ownerId = null;
+    if (publicacion?.usuarioId != null) {
+      ownerId = Number(publicacion.usuarioId);
+    } else if (vehiculo?.usuarioId != null) {
+      ownerId = Number(vehiculo.usuarioId);
+    } else if (vehiculo?.usuario?.idUsuario != null) {
+      ownerId = Number(vehiculo.usuario.idUsuario);
+    }
+
+    // Puede pausar/activar si es ADMIN o si es USER (particular/concesionaria) y dueño
+    const puedeToggle = isAdmin() || (isUser() && ownerId != null && usuarioId  === ownerId);
+
+    // Puede eliminar si es ADMIN o dueño del auto
+    const puedeEliminar = isAdmin() || (ownerId != null && usuarioId  === ownerId);
+
+    function renderBotones(estadoActual) {
+
+      const btnToggleHtml =
+        (puedeToggle && (estadoActual === 'ACTIVA' || estadoActual === 'PAUSADA'))
+          ? (estadoActual === 'ACTIVA'
+              ? `<button id="btnToggleEstado" class="btn btn-warning">Pausar publicación</button>`
+              : `<button id="btnToggleEstado" class="btn btn-success">Activar publicación</button>`)
+          : ``;
+
+      const btnEliminarHtml = puedeEliminar
+          ? `<button id="btnEliminarPublicacion" class="btn btn-danger">Eliminar publicación</button>` : ``;
+      
+      acciones.innerHTML = `${btnToggleHtml} ${btnEliminarHtml}`.trim();
+
+      // Toggle handler
+      const btnToggle = document.getElementById('btnToggleEstado');
+      btnToggle?.addEventListener('click', async () => {
+        btnToggle.disabled = true;
+        const original = btnToggle.textContent;
+        btnToggle.textContent = 'Actualizando...';
+
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+          btnToggle.disabled = false;
+          btnToggle.textContent = original;
+          return;
+        }
 
         try {
-            const response = await fetch(`${URL_API}/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    nombre: nombre,
-                    apellido: apellido,
-                    dni: parseInt(dni),
-                    mail: mail,
-                    password: password,
-                    rol: rol
-                })
-            });
+          const resp = await fetch(`${URL_API}/publicaciones/${publicacionId}/estado`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,   
+              'Accept': 'application/json'
+            } 
+          });
 
-            const mensaje = document.getElementById('mensaje');
+          if (resp.status === 401 || resp.status === 403) {
+            showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
+            btnEliminar.textContent = original;
+            btnEliminar.disabled = false;
+            return;
+          }
 
-            if (response.ok) {
-                const data = await response.json();
-                const usuario = data.usuario;
-                mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje}</div>`;
+          if (!resp.ok) {
+            const txt = await resp.text();
+            alert(`No se pudo actualizar el estado: ${txt}`);
+            btnToggle.disabled = false;
+            btnToggle.textContent = original;
+            return;
+          }
 
-                if (usuario && usuario.esConcesionaria === true) {
-                    localStorage.setItem('usuarioIdVerif', String(usuario.idUsuario));
-                    setTimeout(() => {
-                    window.location.href = "formVerificacion.html";
-                    }, 1000);
-                } else {
-                    // si no, al login como antes
-                    setTimeout(() => {
-                    window.location.href = "login.html";
-                    }, 1000);
-                }
-            } else {
-                const error = await response.text();
-                mensaje.innerHTML = `<div class="alert alert-danger">${error}</div>`;
-            }
-        } catch (error) {
-            document.getElementById('mensaje').innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor</div>`;
-        } finally {
-            if (!document.hidden) {
-                btnSubmit.textContent = originalText;
-                btnSubmit.disabled = false;
-            }
+          // Alternamos en el front en base al texto actual
+          const nuevo = (estadoActual === 'ACTIVA') ? 'PAUSADA' : 'ACTIVA';
+          estadoSpan.textContent = nuevo;
+          renderBotones(nuevo);
+          showMsg('Publicación actualizada', 'success');
+        } catch (e) {
+          console.error('Error al actualizar estado:', e);
+          alert('Error al actualizar el estado de la publicación');
+          btnToggle.disabled = false;
+          btnToggle.textContent = original;
         }
-    });
-});
-
-
-
-LOGIN.JS:
-import { URL_API } from '../constants/database.js';
-
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('loginForm');
-  const btnSubmit = form.querySelector('button[type="submit"]');
-
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const originalText = btnSubmit.textContent;
-    btnSubmit.textContent = 'Ingresando...';
-    btnSubmit.disabled = true;
-
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    try {
-      const response = await fetch(`${URL_API}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          mail: email,
-          password: password
-        })
       });
 
-      const mensaje = document.getElementById('mensaje');
+      // Eliminar handler (opcional, si querés tenerlo acá también)
+      const btnEliminar = document.getElementById('btnEliminarPublicacion');
+      btnEliminar?.addEventListener('click', async () => {
+        if (!confirm('¿Seguro que querés eliminar esta publicación? El vehículo asociado NO se eliminará.')) return;
 
-      if (response.ok) {
-        const data = await response.json();
-        // console.log("Respuesta del backend:", data); 
-        // console.log("ID del usuario:", data.id);  
-        mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje}</div>`;
-        localStorage.setItem("usuarioId", data.id);
-        setTimeout(() => {
-            window.location.href = "index.html";
-        }, 1000); // 1000 milisegundos = 1 segundo
+        btnEliminar.disabled = true;
+        const originalText = btnEliminar.textContent;
+        btnEliminar.textContent = 'Eliminando...';
 
-      } else {
-        const error = await response.text();
-        mensaje.innerHTML = `<div class="alert alert-danger">${error}</div>`;
-      }
-    } catch (error) {
-      document.getElementById('mensaje').innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor</div>`;
-    } finally {
-      if (!document.hidden) {
-        btnSubmit.textContent = originalText;
-        btnSubmit.disabled = false;
-      }
+        try {
+          const del = await fetch(`${URL_API}/publicaciones/${publicacionId}`, { 
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,   
+              'Accept': 'application/json'
+            } 
+          });
+
+          if (del.status === 401 || del.status === 403) {
+            showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
+            btnEliminar.textContent = originalText;
+            btnEliminar.disabled = false;
+            return;
+          }
+
+          if (!del.ok) {
+            const txt = await del.text();
+            alert(`Error al eliminar: ${txt}`);
+            return;
+          }
+          showMsg('Publicación eliminada', 'success');
+          window.location.href = `vehiculoDetalle.html?id=${publicacion.vehiculoId}`;
+        } catch (e) {
+          console.error('Error al eliminar la publicación:', e);
+          alert('No se pudo eliminar la publicación');
+        } finally {
+          btnEliminar.disabled = false;
+          btnEliminar.textContent = originalText;
+        }
+      });
     }
-  });
+
+    async function renderFavorito(publicacionId) {
+      if (!acciones) return;
+
+      const logged = isLogged;
+      let esFav = false;
+
+      if (logged && usuarioId != null) {
+        try {
+          const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/favoritos/check/${publicacionId}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json',
+              'Cache-Control': 'no-cache'
+            },
+            cache: 'no-store'
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            esFav = !!data?.favorito;
+          }
+        } catch (e) {
+          console.warn('No se pudo verificar favorito:', e);
+        }
+      }
+
+      const btnId = 'btn-favorito';
+      acciones.insertAdjacentHTML('afterbegin', `
+        <button id="${btnId}" class="btn ${esFav ? 'btn-danger' : 'btn-outline-danger'}">
+          <span class="me-1" aria-hidden="true">${esFav ? '❤' : '♡'}</span>
+          <span class="fav-label">${esFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}</span>
+        </button>
+      `);
+
+      const btnFav = document.getElementById(btnId);
+      btnFav.addEventListener('click', async () => {
+        if (!logged || usuarioId == null) {
+          window.location.href = 'login.html';
+          return;
+        }
+        btnFav.disabled = true;
+        const wasFav = esFav;
+        try {
+          const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/favoritos/${publicacionId}`, {
+            method: wasFav ? 'DELETE' : 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json'
+            }
+          });
+
+          if (resp.status === 401 || resp.status === 403) {
+            showMsg("No autorizado. Iniciá sesión nuevamente.", "danger");
+            return;
+          }
+          if (!resp.ok) {
+            const txt = await resp.text();
+            showMsg(txt || 'No se pudo actualizar favoritos', 'danger');
+            return;
+          }
+
+          esFav = !wasFav;
+          btnFav.querySelector('.fav-label').textContent = esFav ? 'Quitar de favoritos' : 'Agregar a favoritos';
+          btnFav.classList.toggle('btn-danger', esFav);
+          btnFav.classList.toggle('btn-outline-danger', !esFav);
+          btnFav.querySelector('span[aria-hidden="true"]').textContent = esFav ? '❤' : '♡';
+          showMsg(esFav ? 'Agregado a favoritos' : 'Quitado de favoritos', 'success');
+        } catch (e) {
+          console.error('Favoritos error:', e);
+          showMsg('Error al actualizar favoritos', 'danger');
+        } finally {
+          btnFav.disabled = false;
+        }
+      });
+    }
+
+    // Primer render de botones
+    renderBotones(publicacion.estadoPublicacion);
+
+    await renderFavorito(publicacionId);
+
+  } catch (error) {
+    console.error("Error al obtener detalles de la publicación:", error);
+    const container = document.getElementById('detalle-publicacion');
+    container.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+  }
 });
+
+
+
+
+
+PublicacionDetalle.html:
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Detalle de Publicación - AutentiCar</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="css/styles.css" rel="stylesheet"/>
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main class="container my-5">
+    <div id="detalle-publicacion"></div>
+    <div id="mensaje" class="container mt-3"></div>
+  </main>
+
+  <footer class="site-footer bg-dark text-white text-center py-3">
+    <div class="container">
+      <p class="m-0">© 2025 AutentiCar. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="js/nav.js"></script>
+  <script type="module" src="js/publicacionDetalle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+</body>
+</html>
+
