@@ -289,8 +289,30 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
   const btnEliminar = document.getElementById('btnEliminarPublicacion');
   const btnToggle = document.getElementById('btnToggleEstado');
 
+  function actualizarBotonToggle(estado) {
+    if (!btnToggle) return;
+
+    if (estado === 'ACTIVA') {
+      btnToggle.classList.remove('btn-success');
+      btnToggle.classList.add('btn-warning');
+      btnToggle.textContent = 'Pausar publicación';
+    } else if (estado === 'PAUSADA') {
+      btnToggle.classList.remove('btn-warning');
+      btnToggle.classList.add('btn-success');
+      btnToggle.textContent = 'Activar publicación';
+    }
+  }
+
+  // Estado inicial del botón
+  actualizarBotonToggle(estadoActual);
+
+  // 🔹 Handler para pausar/activar
   btnToggle?.addEventListener('click', async () => {
     if (!token) return showMsg('Sesión no válida.', 'warning');
+
+    const estadoPrevio = estadoActual;
+    const nuevoEstado = estadoPrevio === 'ACTIVA' ? 'PAUSADA' : 'ACTIVA';
+
     btnToggle.disabled = true;
     btnToggle.textContent = 'Actualizando...';
 
@@ -300,14 +322,22 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!resp.ok) throw new Error(await resp.text());
-      showMsg('Estado actualizado correctamente.', 'success');
-      setTimeout(() => window.location.reload(), 800);
+
+      // Actualizar estado local
+      estadoActual = nuevoEstado;
+      actualizarBotonToggle(estadoActual);
+      showMsg(
+        estadoActual === 'ACTIVA'
+          ? 'La publicación fue activada correctamente.'
+          : 'La publicación fue pausada correctamente.',
+        'success'
+      );
     } catch (e) {
       console.error(e);
       showMsg('Error al actualizar estado.', 'danger');
+      actualizarBotonToggle(estadoPrevio); 
     } finally {
       btnToggle.disabled = false;
-      btnToggle.textContent = 'Pausar publicación';
     }
   });
 
