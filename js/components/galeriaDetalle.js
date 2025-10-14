@@ -125,6 +125,10 @@ export function initGaleriaDetalle({
       if (!imagenes.length) return;
       if (!confirm('¿Eliminar esta imagen?')) return;
 
+      const oldHtml = btnDelSlide.innerHTML;
+      btnDelSlide.disabled = true;
+      btnDelSlide.textContent = 'Eliminando...';
+
       try {
         const imgAEliminar = imagenes[indiceActual];
         await deleteImagen(imgAEliminar.idImagen);
@@ -138,6 +142,9 @@ export function initGaleriaDetalle({
         onChange?.(imagenes);
       } catch (err) {
         alert(err.message || 'No se pudo eliminar la imagen');
+      } finally {
+        btnDelSlide.disabled = false;
+        btnDelSlide.innerHTML = oldHtml;
       }
     });
   }

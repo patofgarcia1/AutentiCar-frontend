@@ -164,11 +164,28 @@ document.addEventListener('DOMContentLoaded', async () => {
           input.type = 'file';
           input.accept = 'image/*';
           input.multiple = true;
+
           input.onchange = async () => {
             const files = Array.from(input.files || []);
             if (!files.length) return;
-            await galeria.upload(files);
+
+            // UI: estado "Agregando..."
+            const oldText = btnAddImgs.textContent;
+            btnAddImgs.disabled = true;
+            btnAddImgs.textContent = 'Agregando...';
+
+            try {
+              await galeria.upload(files);   // <- usa tu instancia de galería
+            } catch (e) {
+              console.error(e);
+              alert(e.message || 'Error al subir');
+            } finally {
+              btnAddImgs.disabled = false;
+              btnAddImgs.textContent = oldText || 'Agregar imágenes';
+              input.value = '';
+            }
           };
+
           input.click();
         });
       }

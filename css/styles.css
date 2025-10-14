@@ -1017,11 +1017,11 @@ header.bg-primary {
 
 /* ==== ICONO DE ELIMINAR ==== */
 .btn-del-img {
-  background:rgb(118, 18, 18);
+  background:rgb(206, 44, 44);
   border: none;
   color: #fff;
   border-radius: 10px;
-  width: 90px;
+  width: 100px;
   height: 70px;
   display: flex;
   align-items: center;
@@ -1030,7 +1030,7 @@ header.bg-primary {
   font-size: 1.1rem;
   z-index: 9999;
   top:30px;
-  right: 30px;
+  right: 125px;
 }
 
 .btn-del-img:hover {
