@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const liFavoritos = document.getElementById('nav-favoritos');
 
   const liAdminUsuarios  = document.getElementById('nav-admin-usuarios');
-  const liAdminVehiculos = document.getElementById('nav-admin-vehiculos');
+  // const liAdminVehiculos = document.getElementById('nav-admin-vehiculos');
 
   const token = localStorage.getItem('token');
   const rol   = localStorage.getItem('rol'); 
@@ -39,10 +39,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // solo admin
     if (isAdmin) {
       liAdminUsuarios?.classList.remove('d-none');
-      liAdminVehiculos?.classList.remove('d-none');
+      // liAdminVehiculos?.classList.remove('d-none');
     } else {
       liAdminUsuarios?.classList.add('d-none');
-      liAdminVehiculos?.classList.add('d-none');
+      // liAdminVehiculos?.classList.add('d-none');
     }
   } else {
     liLogin?.classList.remove('d-none');
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     liPerfil?.classList.add('d-none');
     liLogout?.classList.add('d-none');
     liAdminUsuarios?.classList.add('d-none');
-    liAdminVehiculos?.classList.add('d-none');
+    // liAdminVehiculos?.classList.add('d-none');
     liFavoritos?.classList.add('d-none');
   }
 

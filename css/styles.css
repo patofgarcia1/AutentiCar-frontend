@@ -1043,6 +1043,39 @@ header.bg-primary {
   opacity: 1;
 }
 
+/* === Usuarios === */
+
+.card-autoplat-usuario {
+  border-radius: 1rem;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+.usuario-head {
+  margin-bottom: 10px;
+  padding: 1px 1px;
+}
+
+.usuario-foto {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+}
+
+.usuario-actions {
+  justify-content: flex-start !important; 
+  gap: 40px; 
+}
+
+.estado-usuario {
+  font-size: 15px;    
+}
+
+.usuario-card:hover {
+  transform: translateY(-2px);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
 
 /* 
 responsive */

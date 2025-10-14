@@ -1,4 +1,3 @@
-
 import { URL_API } from '../constants/database.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -6,11 +5,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const contenedor = document.getElementById('usuarios-container');
 
   if (!token) {
-    contenedor.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
+    contenedor.innerHTML = `<div class="alert alert-warning text-center mt-4">Sesión no válida. Iniciá sesión nuevamente.</div>`;
     return;
   }
 
-  // Inserta la modal si no existe
+  // Deja la modal como está
   ensureValidacionModal();
 
   try {
@@ -25,35 +24,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     if (response.status === 401 || response.status === 403) {
-      contenedor.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
+      contenedor.innerHTML = `<div class="alert alert-danger text-center mt-4">No autorizado. Iniciá sesión nuevamente.</div>`;
       return;
     }
-    
+
     if (!response.ok) {
       const errorMsg = await response.text();
-      contenedor.innerHTML = `<div class="alert alert-danger">${errorMsg}</div>`;
+      contenedor.innerHTML = `<div class="alert alert-danger text-center mt-4">${errorMsg}</div>`;
       return;
     }
 
     const usuarios = await response.json();
 
     if (!usuarios.length) {
-      contenedor.innerHTML = `<div class="alert alert-info">No tenés usuarios cargados aún.</div>`;
+      contenedor.innerHTML = `<div class="alert alert-info text-center mt-4">No hay usuarios registrados aún.</div>`;
       return;
     }
 
-    // Render cards (con botón Ver validación y un span identificable para el estado)
     contenedor.innerHTML = usuarios.map(u => {
-      const estado = (u.nivelUsuario || '—');
-      return `
-        <div class="col">
-          <div class="card h-100 shadow-sm">
-            <div class="card-body">
-              <h5 class="card-title">${u.nombre ?? ''} ${u.apellido ?? ''}</h5>
-              <p class="card-text"><strong>Mail:</strong> ${u.mail ?? ''}</p>
-              <p class="card-text">
-                <strong>Estado:</strong> 
-                <span class="estado-usuario" data-user-id="${u.idUsuario}">${estado}</span>
+    const estado = (u.nivelUsuario || '—').toString().toUpperCase();
+    const estadoClass = estadoColorClass(estado);
+    const fotoPerfil = u.profilePicUrl || u.fotoPerfilUrl || 'img/defaultProfile.jpg';
+
+    return `
+      <div class="col">
+        <div class="card card-autoplat-usuario usuario-card h-100 shadow-sm">
+          <div class="card-body p-3">
+            <div class="d-flex align-items-center usuario-head">
+              <img src="${fotoPerfil}" alt="Foto de perfil" class="usuario-foto me-3 border rounded-circle">
+              <div class="flex-grow-1">
+                <h6 class="fw-bold mb-1">${u.nombre ?? ''} ${u.apellido ?? ''}</h6>
+                <p class="text-muted mb-0 small">${u.mail ?? ''}</p>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between usuario-actions">
+              <p class="mb-0 small">
+                <strong class="text-secondary">Estado:</strong>
+                <span class="estado-usuario fw-semibold ${estadoClass}" data-user-id="${u.idUsuario}">
+                  ${estado}
+                </span>
               </p>
               <button class="btn btn-sm btn-primary ver-validacion" data-user-id="${u.idUsuario}">
                 Ver validación
@@ -61,27 +71,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           </div>
         </div>
-      `;
-    }).join('');
+      </div>
+    `;
+  }).join('');
 
-    // Delegación de eventos para el botón "Ver validación"
+
+    // Abrir modal
     contenedor.addEventListener('click', async (e) => {
       const btn = e.target.closest('.ver-validacion');
       if (!btn) return;
-
       const userId = btn.getAttribute('data-user-id');
       if (!userId) return;
-
       await abrirModalValidacion(Number(userId), token);
     });
 
   } catch (error) {
     console.error(error);
-    contenedor.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
+    contenedor.innerHTML = `<div class="alert alert-danger text-center mt-4">Error al conectar con el servidor.</div>`;
   }
 });
 
-/* ============ Modal & acciones ============ */
+/* ===== Helper: color por estado ===== */
+function estadoColorClass(estadoUpper) {
+  switch (estadoUpper) {
+    case 'REGISTRADO': return 'text-primary';
+    case 'VALIDADO':   return 'text-success';
+    case 'RECHAZADO':  return 'text-danger';
+    case 'PENDIENTE':  return 'text-warning';
+    default:           return 'text-secondary';
+  }
+}
+
+/* ============ Modal & acciones (igual que ya tenías) ============ */
 
 function ensureValidacionModal() {
   if (document.getElementById('validacionModal')) return;
@@ -126,7 +147,6 @@ async function abrirModalValidacion(userId, token) {
   const modalEl = document.getElementById('validacionModal');
   const modal   = bootstrap.Modal.getOrCreateInstance(modalEl, { backdrop: 'static' });
 
-  // UI refs
   const msg = document.getElementById('val-msg');
   const imgFrente = document.getElementById('imgFrente');
   const imgDorso  = document.getElementById('imgDorso');
@@ -135,7 +155,6 @@ async function abrirModalValidacion(userId, token) {
   const btnValidar = document.getElementById('btnValidar');
   const btnRechazar= document.getElementById('btnRechazar');
 
-  // Reset UI
   msg.innerHTML = '';
   setImg(linkFrente, imgFrente, null);
   setImg(linkDorso,  imgDorso,  null);
@@ -145,7 +164,6 @@ async function abrirModalValidacion(userId, token) {
   modal.show();
 
   try {
-    // Traer URLs de validación
     const resp = await fetch(`${URL_API}/usuarios/validacion/${userId}/dni`, {
       method: 'GET',
       headers: {
@@ -166,19 +184,16 @@ async function abrirModalValidacion(userId, token) {
       return;
     }
 
-    const data = await resp.json(); // { frenteUrl, dorsoUrl }
+    const data = await resp.json();
     const frente = orNull(data?.frenteUrl);
     const dorso  = orNull(data?.dorsoUrl);
 
-    // Render side-by-side (solo imágenes simples, clic abre en nueva pestaña)
     setImg(linkFrente, imgFrente, frente);
     setImg(linkDorso,  imgDorso,  dorso);
 
-    // Habilitar acciones si hay al menos una imagen (podés exigir ambas)
     btnValidar.disabled  = !(frente && dorso);
     btnRechazar.disabled = false;
 
-    // Wire actions
     btnValidar.onclick = () => accionAdmin('validar', userId, token, modal, msg);
     btnRechazar.onclick = () => accionAdmin('rechazar', userId, token, modal, msg);
 
@@ -211,7 +226,6 @@ function appendNoCache(u) {
     url.searchParams.set('_t', Date.now().toString());
     return url.toString();
   } catch {
-    // si es una URL sin protocolo válido, igual agregamos ?_t=...
     const sep = u.includes('?') ? '&' : '?';
     return `${u}${sep}_t=${Date.now()}`;
   }
@@ -256,12 +270,14 @@ async function accionAdmin(tipo, userId, token, modal, msg) {
       return;
     }
 
-    // Éxito → actualizar estado en la card correspondiente
     const nuevoEstado = (tipo === 'validar') ? 'VALIDADO' : 'RECHAZADO';
     const badge = document.querySelector(`.estado-usuario[data-user-id="${userId}"]`);
-    if (badge) badge.textContent = nuevoEstado;
+    if (badge) {
+      badge.textContent = nuevoEstado;
+      badge.className = `estado-usuario fw-semibold ${estadoColorClass(nuevoEstado)}`;
+    }
 
-    msg.innerHTML = `<div class="alert alert-success">Nuevo estado:  ${nuevoEstado}.</div>`;
+    msg.innerHTML = `<div class="alert alert-success">Nuevo estado: ${nuevoEstado}.</div>`;
     setTimeout(() => modal.hide(), 800);
 
   } catch (e) {
