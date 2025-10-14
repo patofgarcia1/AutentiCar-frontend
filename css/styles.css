@@ -917,6 +917,113 @@ header.bg-primary {
   margin-bottom: 25px;   
 }
 
+/* PUBLICACION DETALLE */
+/* Tarjetas */
+.card-autoplat {
+  border-radius: 1rem;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+/* Imagen de portada */
+.portada-vehiculo {
+  max-height: 390px;
+  object-fit: cover;
+}
+
+/* Íconos de especificaciones */
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.spec-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Íconos azules como en detalle de evento */
+.spec-icon-blue {
+  filter: invert(34%) sepia(85%) saturate(5082%) hue-rotate(206deg) brightness(97%) contrast(95%);
+}
+
+/* Card del vendedor */
+.card-header-vendedor h6 {
+  font-size: 15px;
+  color: #0d6efd; 
+  letter-spacing: 0.3px;
+}
+
+.vendedor-foto {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+}
+
+/* Mantenimiento */
+.card-autoplat h6 {
+  font-weight: 600;
+}
+
+.precio-publicacion {
+  margin-right: 1.5rem; /* mueve un poco el precio a la izquierda */
+}
+
+.btn-favorito {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: white;
+  border-radius: 50%;
+  border: 2px solid #dc3545;
+  color: #dc3545;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 5;
+}
+
+.btn-favorito:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-favorito i {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.favorito-activo {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+}
+
+.portada-vehiculo {
+  max-height: 380px;
+  object-fit: cover;
+}
+
+/* Carrusel de galería */
+.carousel-inner img {
+  border-radius: 1rem;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+}
+
 /* 
 responsive */
 
