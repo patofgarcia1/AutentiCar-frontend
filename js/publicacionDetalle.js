@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <!-- IZQUIERDA -->
         <div class="col-lg-8 position-relative">
           <button id="btnFavorito" class="btn-favorito">
-            <i class="bi bi-heart"></i>
+            <img id="iconoFavorito" src="img/corazonVacio.png" alt="Favorito" class="icono-favorito">
           </button>
 
           <!-- Galería principal -->
@@ -222,32 +222,44 @@ function actualizarCarousel(fotos) {
 
 function initFavoritos(publicacionId) {
   const btn = document.getElementById('btnFavorito');
-  if (!btn) return;
+  const icono = document.getElementById('iconoFavorito');
+  if (!btn || !icono) return;
 
   const usuarioId = localStorage.getItem('usuarioId');
   const token = localStorage.getItem('token');
   if (!usuarioId || !token) return;
 
+  // Función auxiliar para actualizar la imagen
+  function actualizarIcono(esFav) {
+    icono.src = esFav ? 'img/corazonRelleno.png' : 'img/corazonVacio.png';
+  }
+
+  // Estado inicial
   fetch(`${URL_API}/usuarios/${usuarioId}/favoritos/check/${publicacionId}`, {
     headers: { Authorization: `Bearer ${token}` },
   })
     .then(r => (r.ok ? r.json() : { favorito: false }))
     .then(data => {
-      const esFav = data?.favorito;
+      const esFav = !!data?.favorito;
       btn.classList.toggle('favorito-activo', esFav);
-      btn.innerHTML = `<i class="bi ${esFav ? 'bi-heart-fill' : 'bi-heart'}"></i>`;
-    });
+      actualizarIcono(esFav);
+    })
+    .catch(() => actualizarIcono(false));
 
+  // Click para alternar
   btn.addEventListener('click', async () => {
     const esActivo = btn.classList.contains('favorito-activo');
+
     try {
       const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/favoritos/${publicacionId}`, {
         method: esActivo ? 'DELETE' : 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
+
       if (resp.ok) {
-        btn.classList.toggle('favorito-activo');
-        btn.innerHTML = `<i class="bi ${!esActivo ? 'bi-heart-fill' : 'bi-heart'}"></i>`;
+        const nuevoEstado = !esActivo;
+        btn.classList.toggle('favorito-activo', nuevoEstado);
+        actualizarIcono(nuevoEstado);
       }
     } catch (e) {
       console.error('Error al actualizar favorito:', e);

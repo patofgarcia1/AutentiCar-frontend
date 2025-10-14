@@ -968,7 +968,6 @@ header.bg-primary {
   background: white;
   border-radius: 50%;
   border: 2px solid #dc3545;
-  color: #dc3545;
   width: 46px;
   height: 46px;
   display: flex;
@@ -978,23 +977,21 @@ header.bg-primary {
   cursor: pointer;
   transition: all 0.25s ease;
   z-index: 5;
+  padding: 0;
 }
 
-.btn-favorito:hover {
-  background-color: #dc3545;
-  color: white;
+.icono-favorito {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  filter: invert(29%) sepia(87%) saturate(6110%) hue-rotate(341deg) brightness(95%) contrast(96%);
 }
 
-.btn-favorito i {
-  font-size: 1.4rem;
-  line-height: 1;
+.btn-favorito:hover .icono-favorito {
+  transform: scale(1.1);
 }
 
-.favorito-activo {
-  background-color: #dc3545 !important;
-  color: white !important;
-  border-color: #dc3545 !important;
-}
 
 .portada-galeria {
   max-height: 290px;       /* antes 500px */
