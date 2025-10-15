@@ -64,4 +64,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.removeItem('vehiculoId');
     window.location.href = 'index.html';
   });
+  
 });
