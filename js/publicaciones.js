@@ -72,6 +72,32 @@ document.addEventListener('DOMContentLoaded', async () => {
       setActive(btn, state.kmIds.includes(btn.dataset.km));
     });
     if (inputQ) inputQ.value = state.q || '';
+
+    refreshDropdownLabel('dropdownColor', state.colores, 'Color');
+    refreshDropdownLabel('dropdownAnio', state.anios.map(String), 'Año');
+    refreshDropdownLabel(
+      'dropdownPrecio',
+      state.priceIds.map(id => PRICE_BUCKETS.find(b => b.id === id)?.label || id),
+      'Precio'
+    );
+    refreshDropdownLabel(
+      'dropdownKm',
+      state.kmIds.map(id => KM_BUCKETS.find(b => b.id === id)?.label || id),
+      'Kilometraje'
+    );
+  }
+
+  function refreshDropdownLabel(dropdownId, selectedArray, defaultLabel) {
+    const btn = document.getElementById(dropdownId);
+    if (!btn) return;
+    if (selectedArray.length === 0) {
+      btn.textContent = defaultLabel;
+      btn.classList.remove('has-selection');
+    } else {
+      const joined = selectedArray.join(', ');
+      btn.textContent = joined.length > 25 ? joined.substring(0, 25) + '…' : joined;
+      btn.classList.add('has-selection');
+    }
   }
 
   // Construye /publicaciones/filtro con parámetros repetidos

@@ -14,45 +14,71 @@
     <div id="site-nav"></div>
 
     <main class="container my-5">
-        <section class="search-section bg-white p-4 rounded-4 shadow-sm mb-4">
-            <form id="search-form" class="search-inline">
-                <label for="search-q" class="form-label fw-semibold text-secondary mb-2">
-                Buscar por marca, modelo o palabra clave
-                </label>
-
-                <div class="input-group input-group-lg">
-                <span class="input-group-text">
-                    <span class="material-symbols-outlined">search</span>
+        <section class="search-section bg-white p-5 rounded-4 shadow-sm mb-4">
+            <form id="search-form" class="mb-3">
+                <div class="position-relative">
+                <span class="material-symbols-outlined position-absolute top-50 start-0 translate-middle-y ms-3 text-muted fs-4">
+                    search
                 </span>
                 <input
                     id="search-q"
                     type="text"
-                    class="form-control"
+                    class="form-control form-control-lg ps-5 py-3 rounded-pill border-2 border-light"
+                    placeholder="Buscar por marca, modelo o palabra clave..."
                     autocomplete="off"
                 />
                 </div>
             </form>
 
-            <div class="mt-3 d-flex gap-2 flex-wrap" id="chips-marcas"></div>
-            <div class="mt-2">
-                <label class="form-label fw-semibold text-secondary mb-2 d-block">Color</label>
-                <div class="mt-2 d-flex gap-2 flex-wrap" id="chips-colores"></div>
-            </div>
-            <div class="mt-2">
-                <label class="form-label fw-semibold text-secondary mb-2 d-block">Año</label>
-                <div class="d-flex gap-2 flex-wrap" id="chips-anios"></div>
+            <!-- Marcas (mantiene el tamaño de brand-card existente) -->
+            <div class="mt-4 d-flex gap-2 flex-wrap" id="chips-marcas"></div>
+
+            <!-- Filtros avanzados -->
+            <div class="advanced-filters mt-4">
+                <h6 class="fw-bold text-secondary mb-3">Filtros avanzados</h6>
+                <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="dropdown w-100">
+                    <button class="btn btn-light dropdown-toggle w-100 text-start filter-dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="dropdownColor">
+                        Color
+                    </button>
+                    <ul class="dropdown-menu w-100" id="chips-colores"></ul>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="dropdown w-100">
+                    <button class="btn btn-light dropdown-toggle w-100 text-start filter-dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="dropdownAnio">
+                        Año
+                    </button>
+                    <ul class="dropdown-menu w-100" id="chips-anios"></ul>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="dropdown w-100">
+                    <button class="btn btn-light dropdown-toggle w-100 text-start filter-dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="dropdownPrecio">
+                        Precio
+                    </button>
+                    <ul class="dropdown-menu w-100" id="chips-precio"></ul>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="dropdown w-100">
+                    <button class="btn btn-light dropdown-toggle w-100 text-start filter-dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="dropdownKm">
+                        Kilometraje
+                    </button>
+                    <ul class="dropdown-menu w-100" id="chips-km"></ul>
+                    </div>
+                </div>
+                </div>
             </div>
 
-            <div class="mt-2">
-                <label class="form-label fw-semibold text-secondary mb-2 d-block">Precio</label>
-                <div class="d-flex gap-2 flex-wrap" id="chips-precio"></div>
+            <div class="mt-3 text-end">
+                <button id="btn-clear-filtros" type="button" class="btn btn-outline-secondary btn-sm">
+                Limpiar filtros
+                </button>
             </div>
+            </section>
 
-            <div class="mt-2">
-                <label class="form-label fw-semibold text-secondary mb-2 d-block">Kilometraje</label>
-                <div class="d-flex gap-2 flex-wrap" id="chips-km"></div>
-            </div>
-        </section>
 
         <div id="lista-publicaciones" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"></div>
 

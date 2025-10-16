@@ -161,6 +161,72 @@ header.bg-primary {
   color: #212529;
 }
 
+.search-section input#search-q {
+  font-size: 17px;
+  border-color: #e9ecef;
+  transition: all .2s ease;
+  margin-top: -20px;
+}
+.search-section input#search-q:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 4px rgba(13,110,253,.15);
+}
+
+/* --- Dropdowns de filtros avanzados --- */
+.advanced-filters .dropdown-toggle {
+  border: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  font-weight: 500;
+  color: #495057;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+
+.advanced-filters .dropdown-toggle.active,
+.advanced-filters .dropdown-toggle:focus,
+.advanced-filters .dropdown-toggle:hover {
+  background-color: #e9f2ff;
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+
+.dropdown-menu {
+  padding: .5rem;
+  border-radius: .75rem;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.dropdown-menu button.chip {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  border-radius: .5rem;
+  padding: .5rem .75rem;
+  font-size: .9rem;
+  color: #495057;
+  transition: color .15s ease;
+}
+
+.dropdown-menu button.chip:hover {
+  background: #f8f9fa;
+}
+
+.dropdown-menu button.chip.active {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* Cuando hay selección, mostrar en el botón */
+.filter-dropdown.has-selection {
+  background-color: #0d6efd !important;
+  color: #fff !important;
+  border-color: #0d6efd !important;
+}
+
 
 /* Cards */
 .card-auto {
