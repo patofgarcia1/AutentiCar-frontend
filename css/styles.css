@@ -79,7 +79,7 @@ header.bg-primary {
   color: var(--chip-text);
   font-size: .9rem;
   cursor: pointer;
-  transition: background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
+  transition: color .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
 
 .chip:hover {
@@ -104,50 +104,9 @@ header.bg-primary {
 
 /* --- Brand cards (marcas) ------------------------------------ */
 .brand-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 12px;
-}
-
-.brand-card {
-  border: 1px solid #e9ecef;
-  border-radius: 14px;
-  padding: 10px 12px;
-  background: #fff;
-  cursor: pointer;
-  text-align: center;
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
-}
-
-.brand-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0,0,0,.06);
-}
-
-.brand-card.active {
-  border-color: #0d6efd;
-  background: #f0f7ff;
-  box-shadow: 0 0 0 3px rgba(13,110,253,.15);
-}
-
-.brand-card img {
-  height: 36px;
-  width: auto;
-  object-fit: contain;
-  display: block;
-  margin: 4px auto 6px;
-}
-
-.brand-card span {
-  display: block;
-  font-size: .9rem;
-  color: #212529;
-}
-
-/* .brand-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 12px;
 }
 
 .brand-card {
@@ -168,45 +127,40 @@ header.bg-primary {
 
 .brand-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px rgba(0,0,0,.06);
+}
+
+.brand-card.active {
+  border-color: #0d6efd;
+  background: #f0f7ff;
+  box-shadow: 0 0 0 3px rgba(13,110,253,.15);
+}
+
+.chip.active,
+.brand-card.active {
+  background: #0d6efd;  /* azul Bootstrap */
+  color: #fff;
+  border-color: #0d6efd;
 }
 
 .brand-card img {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
   margin-bottom: .4rem;
 }
 
-.brand-card span {
-  font-size: 0.9rem;
-  color: #333;
-  font-weight: 500;
-} */
+.brand-card.active img { 
+  filter: grayscale(0); 
+  opacity: 1; 
+}
 
-/* Chips */
-/* .chip {
-  border: 1px solid;
-  border-radius: 25px;
-  padding: 6px 14px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: 0.3s;
+.brand-card span {
+  display: block;
+  font-size: .9rem;
+  color: #212529;
 }
-.chip-primary {
-  background: var(--primary);
-  color: white;
-}
-.chip-primary:hover {
-  background: var(--primary-dark);
-}
-.chip-secondary {
-  background: var(--secondary);
-  color: white;
-}
-.chip-secondary:hover {
-  opacity: 0.8;
-} */
+
 
 /* Cards */
 .card-auto {
