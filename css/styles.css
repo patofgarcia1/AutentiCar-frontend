@@ -65,7 +65,86 @@ header.bg-primary {
   font-size: 22px;
 }
 
+.chip {
+  --chip-bg: #f8f9fa;
+  --chip-text: #495057;
+  --chip-border: #dee2e6;
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  padding: .35rem .75rem;
+  border: 1px solid var(--chip-border);
+  border-radius: 999px;
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  font-size: .9rem;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.chip:hover {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13,110,253,.12);
+}
+
+.chip.active {
+  background: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13,110,253,.2);
+}
+
+/* variante “secondary” que usás para color/precio/km */
+.chip.chip-secondary.active {
+  background: #6c757d;
+  border-color: #6c757d;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(108,117,125,.2);
+}
+
+/* --- Brand cards (marcas) ------------------------------------ */
 .brand-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.brand-card {
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+}
+
+.brand-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.06);
+}
+
+.brand-card.active {
+  border-color: #0d6efd;
+  background: #f0f7ff;
+  box-shadow: 0 0 0 3px rgba(13,110,253,.15);
+}
+
+.brand-card img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  margin: 4px auto 6px;
+}
+
+.brand-card span {
+  display: block;
+  font-size: .9rem;
+  color: #212529;
+}
+
+/* .brand-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
@@ -103,10 +182,10 @@ header.bg-primary {
   font-size: 0.9rem;
   color: #333;
   font-weight: 500;
-}
+} */
 
 /* Chips */
-.chip {
+/* .chip {
   border: 1px solid;
   border-radius: 25px;
   padding: 6px 14px;
@@ -127,7 +206,7 @@ header.bg-primary {
 }
 .chip-secondary:hover {
   opacity: 0.8;
-}
+} */
 
 /* Cards */
 .card-auto {
