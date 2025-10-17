@@ -138,7 +138,7 @@ header.bg-primary {
 
 .chip.active,
 .brand-card.active {
-  background: #0d6efd;  /* azul Bootstrap */
+  background: #0d6efd;  
   color: #fff;
   border-color: #0d6efd;
 }
@@ -172,7 +172,6 @@ header.bg-primary {
   box-shadow: 0 0 0 4px rgba(13,110,253,.15);
 }
 
-/* --- Dropdowns de filtros avanzados --- */
 .advanced-filters .dropdown-toggle {
   border: 1px solid #dee2e6;
   background-color: #f8f9fa;
@@ -220,13 +219,11 @@ header.bg-primary {
   color: #fff;
 }
 
-/* Cuando hay selección, mostrar en el botón */
 .filter-dropdown.has-selection {
   background-color: #0d6efd !important;
   color: #fff !important;
   border-color: #0d6efd !important;
 }
-
 
 /* Cards */
 .card-auto {
@@ -260,7 +257,7 @@ header.bg-primary {
 }
 
 #btn-agregar-vehiculo img {
-  width: 35%;   /* ajustá según tu icono */
+  width: 35%;   
   height: auto;
 }
 
