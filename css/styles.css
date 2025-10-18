@@ -418,7 +418,7 @@ header.bg-primary {
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
   padding: 2.5rem 3rem;
   width: 100%;
-  max-width: 640px; /* más ancha que el login */
+  max-width: 640px; 
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -963,7 +963,6 @@ header.bg-primary {
 .primary-btn { color: #fff; background-color: #137fec; }
 .primary-btn:hover { background-color: #0e6ed3; }
 .primary-btn .evento-icon {
-  /* convierte a blanco */
   filter: invert(100%) brightness(105%);
 }
 
@@ -1090,7 +1089,7 @@ header.bg-primary {
 
 
 .portada-galeria {
-  max-height: 290px;       /* antes 500px */
+  max-height: 290px;      
   object-fit: cover;
   cursor: pointer;
   border-radius: 10px;
