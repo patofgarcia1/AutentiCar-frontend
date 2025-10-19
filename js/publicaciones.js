@@ -51,23 +51,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const setActive = (el, on) => el?.classList.toggle('active', !!on);
 
   function refreshSelectionsUI() {
-    // marcas
     chipsMarcas?.querySelectorAll('.brand-card')?.forEach(card => {
       setActive(card, state.marcas.includes(card.dataset.marca));
     });
-    // colores
     chipsColores?.querySelectorAll('button[data-color]')?.forEach(btn => {
       setActive(btn, state.colores.includes(btn.dataset.color));
     });
-    // años
     chipsAnios?.querySelectorAll('button[data-anio]')?.forEach(btn => {
       setActive(btn, state.anios.includes(Number(btn.dataset.anio)));
     });
-    // precio
     chipsPrecio?.querySelectorAll('button[data-precio]')?.forEach(btn => {
       setActive(btn, state.priceIds.includes(btn.dataset.precio));
     });
-    // km
     chipsKm?.querySelectorAll('button[data-km]')?.forEach(btn => {
       setActive(btn, state.kmIds.includes(btn.dataset.km));
     });
