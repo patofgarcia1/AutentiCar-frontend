@@ -133,7 +133,7 @@ function ensureValidacionModal() {
           </div>
         </div>
         <div class="modal-footer">
-          <button id="btnRechazar" type="button" class="btn btn-outline-danger">Rechazar</button>
+          <button id="btnRechazar" type="button" class="btn btn-danger">Rechazar</button>
           <button id="btnValidar"  type="button" class="btn btn-success">Validar</button>
         </div>
       </div>
@@ -191,8 +191,24 @@ async function abrirModalValidacion(userId, token) {
     setImg(linkFrente, imgFrente, frente);
     setImg(linkDorso,  imgDorso,  dorso);
 
-    btnValidar.disabled  = !(frente && dorso);
-    btnRechazar.disabled = false;
+    // btnValidar.disabled  = !(frente && dorso);
+    // btnRechazar.disabled = false;
+
+    if (!(frente && dorso)) {
+      btnValidar.disabled = true;
+      btnRechazar.disabled = true;
+    } else {
+      btnValidar.disabled = false;
+      btnRechazar.disabled = false;
+    }
+
+    const estadoEl = document.querySelector(`.estado-usuario[data-user-id="${userId}"]`);
+    const estadoUsuario = estadoEl ? estadoEl.textContent.trim().toUpperCase() : null;
+
+    if (estadoUsuario === 'VALIDADO') {
+      btnValidar.disabled = true;
+      btnRechazar.disabled = true;
+    }
 
     btnValidar.onclick = () => accionAdmin('validar', userId, token, modal, msg);
     btnRechazar.onclick = () => accionAdmin('rechazar', userId, token, modal, msg);

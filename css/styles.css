@@ -8,29 +8,6 @@
 }
 
 
-/* html, body {
-  height: 100%;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-main {
-  flex: 1;
-}
-
-
-body {
-  font-family: 'Spline Sans', sans-serif;
-  background-color: var(--background);
-  color: var(--text-dark);
-  /* display: flex;
-  flex-direction: column;
-  margin: 0;
-  height: 100%; 
-}*/
-
 html, body { height: 100%; }
 body {
   min-height: 100vh;
