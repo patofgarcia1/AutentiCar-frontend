@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSubirDoc = document.getElementById('btnSubirDoc');
 
   const inputNombre = document.getElementById('nombre');
-  const selTipo     = document.getElementById('tipoDoc');
+  const selTipo = document.getElementById('tipoDoc');
 
   const token = localStorage.getItem("token");
 
