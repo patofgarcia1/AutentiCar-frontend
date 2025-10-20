@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (usuario.profilePicUrl) {
       avatar.style.backgroundImage = `url("${usuario.profilePicUrl}")`;
     } else {
-      avatar.style.backgroundImage = 'url("img/avatar-placeholder.png")';
+      avatar.style.backgroundImage = 'url("img/defaultProfile.jpg")';
     }
 
     if (nivel === 'REGISTRADO') {

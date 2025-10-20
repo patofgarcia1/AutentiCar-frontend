@@ -85,9 +85,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="favorito-card d-flex flex-column flex-md-row align-items-stretch gap-3 p-4 bg-white border rounded-3 shadow-sm">
           
           <div class="publicaciones-thumb flex-shrink-0">
-            <img src="${imgSrc}" alt="Imagen del vehículo"
-              class="w-100 h-100"
-              onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+            <a href="publicacionDetalle.html?id=${pubId}">
+              <img src="${imgSrc}" alt="Imagen del vehículo"
+                class="w-100 h-100"
+                onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+            </a>
           </div>
 
           <div class="d-flex flex-column justify-content-between flex-grow-1">
@@ -96,11 +98,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               ${pub.descripcion ? `<p class="text-muted mb-2 small">${pub.descripcion}</p>` : ''}
               <p class="text-primary fw-semibold fs-5 mb-2">${simbolo} ${precioStr}</p>
               <p class="text-muted"><strong>Estado:</strong> ${pub.estadoPublicacion}</p>
-            </div>
-
-            <div class="d-flex flex-wrap gap-2 mt-2">
-              <a href="publicacionDetalle.html?id=${pubId}" class="btn btn-primary btn-sm">Ver detalle</a>
-              ${vehiculoId ? `<a href="vehiculoDetalle.html?id=${vehiculoId}" class="btn btn-outline-secondary btn-sm">Vehículo</a>` : ``}
             </div>
           </div>
 

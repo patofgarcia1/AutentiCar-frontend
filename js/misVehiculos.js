@@ -55,8 +55,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="favorito-card d-flex flex-column flex-md-row align-items-stretch gap-3 p-4 bg-white border rounded-3 shadow-sm">
           
           <div class="favorito-thumb flex-shrink-0">
-            <img src="${imgSrc}" alt="Imagen de ${v.marca} ${v.modelo}"
-              onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+            <a href="publicacionDetalle.html?id=${v.idVehiculo}">
+              <img src="${imgSrc}" alt="Imagen de ${v.marca} ${v.modelo}"
+                onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+            </a>
           </div>
 
           <div class="d-flex flex-column justify-content-between flex-grow-1">
@@ -65,10 +67,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               <p class="text-muted mb-2 small">${v.version ?? ''}</p>
               <p class="mb-1"><strong>Año:</strong> ${v.anio ?? '—'}</p>
               ${v.kilometraje ? `<p class="mb-3"><strong>Kilometraje:</strong> ${v.kilometraje.toLocaleString('es-AR')} km</p>` : ''}
-            </div>
-
-            <div class="d-flex flex-wrap gap-2 mt-2">
-              <a href="vehiculoDetalle.html?id=${v.idVehiculo}" class="btn btn-primary btn-sm">Ver detalle</a>
             </div>
           </div>
 

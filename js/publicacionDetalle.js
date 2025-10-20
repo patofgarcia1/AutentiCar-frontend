@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <h6 class="fw-semibold mb-0 text-primary">Contactate con el vendedor</h6>
               </div>
               <div class="card-body d-flex align-items-center gap-3 p-0">
-                <img src="${usuario.fotoPerfilUrl || 'img/defaultProfile.png'}" 
+                <img src="${usuario.fotoPerfilUrl || 'img/defaultProfile.jpg'}" 
                      class="rounded-circle border vendedor-foto" alt="Vendedor">
                 <div>
                   <h6 class="fw-bold mb-0">${usuario.nombre || ''} ${usuario.apellido || ''}</h6>
