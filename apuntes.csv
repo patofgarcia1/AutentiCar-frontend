@@ -359,3 +359,50 @@ PublicacionDetalle.html:
 </body>
 </html>
 
+
+
+
+
+APPLICATION.PROPERTIES
+
+#spring.application.name=pfi_back
+#spring.datasource.url=jdbc:mysql://db-autenticar.ckb6c2mownjc.us-east-1.rds.amazonaws.com:3306/bdpfi?sslMode=REQUIRED
+#spring.datasource.username=admin
+#spring.datasource.password=patoluchi
+spring.datasource.url=${DATASOURCE_URL}
+spring.datasource.username=${DATASOURCE_USERNAME}
+spring.datasource.password=${DATASOURCE_PASSWORD}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.hibernate.ddl-auto=update 
+
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+# Cloudinary
+#cloudinary.cloud-name=dcgip5ahd
+#cloudinary.api-key=642199819645746
+#cloudinary.api-secret=VRaS-aukHFO-xvwc45sjmnrqmV0
+cloudinary.cloud-name=${CLOUDINARY_CLOUD_NAME}
+cloudinary.api-key=${CLOUDINARY_API_KEY}
+cloudinary.api-secret=${CLOUDINARY_API_SECRET}
+cloudinary.folder-root=autenticar
+
+# Tamaños de subida
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=100MB
+
+# HS256 – 256 bits en Base64. Generá una y pegala acá.
+#jwt.secret=kHGSykV5w/xeh3hsx89axiYv3AkG8r929WHtMSjIbYQ=
+jwt.secret=${JWT_SECRET}
+jwt.exp-minutes=120
+
+
+# donde corre artefactosbackend
+blockchain.base-url=http://localhost:3000
+
+# URL del microservicio de IA (Uvicorn)
+ai.base-url=http://127.0.0.1:8000
+ai.language=spa
+
+#precio dolar
+app.precio.usd_ars=1400

@@ -171,16 +171,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
 
-        // Volver a la lista del vehículo si logramos deducirlo
-        const backVehiculoId = vehiculoId;
         showMsg('Documento eliminado.', 'success');
-        if (backVehiculoId) {
-          setTimeout(() => {
-            window.location.href = `docsVehiculo.html?id=${backVehiculoId}`;
-          }, 1000);
-        } else {
-          history.back();
-        }
+        setTimeout(() => {
+          window.location.href = `docsEvento.html?id=${doc.idEventoVehicular}`;
+        }, 1000);
       } catch (e) {
         console.error(e);
         alert('No se pudo eliminar el documento');
