@@ -52,7 +52,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (tipoTag) tipoTag.textContent = ev.tipoEvento ?? '—';
 
-    // 3) Render
     titulo.textContent = ev.titulo || 'Evento';
     info.innerHTML = `
       <div class="evento-info-item">
@@ -96,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const creadorId = (ev?.idUsuario != null) ? Number(ev.idUsuario) : null;
 
     // Sesión
-    const sess = getSession();                // { isLogged, userId, token, rol }
+    const sess = getSession();                
     const loggedId = (sess?.userId != null) ? Number(sess.userId) : null;
     const authToken = sess?.token || null;
 
@@ -104,8 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const puedeEliminar =
       !!authToken && (
         isAdmin() ||
-        (isTaller() && creadorId != null && loggedId === creadorId) ||
-        (isUser()   && ownerId  != null && loggedId === ownerId)
+        (creadorId != null && loggedId === creadorId) 
       );
     
     const puedeAdjuntar = puedeEliminar;
