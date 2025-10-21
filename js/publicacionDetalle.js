@@ -1,6 +1,7 @@
 import { URL_API } from '../constants/database.js';
 import { isAdmin, isUser } from './roles.js';
 import { initGaleriaDetalle } from './components/galeriaDetalle.js';
+import { renderHistorialCard } from './components/historialCard.js'; 
 
 function showMsg(html, type = 'info') {
   const mensaje = document.getElementById('mensaje');
@@ -42,10 +43,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ownerId = vehiculo?.idUsuario ? Number(vehiculo.idUsuario) : null;
     const isOwner = isLogged && ownerId != null && usuarioId === ownerId;
 
-    // === 5) DATOS ===
+    const puedeVer = await puedeVerHistorial(vehiculo, usuarioId, isLogged, isOwner);
+
+    const allowedRaw = vehiculo?.allowedToSee ?? null;
+    const allowed = allowedRaw ? String(allowedRaw).toUpperCase() : null;
+    const soloValidados = ['VALIDADO', 'VALIDADOS', 'USUARIOS_VALIDADOS'].includes(allowed);
+
+    const cardHistorialHTML = renderHistorialCard({
+      puedeVer,
+      isLogged,
+      soloValidados,
+      vehiculoId: vehiculo?.idVehiculo
+    });
+
     const simbolo = publicacion.moneda === 'DOLARES' ? 'U$D' : '$';
 
-    // === 6) HTML ===
     container.innerHTML = `
       <div class="row g-4">
         <!-- IZQUIERDA -->
@@ -112,17 +124,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           ` : ''}
 
           <!-- Card mantenimiento -->
-          ${await puedeVerHistorial(vehiculo, usuarioId, isLogged, isOwner) ? `
-            <div class="card card-autoplat p-4">
-              <h6 class="fw-bold">Historial de Mantenimiento</h6>
-              <p class="text-muted small mb-2">
-                Incluye registros de documentos y eventos del vehículo.
-              </p>
-              <a href="docsVehiculo.html?id=${vehiculo?.idVehiculo}" class="btn btn-outline-primary w-100 mb-2">Ver Documentos</a>
-              <a href="eventosVehiculo.html?id=${vehiculo?.idVehiculo}" class="btn btn-outline-primary w-100">Ver Eventos</a>
-            </div>
-          ` : ''}
-
+          ${cardHistorialHTML}
+          
           <!-- Card acciones -->
           ${(isOwner || isAdmin()) ? `
             <div class="card card-autoplat p-4 mt-3">
