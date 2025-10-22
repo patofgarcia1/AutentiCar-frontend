@@ -1063,7 +1063,6 @@ header.bg-primary {
   transform: scale(1.1);
 }
 
-
 .portada-galeria {
   max-height: 290px;      
   object-fit: cover;
@@ -1076,6 +1075,33 @@ header.bg-primary {
   transform: scale(1.02);
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
+
+.edge-tight {
+  margin-left: -10px;   /* compensa p-3 (1rem) */
+  margin-right: -10px;
+}
+
+.btn-wpp {
+  background: #288349;     /* tu color base */
+  color: #fff;
+}
+
+.btn-wpp:hover {
+  background: #1ebe57;
+  color: #fff;
+}
+
+.btn-wpp .wpp-icono {
+  width: 20px;
+  height: 20px;
+}
+
+/* Si querés aún menos padding horizontal en el botón: */
+.btn-wpp {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
 
 /* Contenedor de la galería */
 .card.card-autoplat.galeria-card {

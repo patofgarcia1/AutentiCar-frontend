@@ -113,13 +113,23 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
               <div class="card-body d-flex align-items-center gap-3 p-0">
                 <img src="${usuario.fotoPerfilUrl || 'img/defaultProfile.jpg'}" 
-                     class="rounded-circle border vendedor-foto" alt="Vendedor">
+                  class="rounded-circle border vendedor-foto" alt="Vendedor">
                 <div>
                   <h6 class="fw-bold mb-0">${usuario.nombre || ''} ${usuario.apellido || ''}</h6>
                   <p class="text-muted mb-1 small">${usuario.email || ''}</p>
                   <p class="text-muted mb-0 small">Teléfono: ${usuario.telefono || '-'}</p>
                 </div>
               </div>
+              ${usuario.telefono ? `
+                <div class="mt-3 px-4">
+                  <a href="https://api.whatsapp.com/send?phone=${usuario.telefono}&text=${encodeURIComponent('Hola, quiero más información sobre tu publicación en AutentiCar.')}"
+                    target="_blank"
+                    class="botonWpp btn btn-wpp d-flex align-items-center justify-content-center gap-2 w-100">
+                    <img src="img/wppIcono.png" alt="WhatsApp" class="wpp-icono">
+                    <span>Contactar por WhatsApp</span>
+                  </a>
+                </div>
+              ` : ''}
             </div>
           ` : ''}
 
