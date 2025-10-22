@@ -65,10 +65,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                   ${estado}
                 </span>
               </p>
-              <button class="btn btn-sm btn-primary ver-validacion" data-user-id="${u.idUsuario}">
+              <button class="btn btn-sm btn-primary ver-validacion  ms-auto" data-user-id="${u.idUsuario}">
                 Ver validación
               </button>
             </div>
+            ${u.quiereOferta ? `
+              <div class="mt-2 d-flex align-items-center gap-2 p-2 plan-usuario">
+                <img src="img/planMensualIcono.png" alt="Plan mensual"class="flex-shrink-0">
+                <span class="text-success fw-semibold small">Quiere contratar el plan mensual</span>
+              </div>
+            ` : ''}
           </div>
         </div>
       </div>

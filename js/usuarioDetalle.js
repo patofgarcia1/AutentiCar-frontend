@@ -96,6 +96,70 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
     accionesContainer.innerHTML = botonesHTML;
 
+    const suscripcionWrapId = 'suscripcion-wrap';
+const suscripcionWrap = document.createElement('div');
+suscripcionWrap.id = suscripcionWrapId;
+suscripcionWrap.className = 'mt-3';
+
+if (usuario.quiereOferta === true) {
+  suscripcionWrap.innerHTML = `
+    <div class="d-flex align-items-center gap-2 p-2 rounded border bg-light-subtle">
+      <span class="text-success fw-semibold">Plan mensual activo</span>
+      <button id="btn-cancelar-oferta" class="btn btn-sm btn-outline-danger ms-auto">
+        Cancelar suscripción
+      </button>
+    </div>
+  `;
+} else {
+  suscripcionWrap.innerHTML = `
+    <div class="d-flex align-items-center gap-2 p-2 rounded border" style="background:#f8f9fa;">
+      <span class="text-muted small">Sin plan mensual activo</span>
+    </div>
+  `;
+}
+
+accionesContainer.insertAdjacentElement('afterend', suscripcionWrap);
+
+// Listener del botón "Cancelar"
+document.getElementById('btn-cancelar-oferta')?.addEventListener('click', async () => {
+  const ok = confirm('¿Seguro querés cancelar la suscripción?');
+  if (!ok) return;
+  try {
+    const token = localStorage.getItem("token");
+    const usuarioId = localStorage.getItem("usuarioId");
+
+    const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/oferta/toggle`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      showMsg(err || 'No se pudo cancelar la suscripción', 'danger');
+      return;
+    }
+
+    const data = await resp.json(); // { quiereOferta: false, message: ... }
+    if (data?.quiereOferta === false) {
+      // Refrescá solo el wrapper
+      document.getElementById(suscripcionWrapId).innerHTML = `
+        <div class="d-flex align-items-center gap-2 p-2 rounded border" style="background:#f8f9fa;">
+          <span class="text-muted small">Suscripción cancelada</span>
+        </div>
+      `;
+      showMsg('Suscripción cancelada correctamente', 'success');
+    } else {
+      showMsg('La suscripción siguió activa.', 'warning');
+    }
+  } catch (e) {
+    console.error(e);
+    showMsg('Error de conexión con el servidor', 'danger');
+  }
+});
+
     // Listeners
     document.getElementById('btn-vehiculos')?.addEventListener('click', () => {
       window.location.href = `misVehiculos.html?usuario=${usuarioId}`;

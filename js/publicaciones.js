@@ -321,63 +321,99 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ===== Botón flotante (igual que antes) =====
   function ensureLimitModals() {
-    if (!document.getElementById('limitModal')) {
-      document.body.insertAdjacentHTML('beforeend', `
-        <div class="modal fade" id="limitModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Límite alcanzado</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-              </div>
-              <div class="modal-body">
-                <p class="mb-0">
-                  No podés realizar más publicaciones. 
-                  Chequeá nuestras <a href="#" id="linkOfertas" class="link-primary">ofertas</a>.
-                </p>
-              </div>
+    if (document.getElementById('limitModal')) return;
+
+    // Inserta ambos modales
+    document.body.insertAdjacentHTML('beforeend', `
+      <!-- Modal límite -->
+      <div class="modal fade" id="limitModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Límite alcanzado</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center">
+              <p>No podés realizar más publicaciones.</p>
+              <p>Chequeá nuestras <a href="#" id="linkOfertas" class="link-primary">ofertas</a>.</p>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="modal fade" id="ofertasModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Planes disponibles</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-              </div>
-              <div class="modal-body">
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <div class="border rounded p-3 h-100">
-                      <h5 class="mb-1">Plan Premium Mensual</h5>
-                      <p class="text-muted mb-2">usd 10</p>
-                      <p class="mb-3">Incluye: <strong>Publicaciones ilimitadas</strong>.</p>
-                      <button class="btn btn-primary w-100" id="btnPlanPlus">Suscribirme</button>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="border rounded p-3 h-100">
-                      <h5 class="mb-1">Plan Premium Anual</h5>
-                      <p class="text-muted mb-2">usd 110</p>
-                      <p class="mb-3">Incluye: <strong>Publicaciones ilimitadas</strong>.</p>
-                      <button class="btn btn-primary w-100" id="btnPlanPremium">Suscribirme</button>
-                    </div>
-                  </div>
+      <!-- Modal oferta -->
+      <div class="modal fade" id="ofertasModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Plan mensual disponible</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <div class="border rounded p-3 text-center">
+                <h5 class="mb-1">Plan Premium Mensual</h5>
+                <p class="text-muted mb-2">usd 10 / mes</p>
+                <p class="mb-3">Incluye: <strong>Publicaciones ilimitadas</strong>.</p>
+                <button class="btn btn-success w-100" id="btnComprarPlan">Comprar</button>
+                <div id="mensajeCompra" class="mt-3 text-success fw-semibold" style="display:none;">
+                  ¡Gracias! Te contactaremos pronto para completar la compra.
                 </div>
               </div>
             </div>
           </div>
-        </div>`);
-      document.getElementById('linkOfertas')?.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        const m1 = bootstrap.Modal.getOrCreateInstance(document.getElementById('limitModal'));
-        const m2 = bootstrap.Modal.getOrCreateInstance(document.getElementById('ofertasModal'), { backdrop: 'static' });
-        m1.hide(); setTimeout(() => m2.show(), 200);
-      });
-    }
+        </div>
+      </div>
+    `);
+
+    // ====== Eventos de las modales ======
+    const limitEl = document.getElementById('limitModal');
+    const ofertasEl = document.getElementById('ofertasModal');
+    const btnComprar = document.getElementById('btnComprarPlan');
+    const mensajeCompra = document.getElementById('mensajeCompra');
+    const linkOfertas = document.getElementById('linkOfertas');
+
+    // Link "ofertas" -> cierra la modal de límite y abre la de oferta
+    linkOfertas?.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const m1 = bootstrap.Modal.getOrCreateInstance(limitEl);
+      const m2 = bootstrap.Modal.getOrCreateInstance(ofertasEl, { backdrop: 'static' });
+      m1.hide();
+      setTimeout(() => m2.show(), 200);
+    });
+
+    // Botón comprar plan
+    btnComprar?.addEventListener('click', async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const usuarioId = localStorage.getItem("usuarioId");
+        const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/oferta/toggle`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!resp.ok) {
+          const err = await resp.text();
+          alert('Error: ' + err);
+          return;
+        }
+
+        const data = await resp.json(); 
+        if (data?.quiereOferta === true) {
+          btnComprar.disabled = true;
+          mensajeCompra.style.display = 'block';
+        } else {
+          alert('La suscripción fue cancelada.');
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        alert('Error al enviar la solicitud.');
+      }
+    });
   }
+
   const btnAdd = document.getElementById('btn-agregar-vehiculo');
   showIf(btnAdd, isAdmin() || isUser());
   ensureLimitModals();
@@ -388,6 +424,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const r = await fetch(`${URL_API}/usuarios/${usuarioId}/publicaciones/count`,
         { headers: { 'Accept':'application/json','Cache-Control':'no-cache' }, cache:'no-store' });
+
       if (!r.ok) { window.location.href = 'addVehiculo.html'; return; }
       const data = await r.json();
       const count = Number(data?.count), limit = Number(data?.limit ?? 5);
