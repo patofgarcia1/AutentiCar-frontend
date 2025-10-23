@@ -68,6 +68,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     contenedor.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
   }
 
+  
+
   // 2) Decidir si mostramos el botón “Agregar evento”
   try {
     // detalle del vehículo (público) para conocer al dueño
@@ -96,8 +98,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="d-flex justify-content-end mt-3">
           <a href="addEvento.html?id=${vehiculoId}" class="btn btn-agregar-evento">Agregar evento</a>
         </div>
+        <div class="d-flex justify-content-end mt-2">
+          <a href="eventosEliminados.html?id=${vehiculoId}" class="btn btn-outline-secondary">
+            Ver eventos eliminados
+          </a>
+        </div>
         `
       );
+    }
+
+    const VIN = v?.vin || v?.numChasis || null;
+
+    if (VIN) {
+      try {
+        const bcResp = await fetch(`http://localhost:3000/events/${VIN}`);
+        if (bcResp.ok) {
+          const bcEvents = await bcResp.json();
+          const count = Array.isArray(bcEvents) ? bcEvents.length : 0;
+          contenedor.insertAdjacentHTML(
+            'beforebegin',
+            `<p class="text-muted small mb-2">
+              Eventos del vehículo guardados en blockchain: <strong>${count}</strong>
+            </p>`
+          );
+        }
+      } catch (e) {
+        console.warn('No se pudo obtener el count de blockchain:', e);
+      }
     }
   } catch (e) {
     console.warn('No se pudo evaluar permisos para el botón Agregar evento:', e);

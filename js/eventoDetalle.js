@@ -138,12 +138,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-          const resp = await fetch(`${URL_API}/eventos/${ev.idEvento}`, 
-            { method: 'DELETE',
-              headers: {
-                'Authorization': `Bearer ${authToken}`,   
-                'Accept': 'application/json'
-              } 
+          // const resp = await fetch(`${URL_API}/eventos/${ev.idEvento}`, 
+          //   { method: 'DELETE',
+          //     headers: {
+          //       'Authorization': `Bearer ${authToken}`,   
+          //       'Accept': 'application/json'
+          //     } 
+          // });
+
+          const resp = await fetch(`${URL_API}/eventos/${ev.idEvento}/eliminarLogico`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Accept': 'application/json'
+            }
           });
 
           if (resp.status === 401 || resp.status === 403) {
