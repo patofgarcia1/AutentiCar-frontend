@@ -3,6 +3,7 @@ import { URL_API } from '../constants/database.js';
 document.addEventListener('DOMContentLoaded', async () => {
   const token = localStorage.getItem("token");
   const contenedor = document.getElementById('usuarios-container');
+  const rol = (localStorage.getItem('rol') || '').toUpperCase();
 
   if (!token) {
     contenedor.innerHTML = `<div class="alert alert-warning text-center mt-4">Sesión no válida. Iniciá sesión nuevamente.</div>`;
@@ -45,6 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const estado = (u.nivelUsuario || '—').toString().toUpperCase();
     const estadoClass = estadoColorClass(estado);
     const fotoPerfil = u.profilePicUrl || u.fotoPerfilUrl || 'img/defaultProfile.jpg';
+    const tipoUsuario = (u.rol || u.tipo || '').toUpperCase(); 
 
     return `
       <div class="col">
@@ -65,7 +67,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                   ${estado}
                 </span>
               </p>
-              <button class="btn btn-sm btn-primary ver-validacion  ms-auto" data-user-id="${u.idUsuario}">
+              <button class="btn btn-sm btn-primary ver-validacion  ms-auto" 
+                data-user-id="${u.idUsuario}"
+                data-tipo-usuario="${tipoUsuario}">
                 Ver validación
               </button>
             </div>
@@ -81,14 +85,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }).join('');
 
-
     // Abrir modal
     contenedor.addEventListener('click', async (e) => {
       const btn = e.target.closest('.ver-validacion');
       if (!btn) return;
       const userId = btn.getAttribute('data-user-id');
       if (!userId) return;
-      await abrirModalValidacion(Number(userId), token);
+
+      const tipoUsuario = btn.dataset.tipoUsuario; 
+
+      if (tipoUsuario === 'TALLER' || tipoUsuario === 'CONCESIONARIO') {
+        await abrirModalValidacionInstitucion(Number(userId), token, rol);
+      } else {
+        await abrirModalValidacion(Number(userId), token);
+      }
     });
 
   } catch (error) {
@@ -108,7 +118,6 @@ function estadoColorClass(estadoUpper) {
   }
 }
 
-/* ============ Modal & acciones (igual que ya tenías) ============ */
 
 function ensureValidacionModal() {
   if (document.getElementById('validacionModal')) return;
@@ -307,5 +316,120 @@ async function accionAdmin(tipo, userId, token, modal, msg) {
     msg.innerHTML = `<div class="alert alert-danger">Error de conexión con el servidor.</div>`;
     btnValidar.disabled = false;
     btnRechazar.disabled = false;
+  }
+}
+
+function ensureValidacionModalInstitucion() {
+  if (document.getElementById('validacionInstitucionModal')) return;
+
+  const modalHtml = `
+  <div class="modal fade" id="validacionInstitucionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Validación Taller / Concesionaria</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div id="val-inst-msg" class="mb-3"></div>
+          <p><strong>Domicilio:</strong> <span id="instDomicilio" class="text-muted"></span></p>
+          <div class="text-center mt-3">
+            <a id="instArchivoLink" href="#" target="_blank" rel="noopener">
+              <img id="instArchivoPreview" alt="Archivo subido" 
+                   class="img-fluid rounded border" style="max-height: 300px;">
+            </a>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btnInstRechazar" type="button" class="btn btn-danger">Rechazar</button>
+          <button id="btnInstValidar"  type="button" class="btn btn-success">Validar</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+async function abrirModalValidacionInstitucion(userId, token, rolActual) {
+  ensureValidacionModalInstitucion();
+  const modalEl = document.getElementById('validacionInstitucionModal');
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl, { backdrop: 'static' });
+
+  const msg = document.getElementById('val-inst-msg');
+  const domicilioEl = document.getElementById('instDomicilio');
+  const archivoLink = document.getElementById('instArchivoLink');
+  const archivoPreview = document.getElementById('instArchivoPreview');
+  const btnValidar = document.getElementById('btnInstValidar');
+  const btnRechazar = document.getElementById('btnInstRechazar');
+
+  msg.innerHTML = '';
+  domicilioEl.textContent = 'Cargando...';
+  archivoLink.href = '#';
+  archivoPreview.src = '';
+  btnValidar.disabled = true;
+  btnRechazar.disabled = true;
+
+  modal.show();
+
+  try {
+    const archivoResp = await fetch(`${URL_API}/usuarios/validacion/${userId}/archivo`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const archivoData = archivoResp.ok ? await archivoResp.json() : {};
+    const archivoUrl = archivoData?.url ?? null;
+
+    const verifResp = await fetch(`${URL_API}/concesionariaTallerVerif/${userId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const verifData = verifResp.ok ? await verifResp.json() : {};
+    const domicilio = verifData?.domicilio ?? '(sin domicilio registrado)';
+    console.log(verifResp);
+
+    domicilioEl.textContent = domicilio;
+
+    if (archivoUrl) {
+      archivoLink.href = archivoUrl;
+      archivoPreview.src = archivoUrl;
+      btnValidar.disabled = false;
+      btnRechazar.disabled = false;
+    } else {
+      archivoPreview.src = 'img/no-file.png';
+    }
+
+    if (rolActual !== 'ADMIN') {
+      btnValidar.style.display = 'none';
+      btnRechazar.style.display = 'none';
+    }
+
+    btnValidar.onclick = () => accionAdminInstitucion('validar', userId, token, modal, msg);
+    btnRechazar.onclick = () => accionAdminInstitucion('rechazar', userId, token, modal, msg);
+
+  } catch (e) {
+    console.error(e);
+    msg.innerHTML = `<div class="alert alert-danger">Error al obtener datos de validación.</div>`;
+  }
+}
+
+async function accionAdminInstitucion(tipo, userId, token, modal, msg) {
+  const endpoint = tipo === 'validar'
+    ? `${URL_API}/usuarios/validacion/${userId}/validarTallerConcesionaria`
+    : `${URL_API}/usuarios/validacion/${userId}/rechazarTallerConcesionaria`;
+
+  try {
+    const resp = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!resp.ok) {
+      const txt = await resp.text();
+      msg.innerHTML = `<div class="alert alert-danger">Error: ${txt}</div>`;
+      return;
+    }
+
+    msg.innerHTML = `<div class="alert alert-success">Solicitud ${tipo === 'validar' ? 'validada' : 'rechazada'} correctamente.</div>`;
+    setTimeout(() => modal.hide(), 800);
+  } catch (e) {
+    msg.innerHTML = `<div class="alert alert-danger">Error de conexión con el servidor.</div>`;
   }
 }
