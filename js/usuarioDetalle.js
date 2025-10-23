@@ -67,10 +67,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       avatar.style.backgroundImage = 'url("img/defaultProfile.jpg")';
     }
 
+    const urlValidacion = (rol === 'TALLER' || rol === 'CONCESIONARIO')
+      ? 'validacionTallerConcesionaria.html'
+      : 'validacionUsuario.html';
+
     if (nivel === 'REGISTRADO') {
       nivelContainer.innerHTML = `
         <div class="alert alert-warning mt-3" role="alert">
-          Usuario no validado. Valídate <a href="validacionUsuario.html" class="alert-link">acá</a>.
+          Usuario no validado. Valídate <a href="${urlValidacion}" class="alert-link">acá</a>.
         </div>
       `;
     } else if (nivel === 'PENDIENTE') {

@@ -1187,8 +1187,23 @@ header.bg-primary {
   box-shadow: 0 6px 16px rgba(0,0,0,0.08);
 }
 
-/* 
-responsive */
+/* VALIDACION TALLER */
+.archivoSubmit{
+  margin-top: 20px;
+}
+#btnSubirArchivo{
+  margin-top: 5px;
+}
+
+#domicilio {
+  padding-top: 3px ;
+  padding-bottom: 3px ;
+  height: 35px ;
+  margin-left: -2px;
+}
+
+
+/* responsive */
 
 @media (max-width: 420px) {
   .input-group { flex-wrap: wrap; }
