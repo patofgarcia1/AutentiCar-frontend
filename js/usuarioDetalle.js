@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     userNombre.textContent = `${usuario.nombre} ${usuario.apellido}`;
     userEmail.textContent = usuario.mail;
     if (usuario.telefonoCelular) {
-      userTel.textContent = usuario.telefonoCelular;
+      userTel.textContent = `Teléfono: ${usuario.telefonoCelular}`;
     }
 
     if (usuario.profilePicUrl) {

@@ -131,13 +131,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   const resolveVehiculoId = (pub) =>
     pub?.vehiculoId ?? pub?.vehiculo?.idVehiculo ?? pub?.idVehiculo ?? null;
 
-  async function fetchPortadaVehiculo(vehiculoId) {
+  // async function fetchPortadaVehiculo(vehiculoId) {
+  //   try {
+  //     const r = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
+  //     if (!r.ok) return null;
+  //     const v = await r.json();
+  //     return toThumb(v.portadaUrl) || null;
+  //   } catch { return null; }
+  // }
+
+  async function fetchVehiculoInfo(vehiculoId) {
     try {
       const r = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
       if (!r.ok) return null;
       const v = await r.json();
-      return toThumb(v.portadaUrl) || null;
-    } catch { return null; }
+
+      // Tomamos portada y datos clave del vehículo
+      return {
+        portada: toThumb(v.portadaUrl) || null,
+        anio: v.anio ?? null,
+        kilometraje: v.kilometraje ?? null
+      };
+    } catch {
+      return null;
+    }
   }
 
   async function renderPublicaciones(list) {
@@ -145,15 +162,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       container.innerHTML = `<div class="alert alert-info">No hay publicaciones disponibles.</div>`;
       return;
     }
-    const portadas = await Promise.all(
+    const vehiculosInfo = await Promise.all(
       list.map(async (pub) => {
         const vid = resolveVehiculoId(pub);
-        return vid ? await fetchPortadaVehiculo(vid) : null;
+        return vid ? await fetchVehiculoInfo(vid) : {};
       })
     );
+
     container.innerHTML = list.map((pub, i) => {
       const pubId = pub.idPublicacion ?? pub.id ?? '';
-      const img   = portadas[i] || PLACEHOLDER;
+      const info = vehiculosInfo[i] || {};
+      const img = info.portada || PLACEHOLDER;
+      const anio = info.anio ?? '—';
+      const km = info.kilometraje ? info.kilometraje.toLocaleString('es-AR') : '—';
       const symbol = SIMBOLOS[(pub.moneda || 'PESOS').toUpperCase()] || '$';
       const precioStr = (typeof pub.precio === 'number')
         ? pub.precio.toLocaleString('es-AR')
@@ -164,11 +185,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="card card-auto h-100 border-0 shadow-sm">
             <a href="publicacionDetalle.html?id=${pubId}">
               <img src="${img}" class="card-img-top rounded-top" alt="Imagen del vehículo"
-                   onerror="this.onerror=null;this.src='${PLACEHOLDER}'" />
+                onerror="this.onerror=null;this.src='${PLACEHOLDER}'" />
             </a>
             <div class="card-body d-flex flex-column">
               <h5 class="card-title text-dark fw-bold">${pub.titulo ?? 'Publicación'}</h5>
-
+              <p class="text-muted mb-2">${anio} | ${km} km</p>
               <p class="precio mt-auto mb-3">${symbol} ${precioStr}</p>
             </div>
           </div>
