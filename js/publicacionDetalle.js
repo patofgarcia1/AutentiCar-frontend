@@ -142,7 +142,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="card card-autoplat p-4 mt-3">
               <h6 class="fw-bold">Acciones del dueño</h6>
               <div class="d-flex flex-column gap-2">
-                <button id="btnAgregarImgs" class="btn btn-outline-primary w-100">Agregar imágenes</button>
                 <button id="btnToggleEstado" class="btn btn-warning w-100">Pausar publicación</button>
                 <button id="btnEliminarPublicacion" class="btn btn-danger w-100">Eliminar publicación</button>
               </div>
@@ -157,6 +156,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const galeriaRoot = document.getElementById('galeria-root');
 
     if (galeriaRoot) {
+      galeriaRoot.classList.add('loading');
+
       const authHeaders = token ? { Authorization: `Bearer ${token}` } : undefined;
       const galeria = initGaleriaDetalle({
         root: galeriaRoot,
@@ -167,13 +168,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         onChange: (imagenes) => {
           const nuevasFotos = imagenes.map(i => i.urlImagen);
           actualizarCarousel(nuevasFotos);
+        },
+        onReady: () => {
+          galeriaRoot.classList.remove('loading');
         }
       });
 
-      // Vincular el botón de "Agregar imágenes"
-      const btnAddImgs = document.getElementById('btnAgregarImgs');
-      if (btnAddImgs) {
-        btnAddImgs.addEventListener('click', async () => {
+      setTimeout(() => galeriaRoot.classList.remove('loading'), 1200);
+
+      if (canManageImages) {
+        // aseguramos posicionamiento relativo en la galería
+        galeriaRoot.classList.add('position-relative');
+
+        const fab = document.createElement('button');
+        fab.id = 'btnAddImgsFab';
+        fab.className = 'btn-addimg-fab';
+        fab.type = 'button';
+        fab.title = 'Agregar imágenes';
+        fab.innerHTML = `<img src="img/pluswhite.png" alt="Agregar">`;
+        galeriaRoot.appendChild(fab);
+
+        fab.addEventListener('click', () => {
           const input = document.createElement('input');
           input.type = 'file';
           input.accept = 'image/*';
@@ -183,19 +198,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const files = Array.from(input.files || []);
             if (!files.length) return;
 
-            // UI: estado "Agregando..."
-            const oldText = btnAddImgs.textContent;
-            btnAddImgs.disabled = true;
-            btnAddImgs.textContent = 'Agregando...';
+            // feedback visual en el FAB mientras sube
+            const oldHtml = fab.innerHTML;
+            fab.disabled = true;
+            fab.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
 
             try {
-              await galeria.upload(files);   // <- usa tu instancia de galería
+              await galeria.upload(files);
             } catch (e) {
               console.error(e);
-              alert(e.message || 'Error al subir');
+              showMsg(e.message || 'Error al subir', 'danger');
             } finally {
-              btnAddImgs.disabled = false;
-              btnAddImgs.textContent = oldText || 'Agregar imágenes';
+              fab.disabled = false;
+              fab.innerHTML = oldHtml;
               input.value = '';
             }
           };
