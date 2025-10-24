@@ -18,7 +18,7 @@ body {
 main { flex: 1 0 auto; }
 
 /* NAV */
-header.bg-primary {
+/* header.bg-primary {
   background-color: var(#4D94FD) !important;
 }
 .nav-link.text-white:hover {
@@ -27,7 +27,54 @@ header.bg-primary {
 
 .nav-item{
   font-weight: 600;
+} */
+
+/* NAV NUEVO */
+.bg-primary-gradient{
+  background: linear-gradient(90deg,#0d6efd 0%, #0aa1ff 100%);
+  backdrop-filter: saturate(140%) blur(6px);
 }
+
+/* tipografía/colores del nav */
+.site-navbar .nav-link{
+  color:#fff;
+  opacity:.92;
+  transition: opacity .15s ease, transform .15s ease;
+}
+.site-navbar .nav-link:hover,
+.site-navbar .nav-link.active{
+  opacity:1;
+  text-decoration:none;
+  transform: translateY(-1px);
+}
+
+.bootstrap-scope * {
+  all: revert !important;
+  box-sizing: border-box !important;
+}
+
+/* marca y botones */
+.site-navbar .navbar-brand{ color:#fff; }
+.site-navbar .btn-light{ color:#0d6efd; border-radius:999px; }
+
+/* iconito de favoritos */
+.site-navbar .nav-icon{
+  filter: drop-shadow(0 0 2px rgba(0,0,0,.25));
+  width:18px; 
+  height:18px;
+}
+
+/* sticky con sombra al scrollear */
+.site-navbar.scrolled{
+  box-shadow: 0 10px 25px rgba(13,110,253,.12);
+}
+
+/* opcional: alineación de items en pantallas grandes */
+@media (min-width: 992px){
+  #mainNav .navbar-nav{ gap:.25rem; }
+}
+
+
 
 /* Buscador */
 .search-section {

@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           ${usuario ? `
             <div class="card card-autoplat mb-4 p-3">
               <div class="card-header-vendedor mb-2">
-                <h6 class="fw-semibold mb-0 text-primary">Contactate con el vendedor</h6>
+                <h6 class="fw-bold mb-0 text-primary text-center">Contactate con el vendedor</h6>
               </div>
               <div class="card-body d-flex align-items-center gap-3 p-0">
                 <img src="${usuario.fotoPerfilUrl || 'img/defaultProfile.jpg'}" 

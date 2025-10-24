@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar el parcial e inyectarlo
   try {
-    const resp = await fetch('partials/nav.html'); 
+    const resp = await fetch('/partials/nav.html'); 
     slot.innerHTML = await resp.text();
   } catch (e) {
     console.error('No se pudo cargar el nav:', e);
