@@ -63,9 +63,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="row g-4">
         <!-- IZQUIERDA -->
         <div class="col-lg-8 position-relative">
-          <button id="btnFavorito" class="btn-favorito">
-            <img id="iconoFavorito" src="img/corazonVacio.png" alt="Favorito" class="icono-favorito">
-          </button>
+          ${isLogged ? `
+            <button id="btnFavorito" class="btn-favorito">
+              <img id="iconoFavorito" src="img/corazonVacio.png" alt="Favorito" class="icono-favorito">
+            </button>
+          ` : ''}
 
           <!-- Galería principal -->
           <div id="galeria-root" class="card card-autoplat overflow-hidden mb-4"></div>
