@@ -345,6 +345,7 @@ main { flex: 1 0 auto; }
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
+  margin-top: -10px;
 }
 
 .login-card {
@@ -398,6 +399,7 @@ main { flex: 1 0 auto; }
   border: none;
   border-radius: 0.5rem;
   transition: background-color 0.2s ease;
+  margin-bottom: -18px;
 }
 
 .login-btn:hover {
@@ -409,7 +411,6 @@ main { flex: 1 0 auto; }
   text-align: center;
   font-size: 0.9rem;
   color: #4b5563;
-  margin-bottom: 0px;
 }
 
 .login-register-link {
@@ -426,6 +427,8 @@ main { flex: 1 0 auto; }
 .login-logo {
   display: flex;
   justify-content: center;
+  margin-top: -28px;
+  margin-bottom: -30px;
 }
 
 .login-logo img {
