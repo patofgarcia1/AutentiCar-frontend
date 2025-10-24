@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </a>
             <div class="card-body d-flex flex-column">
               <h5 class="card-title text-dark fw-bold">${pub.titulo ?? 'Publicación'}</h5>
-              <p class="card-text text-muted small">${pub.descripcion ?? ''}</p>
+
               <p class="precio mt-auto mb-3">${symbol} ${precioStr}</p>
             </div>
           </div>

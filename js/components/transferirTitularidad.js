@@ -11,7 +11,7 @@ export function initTransferirTitularidad(vehiculoId, token) {
   if (!cardAcciones) return;
 
   const btnTransferir = document.createElement('button');
-  btnTransferir.className = 'btn btn-outline-success w-100';
+  btnTransferir.className = 'btn btn-success w-100';
   btnTransferir.id = 'btnTransferirTitular';
   btnTransferir.textContent = 'Vendí mi auto';
   cardAcciones.appendChild(btnTransferir);
