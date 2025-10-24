@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Límite alcanzado</h5>
+              <h5 class="modal-title w-100 text-center">Límite alcanzado</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body text-center">
@@ -346,13 +346,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Plan mensual disponible</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
               <div class="border rounded p-3 text-center">
                 <h5 class="mb-1">Plan Premium Mensual</h5>
-                <p class="text-muted mb-2">usd 10 / mes</p>
+                <p class="text-muted mb-2">USD 10 por mes</p>
                 <p class="mb-3">Incluye: <strong>Publicaciones ilimitadas</strong>.</p>
                 <button class="btn btn-success w-100" id="btnComprarPlan">Comprar</button>
                 <div id="mensajeCompra" class="mt-3 text-success fw-semibold" style="display:none;">

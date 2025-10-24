@@ -1202,6 +1202,21 @@ header.bg-primary {
   margin-left: -2px;
 }
 
+/* transferir titularidad */
+
+#listaResultados button:hover {
+  background-color: #f1f1f1;
+}
+
+.modal-content {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.modal-content.border-success {
+  box-shadow: 0 0 15px rgba(25, 135, 84, 0.5);
+}
+
 
 /* responsive */
 

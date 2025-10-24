@@ -2,6 +2,7 @@ import { URL_API } from '../constants/database.js';
 import { isAdmin, isUser } from './roles.js';
 import { initGaleriaDetalle } from './components/galeriaDetalle.js';
 import { renderHistorialCard } from './components/historialCard.js'; 
+import { initTransferirTitularidad } from './components/transferirTitularidad.js';
 
 function showMsg(html, type = 'info') {
   const mensaje = document.getElementById('mensaje');
@@ -301,6 +302,7 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
   const token = localStorage.getItem('token');
   const btnEliminar = document.getElementById('btnEliminarPublicacion');
   const btnToggle = document.getElementById('btnToggleEstado');
+  initTransferirTitularidad(vehiculo.idVehiculo, token);
 
   function actualizarBotonToggle(estado) {
     if (!btnToggle) return;
