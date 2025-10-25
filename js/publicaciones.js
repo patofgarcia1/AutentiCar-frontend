@@ -440,19 +440,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   btnAdd?.addEventListener('click', async (e) => {
     e.preventDefault();
     const usuarioId = localStorage.getItem('usuarioId');
-    if (!usuarioId) { window.location.href = 'login.html'; return; }
+    if (!usuarioId) { 
+      window.location.href = 'login.html'; 
+      return; 
+    }
+
     try {
       const r = await fetch(`${URL_API}/usuarios/${usuarioId}/publicaciones/count`,
-        { headers: { 'Accept':'application/json','Cache-Control':'no-cache' }, cache:'no-store' });
+        { headers: { 'Accept':'application/json', 'Cache-Control':'no-cache' }, 
+          cache:'no-store' 
+      });
 
       if (!r.ok) { window.location.href = 'addVehiculo.html'; return; }
+
       const data = await r.json();
-      const count = Number(data?.count), limit = Number(data?.limit ?? 5);
+      const count = Number(data?.count);
+      const limit = Number(data?.limit ?? 5);
       const reached = (typeof data?.reached === 'boolean') ? data.reached : (count >= limit);
+
       if (Number.isNaN(count)) { window.location.href = 'addVehiculo.html'; return; }
-      if (reached) bootstrap.Modal.getOrCreateInstance(document.getElementById('limitModal'),{backdrop:'static'}).show();
-      else window.location.href = 'addVehiculo.html';
-    } catch { window.location.href = 'addVehiculo.html'; }
+
+      const userResp = await fetch(`${URL_API}/usuarios/${usuarioId}`, {
+        headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${token}` }
+      });
+      const usuario = userResp.ok ? await userResp.json() : null;
+      const quiereOferta = !!usuario?.quiereOferta;
+
+      if (reached && !quiereOferta) {
+        const modal = document.getElementById('limitModal');
+        bootstrap.Modal.getOrCreateInstance(modal, { backdrop: 'static' }).show();
+      } else {
+        window.location.href = 'addVehiculo.html';
+      }
+
+    } catch (err) {
+      console.error('Error al verificar límite de publicaciones:', err);
+      window.location.href = 'addVehiculo.html';
+    }
   });
 
   // Inicial

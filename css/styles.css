@@ -114,7 +114,7 @@ main { flex: 1 0 auto; }
 .chip.active {
   background: #0d6efd;
   color: #fff;
-  border-color: #0d6efd;
+    border-color: #0d6efd;
   box-shadow: 0 0 0 3px rgba(13,110,253,.2);
 }
 
@@ -155,16 +155,14 @@ main { flex: 1 0 auto; }
 }
 
 .brand-card.active {
-  border-color: #0d6efd;
   background: #f0f7ff;
   box-shadow: 0 0 0 3px rgba(13,110,253,.15);
 }
 
 .chip.active,
 .brand-card.active {
-  background: #0d6efd;  
+  background: #c1cee3;  
   color: #fff;
-  border-color: #0d6efd;
 }
 
 .brand-card img {
@@ -239,7 +237,7 @@ main { flex: 1 0 auto; }
 }
 
 .dropdown-menu button.chip.active {
-  background: #0d6efd;
+  background: #8b9dba;
   color: #fff;
 }
 
