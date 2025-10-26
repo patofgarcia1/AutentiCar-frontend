@@ -3,7 +3,7 @@ export function renderHistorialCard({ puedeVer, isLogged, soloValidados, vehicul
   if (puedeVer) {
     return `
       <div class="card card-autoplat p-4">
-        <h6 class="fw-bold">Historial de Mantenimiento</h6>
+        <h6 class="fw-bold">Historial del Vehículo</h6>
         <p class="text-muted small mb-2">
           Incluye registros de documentos y eventos del vehículo.
         </p>
@@ -16,7 +16,7 @@ export function renderHistorialCard({ puedeVer, isLogged, soloValidados, vehicul
   if (isLogged && soloValidados && !puedeVer) {
     return `
       <div class="card card-autoplat p-4 text-center">
-        <h6 class="fw-bold mb-2">Historial de Mantenimiento</h6>
+        <h6 class="fw-bold mb-2">Historial del Vehículo</h6>
         <p class="text-muted small mb-3">El historial está disponible solo para usuarios validados.</p>
         <a href="validacionUsuario.html" class="btn btn-outline-primary w-100">Validate acá</a>
       </div>
@@ -26,7 +26,7 @@ export function renderHistorialCard({ puedeVer, isLogged, soloValidados, vehicul
   if (!isLogged) {
     return `
       <div class="card card-autoplat p-4 text-center">
-        <h6 class="fw-bold mb-2">Historial de Mantenimiento</h6>
+        <h6 class="fw-bold mb-2">Historial del Vehículo</h6>
         <p class="text-muted small mb-3">Para ver el historial necesitás iniciar sesión.</p>
         <a href="login.html" class="btn btn-outline-primary w-100">Iniciá sesión acá</a>
       </div>

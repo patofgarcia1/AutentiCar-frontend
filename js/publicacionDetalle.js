@@ -311,7 +311,9 @@ async function puedeVerHistorial(vehiculo, userId, isLogged, isOwner) {
   const allowed = ((vehiculo?.allowedToSee || 'REGISTRADO') + '').toUpperCase();
   let nivel = 'REGISTRADO';
   try {
-    const r = await fetch(`${URL_API}/usuarios/publico/${userId}`);
+    const r = await fetch(`${URL_API}/usuarios/${userId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
     if (r.ok) {
       const d = await r.json();
       if (d?.nivelUsuario) nivel = (d.nivelUsuario + '').toUpperCase();
