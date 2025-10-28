@@ -47,20 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje || 'Usuario registrado con éxito'}</div>`;
 
                 setTimeout(() => { window.location.href = 'login.html'; }, 1000);
-                // const usuario = data.usuario || {};
-                // const idUsuario = usuario.idUsuario;
-
-                // // en tu DTO viene esConcesionaria; como fallback, miramos rol
-                // const esConcesionaria = (typeof usuario.esConcesionaria === 'boolean')
-                //     ? usuario.esConcesionaria
-                //     : (usuario.rol === 'CONCESIONARIO' || rol === 'CONCESIONARIO');
-
-                // if (esConcesionaria === true && idUsuario != null) {
-                //     localStorage.setItem('usuarioIdVerif', String(idUsuario));
-                //     setTimeout(() => { window.location.href = 'formVerificacion.html'; }, 1000);
-                // } else {
-                //     setTimeout(() => { window.location.href = 'login.html'; }, 1000);
-                // }
 
             } else {
                 const errMsg = data?.mensaje || 'Error en el registro';
