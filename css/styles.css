@@ -69,12 +69,6 @@ main { flex: 1 0 auto; }
   box-shadow: 0 10px 25px rgba(13,110,253,.12);
 }
 
-/* opcional: alineación de items en pantallas grandes */
-@media (min-width: 992px){
-  #mainNav .navbar-nav{ gap:.25rem; }
-}
-
-
 
 /* Buscador */
 .search-section {
@@ -1386,4 +1380,8 @@ main { flex: 1 0 auto; }
 
 @media (max-width: 576px){
   .btn-addimg-fab{ right: 12px; bottom: 12px; }
+}
+
+@media (min-width: 992px){
+  #mainNav .navbar-nav{ gap:.25rem; }
 }
