@@ -40,8 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
+      },
+      cache: 'no-store'
     });
 
     if (response.status === 401 || response.status === 403) {

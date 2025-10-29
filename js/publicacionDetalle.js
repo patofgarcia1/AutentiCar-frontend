@@ -382,6 +382,7 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
   });
 
   btnEliminar?.addEventListener('click', async () => {
+    const idUsuario = localStorage.getItem("usuarioId");
     if (!confirm('¿Seguro que querés eliminar esta publicación?')) return;
     btnEliminar.disabled = true;
     btnEliminar.textContent = 'Eliminando...';
@@ -392,7 +393,7 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
       });
       if (!del.ok) throw new Error(await del.text());
       showMsg('Publicación eliminada correctamente.', 'success');
-      setTimeout(() => (window.location.href = `vehiculoDetalle.html?id=${vehiculo.idVehiculo}`), 1000);
+      setTimeout(() => (window.location.href = `misPublicaciones.html?usuario=${idUsuario}`), 1000);
     } catch (e) {
       console.error(e);
       showMsg('Error al eliminar publicación.', 'danger');
