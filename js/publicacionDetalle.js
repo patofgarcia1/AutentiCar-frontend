@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <h6 class="fw-bold">Acciones del dueño</h6>
               <div class="d-flex flex-column gap-2">
                 <button id="btnToggleEstado" class="btn btn-warning w-100">Pausar publicación</button>
-                <button id="btnEliminarPublicacion" class="btn btn-danger w-100">Eliminar publicación</button>
+                <button id="btnEliminarPublicacion" class="btn btn-danger w-100">Eliminar vehículo</button>
               </div>
             </div>
           ` : ''}
@@ -383,23 +383,28 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
 
   btnEliminar?.addEventListener('click', async () => {
     const idUsuario = localStorage.getItem("usuarioId");
-    if (!confirm('¿Seguro que querés eliminar esta publicación?')) return;
+    if (!confirm('¿Seguro que querés eliminar este vehículo?')) return;
     btnEliminar.disabled = true;
     btnEliminar.textContent = 'Eliminando...';
+
     try {
-      const del = await fetch(`${URL_API}/publicaciones/${publicacionId}`, {
+      const del = await fetch(`${URL_API}/vehiculos/${vehiculo.idVehiculo}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
+
       if (!del.ok) throw new Error(await del.text());
-      showMsg('Publicación eliminada correctamente.', 'success');
+
+      showMsg('Vehículo eliminado correctamente.', 'success');
       setTimeout(() => (window.location.href = `misPublicaciones.html?usuario=${idUsuario}`), 1000);
+
     } catch (e) {
       console.error(e);
-      showMsg('Error al eliminar publicación.', 'danger');
+      showMsg('Error al eliminar el vehículo.', 'danger');
+
     } finally {
       btnEliminar.disabled = false;
-      btnEliminar.textContent = 'Eliminar publicación';
+      btnEliminar.textContent = 'Eliminar vehículo';
     }
   });
 }
