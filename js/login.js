@@ -79,11 +79,10 @@ function redirectByRole() {
     window.location.href = 'index.html';
     return;
   }
-  // (Opcional) si más adelante sumás Taller:
   if (rol === 'TALLER') {
     window.location.href = 'inicioTaller.html';
     return;
   }
-  // Fallback por si no hay rol o viene algo inesperado
+
   window.location.href = 'index.html';
 }

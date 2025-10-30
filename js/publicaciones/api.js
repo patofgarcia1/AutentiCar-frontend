@@ -165,3 +165,63 @@ export async function loadPublicacionesPorUsuario(usuarioIdParam) {
       </div>`;
   }
 }
+
+export async function loadPublicacionesPorTaller(usuarioIdParam) {
+  const container = document.getElementById('lista-publicaciones');
+  if (!container) return;
+
+  const usuarioId = usuarioIdParam || localStorage.getItem('usuarioId');
+  const token = localStorage.getItem('token');
+
+  if (!usuarioId || !token) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary mb-3" role="status"></div>
+      <p class="text-muted mb-0">Cargando publicaciones asignadas al taller...</p>
+    </div>`;
+
+  try {
+    const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/publicacionesTaller`, {
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'Cache-Control': 'no-cache'
+      },
+      cache: 'no-store'
+    });
+
+    if (resp.status === 401 || resp.status === 403) {
+      container.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
+      return;
+    }
+
+    if (!resp.ok) {
+      const errTxt = await resp.text();
+      throw new Error(errTxt || 'Error del servidor');
+    }
+
+    const data = await resp.json();
+
+    if (!data || data.length === 0) {
+      container.innerHTML = `
+        <div class="alert alert-info mt-4" role="alert">
+          <strong>Sin publicaciones asignadas.</strong><br>
+          Todavía no tenés vehículos asignados a tu taller.
+        </div>`;
+      return;
+    }
+
+    await renderPublicaciones(data);
+  } catch (err) {
+    console.error('Error al cargar publicaciones del taller:', err);
+    container.innerHTML = `
+      <div class="alert alert-danger mt-4" role="alert">
+        <strong>Error:</strong> No se pudieron cargar las publicaciones del taller.<br>
+        <small>${err.message || 'Intente nuevamente.'}</small>
+      </div>`;
+  }
+}

@@ -1,9 +1,9 @@
-// js/nav.js
+
 document.addEventListener('DOMContentLoaded', async () => {
   const slot = document.getElementById('site-nav');
   if (!slot) return;
 
-  // Cargar el parcial e inyectarlo
+
   try {
     const resp = await fetch('/partials/nav.html'); 
     slot.innerHTML = await resp.text();
@@ -12,27 +12,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // consultamos los elementos dentro del nav inyectado
-  const liLogin    = document.getElementById('nav-login');
+  const liLogin = document.getElementById('nav-login');
   const liRegister = document.getElementById('nav-register');
-  const liPerfil   = document.getElementById('nav-perfil');
-  const liLogout   = document.getElementById('nav-logout');
+  const liPerfil = document.getElementById('nav-perfil');
+  const liLogout = document.getElementById('nav-logout');
   const logoutLink = document.getElementById('logoutLink');
   const liFavoritos = document.getElementById('nav-favoritos');
 
-  const liAdminUsuarios  = document.getElementById('nav-admin-usuarios');
+  const liAdminUsuarios = document.getElementById('nav-admin-usuarios');
   const liConcesionarioPublicaciones = document.getElementById('nav-concesionario-publicaciones');
 
   const linkInicio = document.querySelector('a.nav-link[href="index.html"]');
-  const brandLink  = document.querySelector('.navbar-brand');
+  const brandLink = document.querySelector('.navbar-brand');
 
   const token = localStorage.getItem('token');
-  const rol   = localStorage.getItem('rol'); 
+  const rol = localStorage.getItem('rol'); 
   const hasSession = !!token;
   const isAdmin = rol === 'ADMIN';
   const isConcesionario = rol === 'CONCESIONARIO';
+  const isTaller = rol === 'TALLER';
 
-  // Mostrar/ocultar items según sesión
+
   if (hasSession) {
     liLogin?.classList.add('d-none');
     liRegister?.classList.add('d-none');
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     liPerfil?.classList.remove('d-none');
     liLogout?.classList.remove('d-none');
 
-    // solo admin
+ 
     if (isAdmin) {
       liAdminUsuarios?.classList.remove('d-none');
     } else {
@@ -62,9 +62,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     liFavoritos?.classList.add('d-none');
   }
 
-  if (isConcesionario) {
+   if (isConcesionario) {
     linkInicio?.setAttribute('href', 'inicioConcesionario.html');
     brandLink?.setAttribute('href', 'inicioConcesionario.html');
+  } else if (isTaller) {
+    linkInicio?.setAttribute('href', 'inicioTaller.html');
+    brandLink?.setAttribute('href', 'inicioTaller.html');
   } else {
     linkInicio?.setAttribute('href', 'index.html');
     brandLink?.setAttribute('href', 'index.html');
