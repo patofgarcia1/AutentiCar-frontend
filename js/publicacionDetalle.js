@@ -3,6 +3,7 @@ import { isAdmin, isUser } from './roles.js';
 import { initGaleriaDetalle } from './components/galeriaDetalle.js';
 import { renderHistorialCard } from './components/historialCard.js'; 
 import { initTransferirTitularidad } from './components/transferirTitularidad.js';
+import { initAgregarTaller } from './components/agregarTaller.js';
 
 function showMsg(html, type = 'info') {
   const mensaje = document.getElementById('mensaje');
@@ -328,6 +329,7 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
   const btnEliminar = document.getElementById('btnEliminarPublicacion');
   const btnToggle = document.getElementById('btnToggleEstado');
   initTransferirTitularidad(vehiculo.idVehiculo, token);
+  initAgregarTaller(vehiculo.idUsuario, token);
 
   function actualizarBotonToggle(estado) {
     if (!btnToggle) return;
