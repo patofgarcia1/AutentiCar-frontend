@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const chipsAnios   = document.getElementById('chips-anios');
   const chipsPrecio  = document.getElementById('chips-precio');
   const chipsKm      = document.getElementById('chips-km');
+  const chipsRol     = document.getElementById('chips-rol');
 
   ensureClearButton();
   const btnClear = document.getElementById('btn-clear-filtros');
@@ -40,7 +41,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     colores:  [],   // strings
     anios:    [],   // numbers
     priceIds: [],   // ids de PRICE_BUCKETS
-    kmIds:    []    // ids de KM_BUCKETS
+    kmIds:    [],    // ids de KM_BUCKETS
+    roles:    [] 
   };
 
   // ===== Helpers =====
@@ -65,6 +67,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     chipsKm?.querySelectorAll('button[data-km]')?.forEach(btn => {
       setActive(btn, state.kmIds.includes(btn.dataset.km));
+    });
+    chipsRol?.querySelectorAll('button[data-rol]')?.forEach(btn => {
+      setActive(btn, state.roles.includes(btn.dataset.rol));
     });
     if (inputQ) inputQ.value = state.q || '';
 
@@ -120,6 +125,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (b.max != null) p.append('maxKm', String(b.max));
     });
 
+    (state.roles || []).forEach(r => {
+      p.append('rol', r);
+    });
+
     const qs = p.toString();
     return qs ? `${URL_API}/publicaciones/filtro?${qs}` : `${URL_API}/publicaciones`;
   }
@@ -131,14 +140,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const resolveVehiculoId = (pub) =>
     pub?.vehiculoId ?? pub?.vehiculo?.idVehiculo ?? pub?.idVehiculo ?? null;
 
-  // async function fetchPortadaVehiculo(vehiculoId) {
-  //   try {
-  //     const r = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
-  //     if (!r.ok) return null;
-  //     const v = await r.json();
-  //     return toThumb(v.portadaUrl) || null;
-  //   } catch { return null; }
-  // }
 
   async function fetchVehiculoInfo(vehiculoId) {
     try {
@@ -146,7 +147,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!r.ok) return null;
       const v = await r.json();
 
-      // Tomamos portada y datos clave del vehículo
       return {
         portada: toThumb(v.portadaUrl) || null,
         anio: v.anio ?? null,
@@ -316,6 +316,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
 
+      if (chipsRol) {
+        chipsRol.innerHTML = `
+          <button class="chip chip-secondary" type="button" data-rol="CONCESIONARIO">Concesionarios</button>
+          <button class="chip chip-secondary" type="button" data-rol="PARTICULAR">Particulares</button>  
+        `;
+
+        chipsRol.addEventListener('click', (e) => {
+          const b = e.target.closest('button[data-rol]'); if (!b) return;
+          const val = b.dataset.rol; // 'CONCESIONARIO' | 'PARTICULAR'
+          toggleIn(state.roles, val);
+          state.q = null; if (inputQ) inputQ.value = '';
+          setActive(b, state.roles.includes(val));
+          loadPublicaciones({ showLoading: true });
+        });
+      }
+
       refreshSelectionsUI();
     } catch (err) {
       console.warn('No se pudieron cargar chips de filtros', err);
@@ -331,6 +347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.anios = [];
     state.priceIds = [];
     state.kmIds = [];
+    state.roles = [];  
     if (inputQ) inputQ.value = '';
 
     // quitar activos
