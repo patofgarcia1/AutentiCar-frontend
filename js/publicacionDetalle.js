@@ -407,4 +407,5 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
       btnEliminar.textContent = 'Eliminar vehículo';
     }
   });
+  
 }
