@@ -1233,6 +1233,37 @@ main { flex: 1 0 auto; }
   padding-right: 0.75rem;
 }
 
+/* === Talleres asignados === */
+.card-talleres-asignados {
+  background-color: #fff;
+}
+
+.card-taller {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 0.75rem;
+}
+
+.card-taller:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.talleres-lista {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.btn-eliminar-taller {
+  font-size: 1rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.btn-eliminar-taller:hover {
+  background-color: #f89c9c;
+  color: #fff;
+}
+
 
 /* ==== ICONO DE ELIMINAR ==== */
 .btn-del-img {

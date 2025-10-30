@@ -4,6 +4,7 @@ import { initGaleriaDetalle } from './components/galeriaDetalle.js';
 import { renderHistorialCard } from './components/historialCard.js'; 
 import { initTransferirTitularidad } from './components/transferirTitularidad.js';
 import { initAgregarTaller } from './components/agregarTaller.js';
+import { renderTalleresAsignados } from './components/listarTalleres.js';
 
 function showMsg(html, type = 'info') {
   const mensaje = document.getElementById('mensaje');
@@ -234,6 +235,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // === ACCIONES DEL DUEÑO ===
     if (isOwner || isAdmin()) initOwnerActions(publicacionId, vehiculo, publicacion.estadoPublicacion);
+    
+    if (isOwner || isAdmin()) {
+      const colDerecha = document.querySelector('.col-lg-4');
+      if (colDerecha) {
+        const token = localStorage.getItem('token');
+        renderTalleresAsignados(vehiculo.idUsuario, token, colDerecha);
+      }
+    }
 
   } catch (err) {
     console.error('Error al cargar:', err);
