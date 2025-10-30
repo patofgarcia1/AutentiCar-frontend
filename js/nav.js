@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const liAdminUsuarios  = document.getElementById('nav-admin-usuarios');
   const liConcesionarioPublicaciones = document.getElementById('nav-concesionario-publicaciones');
 
+  const linkInicio = document.querySelector('a.nav-link[href="index.html"]');
+  const brandLink  = document.querySelector('.navbar-brand');
+
   const token = localStorage.getItem('token');
   const rol   = localStorage.getItem('rol'); 
   const hasSession = !!token;
@@ -57,6 +60,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     liLogout?.classList.add('d-none');
     liAdminUsuarios?.classList.add('d-none');
     liFavoritos?.classList.add('d-none');
+  }
+
+  if (isConcesionario) {
+    linkInicio?.setAttribute('href', 'inicioConcesionario.html');
+    brandLink?.setAttribute('href', 'inicioConcesionario.html');
+  } else {
+    linkInicio?.setAttribute('href', 'index.html');
+    brandLink?.setAttribute('href', 'index.html');
   }
 
 

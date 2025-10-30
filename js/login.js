@@ -44,18 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
           data.id = u.idUsuario ?? u.id ?? null;
         }
 
-        // guarda el id como siempre
         localStorage.setItem('usuarioId', data.id);
-        
         const rol = data?.usuario?.rol ?? data?.rol ?? '';
         localStorage.setItem('rol', rol);
+        localStorage.setItem('token', data.token);
 
-        // (opcional) guardá el token para futuras requests
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-        }
-
-        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+        redirectByRole();
 
       } else {
         const err = data?.mensaje || 'Credenciales inválidas';
@@ -73,3 +67,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+function redirectByRole() {
+  const rol = (localStorage.getItem('rol') || '').trim().toUpperCase();
+
+  if (rol === 'CONCESIONARIO') {
+    window.location.href = 'inicioConcesionario.html';
+    return;
+  }
+  if (rol === 'PARTICULAR') {
+    window.location.href = 'index.html';
+    return;
+  }
+  // (Opcional) si más adelante sumás Taller:
+  if (rol === 'TALLER') {
+    window.location.href = 'inicioTaller.html';
+    return;
+  }
+  // Fallback por si no hay rol o viene algo inesperado
+  window.location.href = 'index.html';
+}

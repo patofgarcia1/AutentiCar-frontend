@@ -95,7 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       `
       : `
         <button id="btn-vehiculos" class="btn-primary-full">Mis Vehículos</button>
-        <button id="btn-publicaciones" class="btn-primary-full">Mis Publicaciones</button>
         <button id="btn-eventos" class="btn-primary-full">Mis Eventos</button>
       `;
     accionesContainer.innerHTML = botonesHTML;
@@ -166,9 +165,6 @@ document.getElementById('btn-cancelar-oferta')?.addEventListener('click', async 
 
     // Listeners
     document.getElementById('btn-vehiculos')?.addEventListener('click', () => {
-      window.location.href = `misVehiculos.html?usuario=${usuarioId}`;
-    });
-    document.getElementById('btn-publicaciones')?.addEventListener('click', () => {
       window.location.href = `misPublicaciones.html?usuario=${usuarioId}`;
     });
     document.getElementById('btn-eventos')?.addEventListener('click', () => {

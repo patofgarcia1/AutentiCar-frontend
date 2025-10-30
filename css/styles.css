@@ -321,6 +321,14 @@ main { flex: 1 0 auto; }
   border-radius: 8px;
 }
 
+/* INICIO */
+.concesionario-title{
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 10px;
+}
+
 /* LOGIN */
 
 .login-body {
@@ -800,6 +808,10 @@ main { flex: 1 0 auto; }
   overflow: hidden;
   background: #f3f4f6;
 }
+
+/* #lista-publicaciones-concesionario{
+  margin-top: 30px;
+} */
 
 /* MIS EVENTOS */
 #misEventos-lista {
