@@ -21,12 +21,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const liFavoritos = document.getElementById('nav-favoritos');
 
   const liAdminUsuarios  = document.getElementById('nav-admin-usuarios');
-  // const liAdminVehiculos = document.getElementById('nav-admin-vehiculos');
+  const liConcesionarioPublicaciones = document.getElementById('nav-concesionario-publicaciones');
 
   const token = localStorage.getItem('token');
   const rol   = localStorage.getItem('rol'); 
   const hasSession = !!token;
   const isAdmin = rol === 'ADMIN';
+  const isConcesionario = rol === 'CONCESIONARIO';
 
   // Mostrar/ocultar items según sesión
   if (hasSession) {
@@ -39,22 +40,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     // solo admin
     if (isAdmin) {
       liAdminUsuarios?.classList.remove('d-none');
-      // liAdminVehiculos?.classList.remove('d-none');
     } else {
       liAdminUsuarios?.classList.add('d-none');
-      // liAdminVehiculos?.classList.add('d-none');
     }
+
+    if (isConcesionario) {
+      liConcesionarioPublicaciones?.classList.remove('d-none');
+    } else {
+      liConcesionarioPublicaciones?.classList.add('d-none');
+    }
+
   } else {
     liLogin?.classList.remove('d-none');
     liRegister?.classList.remove('d-none');
     liPerfil?.classList.add('d-none');
     liLogout?.classList.add('d-none');
     liAdminUsuarios?.classList.add('d-none');
-    // liAdminVehiculos?.classList.add('d-none');
     liFavoritos?.classList.add('d-none');
   }
 
-  // Logout
+
   logoutLink?.addEventListener('click', (e) => {
     e.preventDefault();
     localStorage.removeItem('usuarioId');
