@@ -137,9 +137,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toThumb = (url) =>
     url ? url.replace('/upload/', '/upload/w_500,h_250,c_fill,f_auto,q_auto/') : null;
 
+  const ROL_LABEL = {
+    CONCESIONARIO: 'Concesionario',
+    PARTICULAR: 'Particular',
+    TALLER: 'Taller',
+    ADMIN: 'Admin'
+  };
+
+  const resolveUsuarioId = (pub) =>
+    pub?.usuarioId ?? pub?.usuario?.idUsuario ?? pub?.usuario?.id ?? null;
+
+  async function fetchUsuarioPublico(usuarioId) {
+    try {
+      const r = await fetch(`${URL_API}/usuarios/publico/${usuarioId}`, {
+        headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache' },
+        cache: 'no-store'
+      });
+      if (!r.ok) return null;
+      return await r.json(); 
+    } catch {
+      return null;
+    }
+  }
+
   const resolveVehiculoId = (pub) =>
     pub?.vehiculoId ?? pub?.vehiculo?.idVehiculo ?? pub?.idVehiculo ?? null;
-
 
   async function fetchVehiculoInfo(vehiculoId) {
     try {
@@ -169,9 +191,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       })
     );
 
+    const usuariosInfo = await Promise.all(
+      list.map(async (pub) => {
+        const uid = resolveUsuarioId(pub);
+        return uid ? await fetchUsuarioPublico(uid) : null;
+      })
+    );
+
     container.innerHTML = list.map((pub, i) => {
-      const pubId = pub.idPublicacion ?? pub.id ?? '';
+      const pubId = pub.idPublicacion;
       const info = vehiculosInfo[i] || {};
+      const uinfo = usuariosInfo[i] || null;
       const img = info.portada || PLACEHOLDER;
       const anio = info.anio ?? '—';
       const km = info.kilometraje ? info.kilometraje.toLocaleString('es-AR') : '—';
@@ -179,6 +209,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const precioStr = (typeof pub.precio === 'number')
         ? pub.precio.toLocaleString('es-AR')
         : (pub.precio ?? '—');
+
+      const rol = uinfo?.rol || null;
+      const rolLabel = rol ? (ROL_LABEL[rol] || rol) : '—';
 
       return `
         <div class="col">
@@ -190,6 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="card-body d-flex flex-column">
               <h5 class="card-title text-dark fw-bold">${pub.titulo ?? 'Publicación'}</h5>
               <p class="text-muted mb-2">${anio} | ${km} km</p>
+               <p class="text-muted small mb-2"><span class="fw-semibold">Vendido por:</span> ${rolLabel}</p>
               <p class="precio mt-auto mb-3">${symbol} ${precioStr}</p>
             </div>
           </div>
