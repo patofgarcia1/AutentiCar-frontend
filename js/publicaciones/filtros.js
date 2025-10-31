@@ -3,14 +3,14 @@ import { URL_API } from '../../constants/database.js';
 import { toggleIn, setActive, refreshSelectionsUI } from './helpers.js';
 import { loadPublicaciones } from './api.js';
 
-const PRICE_BUCKETS = [
+export const PRICE_BUCKETS = [
   { id: 'hasta-15', label: 'Hasta 15 M', min: null, max: 15000000 },
   { id: '15-35', label: '15 a 35 M', min: 15000000, max: 35000000 },
   { id: '35-55', label: '35 a 55 M', min: 35000000, max: 55000000 },
   { id: 'mas-55', label: 'Más de 55 M', min: 55000000, max: null }
 ];
 
-const KM_BUCKETS = [
+export const KM_BUCKETS = [
   { id: 'hasta-25', label: '≤ 25.000 km', min: null, max: 25000 },
   { id: '25-50', label: '25-50 mil', min: 25000, max: 50000 },
   { id: '50-80', label: '50-80 mil', min: 50000, max: 80000 },
@@ -127,6 +127,17 @@ export async function drawChips(state) {
         toggleIn(state.roles, val);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.roles.includes(val));
+        loadPublicaciones(state);
+      });
+    }
+
+    const formQ = document.getElementById('search-form');
+    const inputQ = document.getElementById('search-q');
+
+    if (formQ && inputQ) {
+      formQ.addEventListener('submit', (e) => {
+        e.preventDefault();
+        state.q = inputQ.value.trim() || null;
         loadPublicaciones(state);
       });
     }

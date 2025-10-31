@@ -1,6 +1,7 @@
 // js/publicaciones/api.js
 import { URL_API } from '../../constants/database.js';
 import { renderPublicaciones } from './render.js';
+import { PRICE_BUCKETS, KM_BUCKETS } from './filtros.js'; 
 
 /**
  * Construye la URL de endpoint de publicaciones a partir del estado actual
@@ -8,18 +9,32 @@ import { renderPublicaciones } from './render.js';
 function endpointFromState(state) {
   const params = new URLSearchParams();
 
-  // búsqueda por texto
+  // === Texto de búsqueda ===
   if (state.q) params.set('q', state.q);
 
-  // filtros múltiples
-  (state.marcas || []).forEach(m => params.append('marca', m));
+  // === Filtros básicos ===
+  (state.marcas  || []).forEach(m => params.append('marca', m));
   (state.colores || []).forEach(c => params.append('color', c));
-  (state.anios || []).forEach(a => params.append('anio', String(a)));
-  (state.roles || []).forEach(r => params.append('rol', r));
+  (state.anios   || []).forEach(a => params.append('anio', String(a)));
+  (state.roles   || []).forEach(r => params.append('rol', r));
 
-  // Filtros de precio y km (por ID de bucket)
-  (state.priceIds || []).forEach(id => params.append('precioId', id));
-  (state.kmIds || []).forEach(id => params.append('kmId', id));
+  // === Precio ===
+  (state.priceIds || []).forEach(id => {
+    const bucket = PRICE_BUCKETS.find(b => b.id === id);
+    if (bucket) {
+      if (bucket.min != null) params.append('minPrecio', bucket.min);
+      if (bucket.max != null) params.append('maxPrecio', bucket.max);
+    }
+  });
+
+  // === Kilometraje ===
+  (state.kmIds || []).forEach(id => {
+    const bucket = KM_BUCKETS.find(b => b.id === id);
+    if (bucket) {
+      if (bucket.min != null) params.append('minKm', bucket.min);
+      if (bucket.max != null) params.append('maxKm', bucket.max);
+    }
+  });
 
   const query = params.toString();
   return query
