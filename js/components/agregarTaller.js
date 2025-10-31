@@ -1,10 +1,10 @@
 import { URL_API } from '../../constants/database.js';
 
-/**
- * Inicializa el flujo de asignación de un taller a un usuario.
- * @param {number} usuarioId - ID del usuario actual (dueño)
- * @param {string} token - Token JWT del usuario autenticado
- */
+export function abrirBuscarTaller(usuarioId, token) {
+  // usa la misma lógica que ya tenés: crea la modal y la muestra
+  mostrarModalAgregarTaller(usuarioId, token); 
+}
+
 export function initAgregarTaller(usuarioId, token) {
   // Insertar botón "Agregar Taller" en la card de acciones del dueño
   const cardAcciones = document.querySelector('.card-autoplat.p-4.mt-3 .d-flex');
@@ -83,9 +83,7 @@ function mostrarModalAgregarTaller(usuarioId, token) {
   });
 }
 
-/**
- * Renderiza los resultados de búsqueda de talleres.
- */
+
 function renderResultadosTaller(talleres, contenedor, usuarioId, token, modal) {
   contenedor.innerHTML = '';
 
@@ -133,7 +131,7 @@ async function agregarTaller(usuarioId, tallerId, token, modal) {
 
     mostrarModalExito('¡El taller fue agregado correctamente!');
     modal.remove();
-    // setTimeout(() => window.location.reload(), 1800);
+    window.dispatchEvent(new CustomEvent('taller:agregado'));
   } catch (err) {
     alertaError = document.createElement('div');
     alertaError.className = 'alert alert-danger alert-error mt-3';
@@ -165,4 +163,11 @@ function mostrarModalExito(mensaje) {
     modalExito.classList.remove('show');
     modalExito.remove();
   }, 3000);
+}
+
+export function abrirModalAgregarTaller() {
+  const modal = bootstrap.Modal.getOrCreateInstance(
+    document.getElementById('modalAgregarTaller')
+  );
+  modal.show();
 }
