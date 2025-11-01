@@ -1,16 +1,19 @@
 // js/inicioConcesionario.js
 import { initState } from './publicaciones/state.js';
 import { drawChips, setupClearButton } from './publicaciones/filtros.js';
-import { loadPublicacionesPorUsuario } from './publicaciones/api.js';
+import { loadPublicaciones } from './publicaciones/api.js';
 import { ensureModalsAndButton } from './publicaciones/modales.js';
 import { refreshSelectionsUI } from './publicaciones/helpers.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const state = initState();
   ensureModalsAndButton();
-  await drawChips(state, loadPage);
-  refreshSelectionsUI(state);
-  setupClearButton(state, loadPage);
+
+  const reloadConcesionarioPubs = (currentState) => loadPublicaciones(currentState, { context: 'concesionario' });
+
+  await drawChips(state, reloadConcesionarioPubs);
+  refreshSelectionsUI(state);
+  setupClearButton(state, reloadConcesionarioPubs);
 
   const usuarioId = localStorage.getItem('usuarioId');
   if (!usuarioId) {
@@ -20,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadPage();
 
   async function loadPage() {
-    await loadPublicacionesPorUsuario(usuarioId, state);
+    await loadPublicaciones(state, { context: 'concesionario' });
     refreshSelectionsUI(state);
   }
 });

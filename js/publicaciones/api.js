@@ -6,7 +6,7 @@ import { PRICE_BUCKETS, KM_BUCKETS } from './filtros.js';
 /**
  * Construye la URL de endpoint de publicaciones a partir del estado actual
  */
-function endpointFromState(state) {
+function endpointFromState(state, context = 'general') {
   const params = new URLSearchParams();
 
   // === Texto de búsqueda ===
@@ -36,13 +36,29 @@ function endpointFromState(state) {
     }
   });
 
-  const query = params.toString();
-  return query
-    ? `${URL_API}/publicaciones/filtro?${query}`
-    : `${URL_API}/publicaciones`;
+  const usuarioId = localStorage.getItem('usuarioId');
+  const tallerId = localStorage.getItem('usuarioId');
+
+  switch (context) {
+    case 'concesionario':
+      params.set('usuarioId', usuarioId);
+      return `${URL_API}/publicaciones/filtro/misPublicaciones?${params.toString()}`;
+    case 'taller':
+      params.set('tallerId', tallerId);
+      return `${URL_API}/publicaciones/filtro/publicacionesTaller?${params.toString()}`;
+    default:
+      return `${URL_API}/publicaciones/filtro?${params.toString()}`;
+  }
+
+  // const query = params.toString();
+  // return query
+  //   ? `${URL_API}/publicaciones/filtro?${query}`
+  //   : `${URL_API}/publicaciones`;
 }
 
-export async function loadPublicaciones(state, { showLoading = true, silent = false } = {}) {
+
+
+export async function loadPublicaciones(state, { context = 'general', showLoading = true, silent = false } = {}) {
   const container = document.getElementById('lista-publicaciones');
   if (!container) return;
 
@@ -55,7 +71,7 @@ export async function loadPublicaciones(state, { showLoading = true, silent = fa
   }
 
   try {
-    const endpoint = endpointFromState(state);
+    const endpoint = endpointFromState(state, context);
     const resp = await fetch(endpoint, {
       headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache' },
       cache: 'no-store'

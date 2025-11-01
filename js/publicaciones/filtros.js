@@ -18,7 +18,7 @@ export const KM_BUCKETS = [
   { id: 'mas-100', label: '≥ 100.000', min: 100000, max: null }
 ];
 
-export async function drawChips(state) {
+export async function drawChips (state, reloadFn = (currentState) => loadPublicaciones(currentState, { context: 'general' })) {
   const chipsMarcas  = document.getElementById('chips-marcas');
   const chipsColores = document.getElementById('chips-colores');
   const chipsAnios   = document.getElementById('chips-anios');
@@ -53,7 +53,7 @@ export async function drawChips(state) {
         toggleIn(state.marcas, card.dataset.marca);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(card, state.marcas.includes(card.dataset.marca));
-        loadPublicaciones(state);
+        reloadFn(state);
       });
     }
 
@@ -67,7 +67,8 @@ export async function drawChips(state) {
         toggleIn(state.colores, b.dataset.color);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.colores.includes(b.dataset.color));
-        loadPublicaciones(state);
+        //loadPublicaciones(state);
+        reloadFn(state);
       });
     }
 
@@ -82,7 +83,8 @@ export async function drawChips(state) {
         toggleIn(state.anios, val);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.anios.includes(val));
-        loadPublicaciones(state);
+        //loadPublicaciones(state);
+        reloadFn(state);
       });
     }
 
@@ -97,7 +99,8 @@ export async function drawChips(state) {
         toggleIn(state.priceIds, id);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.priceIds.includes(id));
-        loadPublicaciones(state);
+        //loadPublicaciones(state);
+        reloadFn(state);
       });
     }
 
@@ -112,7 +115,8 @@ export async function drawChips(state) {
         toggleIn(state.kmIds, id);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.kmIds.includes(id));
-        loadPublicaciones(state);
+        //loadPublicaciones(state);
+        reloadFn(state);
       });
     }
 
@@ -127,7 +131,8 @@ export async function drawChips(state) {
         toggleIn(state.roles, val);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.roles.includes(val));
-        loadPublicaciones(state);
+        //loadPublicaciones(state);
+        reloadFn(state);
       });
     }
 
@@ -138,7 +143,8 @@ export async function drawChips(state) {
       formQ.addEventListener('submit', (e) => {
         e.preventDefault();
         state.q = inputQ.value.trim() || null;
-        loadPublicaciones(state);
+        //loadPublicaciones(state);
+        reloadFn(state);
       });
     }
 
@@ -148,7 +154,7 @@ export async function drawChips(state) {
   }
 }
 
-export function setupClearButton(state) {
+export function setupClearButton(state, reloadFn = (currentState) => loadPublicaciones(currentState, { context: 'general' })) {
   const btnClear = document.getElementById('btn-clear-filtros');
   btnClear?.addEventListener('click', (e) => {
     e.preventDefault();
@@ -156,6 +162,6 @@ export function setupClearButton(state) {
     document.querySelectorAll('.brand-card.active, .chip.active').forEach(el => el.classList.remove('active'));
     const inputQ = document.getElementById('search-q');
     if (inputQ) inputQ.value = '';
-    loadPublicaciones(state);
+    reloadFn(state);
   });
 }
