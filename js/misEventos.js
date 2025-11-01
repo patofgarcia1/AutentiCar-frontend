@@ -1,7 +1,7 @@
 import { URL_API } from '../constants/database.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const container = document.getElementById('misEventos-lista');
+  const container = document.getElementById('eventos-lista');
   const usuarioId = localStorage.getItem('usuarioId');
   const token = localStorage.getItem('token');
 
@@ -39,15 +39,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (!resp.ok) {
-      const errorMsg = await resp.text();
-      container.innerHTML = `<div class="alert alert-info">${errorMsg || 'No se pudieron obtener tus eventos.'}</div>`;
+      container.innerHTML = `<div class="alert alert-info">No se pudieron obtener tus eventos.</div>`;
       return;
     }
 
     const eventos = await resp.json();
 
     if (!Array.isArray(eventos) || eventos.length === 0) {
-      container.innerHTML = `<div class="alert alert-info">No hay eventos disponibles.</div>`;
+      container.innerHTML = `<div class="alert alert-info mt-3">No hay eventos registrados por este usuario.</div>`;
       return;
     }
 
