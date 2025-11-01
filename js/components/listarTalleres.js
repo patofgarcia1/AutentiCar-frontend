@@ -20,7 +20,16 @@ export async function renderTalleresAsignados(usuarioId, token, contenedorDerech
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!resp.ok) throw new Error(await resp.text());
+      if (resp.status === 404) {
+        listaContenedor.innerHTML = '<p class="text-muted small">Todavía no hay talleres asignados.</p>';
+        return;
+      }
+
+      if (!resp.ok) {
+        const texto = await resp.text();
+        throw new Error(texto || 'Error desconocido al cargar talleres.');
+      }
+      
       const talleres = await resp.json();
 
       if (!talleres || talleres.length === 0) {

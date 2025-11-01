@@ -1053,6 +1053,11 @@ main { flex: 1 0 auto; }
   margin-right: 1.5rem; 
 }
 
+.descripcion-publicacion {
+  white-space: pre-line;
+  margin-top: -25px;
+}
+
 .btn-favorito {
   position: absolute;
   top: 12px;

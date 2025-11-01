@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     container.innerHTML = `
       <div class="row g-4">
-        <!-- IZQUIERDA -->
         <div class="col-lg-8 position-relative">
           ${isLogged ? `
             <button id="btnFavorito" class="btn-favorito">
@@ -67,10 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             </button>
           ` : ''}
 
-          <!-- Galería principal -->
           <div id="galeria-root" class="card card-autoplat overflow-hidden mb-4"></div>
 
-          <!-- Datos del vehículo -->
           <div class="card card-autoplat overflow-hidden mb-4">
             <div class="card-body">
               <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3">
@@ -99,14 +96,14 @@ document.addEventListener('DOMContentLoaded', async () => {
               <hr class="my-4"/>
 
               <h5 class="fw-bold mb-3">Descripción</h5>
-              <p class="text-secondary">${publicacion.descripcion || 'Sin descripción disponible.'}</p>
+              <p class="text-secondary descripcion-publicacion">
+                ${publicacion.descripcion || 'Sin descripción disponible.'}
+              </p>
             </div>
           </div>
         </div>
 
-        <!-- DERECHA -->
         <div class="col-lg-4">
-          <!-- Card vendedor -->
           ${usuario ? `
             <div class="card card-autoplat mb-4 p-3">
               <div class="card-header-vendedor mb-2">
@@ -139,11 +136,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           ` : ''}
 
-
-          <!-- Card mantenimiento -->
           ${cardHistorialHTML}
           
-          <!-- Card acciones -->
           ${(isOwner || isAdmin()) ? `
             <div class="card card-autoplat p-4 mt-3">
               <h6 class="fw-bold">Acciones del dueño</h6>
