@@ -50,7 +50,6 @@ function ensureLimitModals() {
     </div>
   `);
 
-  // Eventos de los modales
   const limitEl = document.getElementById('limitModal');
   const ofertasEl = document.getElementById('ofertasModal');
   const btnComprar = document.getElementById('btnComprarPlan');

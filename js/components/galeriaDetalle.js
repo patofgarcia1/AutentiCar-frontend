@@ -4,7 +4,7 @@ export function initGaleriaDetalle({
   root,
   vehiculoId,
   allowUpload = false,
-  allowDelete = false, // nuevo
+  allowDelete = false, 
   authHeaders,
   onChange,
 }) {
@@ -50,7 +50,6 @@ export function initGaleriaDetalle({
   const btnCerrar = root.querySelector('#btnCerrarSlide');
   const btnDelSlide = root.querySelector('#btnDelSlide');
 
-  // ==== API CALLS ====
   async function getImagenes() {
     const res = await fetch(`${URL_API}/vehiculos/${vehiculoId}/imagenes`);
     if (!res.ok) return [];
@@ -77,7 +76,6 @@ export function initGaleriaDetalle({
     if (!res.ok) throw new Error(await res.text());
   }
 
-  // ==== RENDER ====
   function renderPortada() {
     if (!imagenes.length) {
       portada.src = 'img/defaultCar.jpg';
@@ -118,7 +116,6 @@ export function initGaleriaDetalle({
   btnCerrar.addEventListener('click', cerrarSlide);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) cerrarSlide(); });
 
-  // ==== ELIMINAR ====
   if (btnDelSlide) {
     btnDelSlide.addEventListener('click', async (ev) => {
       ev.stopPropagation();
@@ -149,7 +146,6 @@ export function initGaleriaDetalle({
     });
   }
 
-  // ==== CARGA ====
   async function cargarImagenes() {
     try {
       imagenes = await getImagenes();

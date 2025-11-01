@@ -1,12 +1,7 @@
 import { URL_API } from '../../constants/database.js';
 
-/**
- * Inicializa el flujo de transferencia de titularidad.
- * @param {number} vehiculoId - ID del vehículo actual
- * @param {string} token - Token JWT del usuario autenticado
- */
+
 export function initTransferirTitularidad(vehiculoId, token) {
-  // Insertar botón "Vendí mi auto" dentro del panel de acciones del dueño
   const cardAcciones = document.querySelector('.card-autoplat.p-4.mt-3 .d-flex');
   if (!cardAcciones) return;
 
@@ -16,17 +11,12 @@ export function initTransferirTitularidad(vehiculoId, token) {
   btnTransferir.textContent = 'Vendí mi auto';
   cardAcciones.appendChild(btnTransferir);
 
-  // === Evento click ===
   btnTransferir.addEventListener('click', () => {
     mostrarModalTransferencia(vehiculoId, token);
   });
 }
 
-/**
- * Crea y muestra la modal de búsqueda del nuevo titular.
- */
 function mostrarModalTransferencia(vehiculoId, token) {
-  // Crear overlay/modal básico
   const modal = document.createElement('div');
   modal.className = 'modal fade show';
   modal.style.display = 'block';
@@ -56,7 +46,6 @@ function mostrarModalTransferencia(vehiculoId, token) {
 
   let timeout = null;
 
-  // Buscar mientras el usuario escribe
   inputBusqueda.addEventListener('input', () => {
     const query = inputBusqueda.value.trim();
     clearTimeout(timeout);
@@ -84,9 +73,6 @@ function mostrarModalTransferencia(vehiculoId, token) {
   });
 }
 
-/**
- * Renderiza los resultados de búsqueda.
- */
 function renderResultados(usuarios, contenedor, vehiculoId, token, modal) {
   contenedor.innerHTML = '';
 
@@ -113,9 +99,6 @@ function renderResultados(usuarios, contenedor, vehiculoId, token, modal) {
   });
 }
 
-/**
- * Llama al endpoint del backend para transferir titularidad.
- */
 async function transferirTitularidad(vehiculoId, nuevoTitularId, token, modal) {
   try {
     const resp = await fetch(`${URL_API}/vehiculos/${vehiculoId}/transferir?nuevoTitularId=${nuevoTitularId}`, {

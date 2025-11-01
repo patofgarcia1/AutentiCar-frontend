@@ -1,19 +1,18 @@
-// js/components/imagenes.js
+
 import { URL_API } from '../../constants/database.js';
 
 export function initGaleriaImagenes({
   root,           
   vehiculoId,     
-  allowUpload,    // boolean (true: muestra botón/selector y sube)
-  allowDelete,    // boolean (true: muestra ícono de borrar)
+  allowUpload,   
+  allowDelete,   
   titulo = 'Imágenes',
-  onChange,       // callback opcional cuando cambian (p.ej, tras subir/borrar)
-  authHeaders     // <<< OPCIONAL: { Authorization: 'Bearer <token>' }
+  onChange,       
+  authHeaders     
 }) {
   if (!root) throw new Error('root es requerido');
   if (!vehiculoId) throw new Error('vehiculoId es requerido');
 
-  // Si no te pasan headers, intento tomar el token del localStorage
   const resolvedAuthHeaders = (() => {
     if (authHeaders && typeof authHeaders === 'object') return authHeaders;
     const token = localStorage.getItem('token');
@@ -21,11 +20,9 @@ export function initGaleriaImagenes({
   })();
 
 
-  // Estado interno
   let imagenes = [];
   let indiceActual = 0;
 
-  // Estructura base
   root.innerHTML = `
     <section class="mt-4 text-center">
       <p id="galeriaLeyenda" class="text-gray-700 mb-1">Sube aquí las fotos del vehículo.</p>
@@ -48,7 +45,6 @@ export function initGaleriaImagenes({
     </div>
   `;
 
-  // Refs
   const galeria = root.querySelector('#galeria');
   const estado = root.querySelector('#imagenesEstado');
   const overlay = root.querySelector('#slideshow');
@@ -59,7 +55,6 @@ export function initGaleriaImagenes({
   const btnSubir = root.querySelector('#btnSubir');
   const fileInput = root.querySelector('#fileInput');
 
-  // --- API calls ---
   async function getImagenes() {
     const res = await fetch(`${URL_API}/vehiculos/${vehiculoId}/imagenes`);
     if (!res.ok) return [];
@@ -121,8 +116,7 @@ export function initGaleriaImagenes({
       const wrap = document.createElement('div');
       wrap.className = 'gal-item';
 
-      // (opcional) transformación de Cloudinary para thumbs
-      const thumbUrl = toThumb(img.urlImagen, 400, 300); // w=400,h=300,c_fill
+      const thumbUrl = toThumb(img.urlImagen, 400, 300); 
 
       const imgtag = document.createElement('img');
       imgtag.src = thumbUrl;
@@ -159,7 +153,6 @@ export function initGaleriaImagenes({
     contenedor.appendChild(document.querySelector('#btnSubir'));
   }
 
-  // --- Slideshow ---
   function abrirSlideshow(i) {
     indiceActual = i;
     mostrarImagen();
@@ -177,7 +170,7 @@ export function initGaleriaImagenes({
   }
   function mostrarImagen() {
     if (!imagenes.length) return;
-    imgSlide.src = imagenes[indiceActual].urlImagen; // original
+    imgSlide.src = imagenes[indiceActual].urlImagen; 
   }
 
   btnPrev?.addEventListener('click', () => cambiarImagen(-1));
@@ -185,7 +178,6 @@ export function initGaleriaImagenes({
   btnCerrar?.addEventListener('click', cerrarSlideshow);
   overlay?.addEventListener('click', (e) => { if (e.target === overlay) cerrarSlideshow(); });
 
-  // --- Upload ---
   btnSubir?.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -216,7 +208,6 @@ export function initGaleriaImagenes({
     }
   });
 
-  // --- Public helpers ---
   async function cargarImagenes() {
     try {
       imagenes = await getImagenes();
@@ -227,15 +218,12 @@ export function initGaleriaImagenes({
     return imagenes;
   }
 
-  // helper: generar thumbnail de Cloudinary sin re-subir
   function toThumb(url, w, h) {
     try {
-      // reemplaza /upload/ por /upload/w_400,h_300,c_fill/
       return url.replace('/upload/', `/upload/w_${w},h_${h},c_fill/`);
     } catch { return url; }
   }
 
-  // init
   cargarImagenes();
 
   return {

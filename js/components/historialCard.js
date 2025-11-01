@@ -1,4 +1,4 @@
-// components/historialCard.js
+
 export function renderHistorialCard({ puedeVer, isLogged, soloValidados, vehiculoId }) {
   if (puedeVer) {
     return `

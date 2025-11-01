@@ -17,25 +17,12 @@ body {
 
 main { flex: 1 0 auto; }
 
-/* NAV */
-/* header.bg-primary {
-  background-color: var(#4D94FD) !important;
-}
-.nav-link.text-white:hover {
-  text-decoration: underline;
-}
-
-.nav-item{
-  font-weight: 600;
-} */
-
 /* NAV NUEVO */
 .bg-primary-gradient{
   background: linear-gradient(90deg,#0d6efd 0%, #0aa1ff 100%);
   backdrop-filter: saturate(140%) blur(6px);
 }
 
-/* tipografía/colores del nav */
 .site-navbar .nav-link{
   color:#fff;
   opacity:.92;
@@ -53,18 +40,15 @@ main { flex: 1 0 auto; }
   box-sizing: border-box !important;
 }
 
-/* marca y botones */
 .site-navbar .navbar-brand{ color:#fff; }
 .site-navbar .btn-light{ color:#0d6efd; border-radius:999px; }
 
-/* iconito de favoritos */
 .site-navbar .nav-icon{
   filter: drop-shadow(0 0 2px rgba(0,0,0,.25));
   width:18px; 
   height:18px;
 }
 
-/* sticky con sombra al scrollear */
 .site-navbar.scrolled{
   box-shadow: 0 10px 25px rgba(13,110,253,.12);
 }
@@ -112,7 +96,6 @@ main { flex: 1 0 auto; }
   box-shadow: 0 0 0 3px rgba(13,110,253,.2);
 }
 
-/* variante “secondary” que usás para color/precio/km */
 .chip.chip-secondary.active {
   background: #6c757d;
   border-color: #6c757d;
@@ -120,7 +103,6 @@ main { flex: 1 0 auto; }
   box-shadow: 0 0 0 3px rgba(108,117,125,.2);
 }
 
-/* --- Brand cards (marcas) ------------------------------------ */
 .brand-grid {
   display: flex;
   flex-wrap: wrap;
@@ -330,7 +312,6 @@ main { flex: 1 0 auto; }
 }
 
 /* LOGIN */
-
 .login-body {
   font-family: 'Spline Sans', sans-serif;
   background-color: #f9fafb;
@@ -438,7 +419,6 @@ main { flex: 1 0 auto; }
 }
 
 /* REGISTRO */
-
 .register-card {
   background: #fff;
   border-radius: 1rem;
@@ -608,7 +588,7 @@ main { flex: 1 0 auto; }
   margin-top: 6px;
 }
 
-/* === VALIDACIÓN DE USUARIO === */
+/* VALIDACIÓN DE USUARIO */
 .validate-card {
   background-color: #fff;
   border-radius: 1.5rem;
@@ -656,7 +636,7 @@ main { flex: 1 0 auto; }
   display: block;      
 }
 
-/* === CARGAR VEHÍCULO === */
+/*CARGAR VEHÍCULO */
 .vehiculo-card {
   background: #fff;
   border-radius: 15px;
@@ -678,7 +658,6 @@ main { flex: 1 0 auto; }
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
-/* Radios personalizados */
 .radio-option {
   display: inline-block;
   border: 1px solid #d1d5db;
@@ -698,7 +677,6 @@ main { flex: 1 0 auto; }
   font-weight: 600;
 }
 
-/* Botones */
 .btn-cancel {
   background: #f3f4f6;
   border: 1px solid #d1d5db;
@@ -714,7 +692,6 @@ main { flex: 1 0 auto; }
 }
 
 /* FORM PUBLICACION */
-
 #imagenes-root {
   background-color: #f9fafb;
   border: 2px dashed #d1d5db;
@@ -765,7 +742,7 @@ main { flex: 1 0 auto; }
 }
 
 
-/* --- Mis Favoritos --- */
+/* Mis Favoritos */
 .favorito-card {
   border-radius: 16px !important;
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
@@ -808,10 +785,6 @@ main { flex: 1 0 auto; }
   overflow: hidden;
   background: #f3f4f6;
 }
-
-/* #lista-publicaciones-concesionario{
-  margin-top: 30px;
-} */
 
 /* MIS EVENTOS */
 #misEventos-lista {
@@ -997,39 +970,33 @@ main { flex: 1 0 auto; }
   gap: 14px;
 }
 
-/* Botones */
 .primary-btn { color: #fff; background-color: #137fec; }
 .primary-btn:hover { background-color: #0e6ed3; }
 .primary-btn .evento-icon {
   filter: invert(100%) brightness(105%);
 }
 
-/* Secundario: texto azul => ícono azul */
 .secondary-btn {
   background-color: #e5f0ff;
   color: #137fec;
 }
 .secondary-btn:hover { background-color: #d4e7ff; }
 .secondary-btn .evento-icon {
-  /* mismo filtro azul que las tarjetas */
   filter: brightness(0) saturate(100%) invert(36%) sepia(96%)
-          saturate(2639%) hue-rotate(204deg) brightness(97%) contrast(97%);
+    saturate(2639%) hue-rotate(204deg) brightness(97%) contrast(97%);
 }
 
-/* Peligro: texto rojo => ícono rojo */
 .danger-btn {
   background-color: #ffe5e5;
   color: #ef4444;
 }
 .danger-btn:hover { background-color: #ffd6d6; }
 .danger-btn .evento-icon {
-  /* rojo */
   filter: invert(28%) sepia(86%) saturate(3975%)
-          hue-rotate(352deg) brightness(94%) contrast(87%);
+    hue-rotate(352deg) brightness(94%) contrast(87%);
 }
 
 
-/* Docs de un evento */
 #docs-lista .card-text.text-muted {
   font-size: 15px !important;
 }
@@ -1051,7 +1018,6 @@ main { flex: 1 0 auto; }
 }
 
 /* PUBLICACION DETALLE */
-/* Tarjetas */
 .card-autoplat {
   border-radius: 1rem;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
@@ -1139,7 +1105,7 @@ main { flex: 1 0 auto; }
   justify-content: center;
   box-shadow: 0 6px 16px rgba(0,0,0,.22);
   cursor: pointer;
-  z-index: 6;                      /* encima del contenido, debajo o encima del favorito según necesites */
+  z-index: 6;                      
   transition: transform .15s ease, box-shadow .15s ease;
   padding: 0;
 }
@@ -1147,7 +1113,7 @@ main { flex: 1 0 auto; }
 .btn-addimg-fab:hover{
   transform: translateY(-1px);
   box-shadow: 0 10px 24px rgba(0,0,0,.28);
-  background: #9ca3ae;            /* un poco más oscuro al hover */
+  background: #9ca3ae;           
 }
 
 .btn-addimg-fab img{
@@ -1167,8 +1133,8 @@ main { flex: 1 0 auto; }
 
 #galeria-root {
   position: relative;
-  min-height: 300px; /* altura base (ajustable) */
-  background-color: #fff; /* color neutro mientras carga */
+  min-height: 300px; 
+  background-color: #fff;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -1176,7 +1142,7 @@ main { flex: 1 0 auto; }
   overflow: hidden;
 }
 
-/* Placeholder de carga (skeleton) */
+/* Placeholder de carga */
 #galeria-root.loading::before {
   content: "";
   position: absolute;
@@ -1227,13 +1193,12 @@ main { flex: 1 0 auto; }
   height: 20px;
 }
 
-/* Si querés aún menos padding horizontal en el botón: */
 .btn-wpp {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
 }
 
-/* === Talleres asignados === */
+/* Talleres asignados */
 .card-talleres-asignados {
   background-color: #fff;
 }
@@ -1265,7 +1230,7 @@ main { flex: 1 0 auto; }
 }
 
 
-/* ==== ICONO DE ELIMINAR ==== */
+/* ICONO DE ELIMINAR */
 .btn-del-img {
   background:rgb(206, 44, 44);
   border: none;
@@ -1296,7 +1261,7 @@ main { flex: 1 0 auto; }
   opacity: 1;
 }
 
-/* === Usuarios === */
+/*Usuarios */
 
 .card-autoplat-usuario {
   border-radius: 1rem;

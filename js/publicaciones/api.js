@@ -1,24 +1,18 @@
-// js/publicaciones/api.js
+
 import { URL_API } from '../../constants/database.js';
 import { renderPublicaciones } from './render.js';
 import { PRICE_BUCKETS, KM_BUCKETS } from './filtros.js'; 
 
-/**
- * Construye la URL de endpoint de publicaciones a partir del estado actual
- */
 function endpointFromState(state, context = 'general') {
   const params = new URLSearchParams();
 
-  // === Texto de búsqueda ===
   if (state.q) params.set('q', state.q);
 
-  // === Filtros básicos ===
   (state.marcas  || []).forEach(m => params.append('marca', m));
   (state.colores || []).forEach(c => params.append('color', c));
   (state.anios   || []).forEach(a => params.append('anio', String(a)));
   (state.roles   || []).forEach(r => params.append('rol', r));
 
-  // === Precio ===
   (state.priceIds || []).forEach(id => {
     const bucket = PRICE_BUCKETS.find(b => b.id === id);
     if (bucket) {
@@ -27,7 +21,6 @@ function endpointFromState(state, context = 'general') {
     }
   });
 
-  // === Kilometraje ===
   (state.kmIds || []).forEach(id => {
     const bucket = KM_BUCKETS.find(b => b.id === id);
     if (bucket) {
@@ -49,14 +42,7 @@ function endpointFromState(state, context = 'general') {
     default:
       return `${URL_API}/publicaciones/filtro?${params.toString()}`;
   }
-
-  // const query = params.toString();
-  // return query
-  //   ? `${URL_API}/publicaciones/filtro?${query}`
-  //   : `${URL_API}/publicaciones`;
 }
-
-
 
 export async function loadPublicaciones(state, { context = 'general', showLoading = true, silent = false } = {}) {
   const container = document.getElementById('lista-publicaciones');
@@ -80,7 +66,6 @@ export async function loadPublicaciones(state, { context = 'general', showLoadin
     if (!resp.ok) throw new Error(await resp.text());
     const data = await resp.json();
 
-    // Si el backend devuelve un array vacío, lo manejamos desde render.js
     await renderPublicaciones(data);
   } catch (err) {
     console.error('Error al cargar publicaciones:', err);
@@ -94,9 +79,6 @@ export async function loadPublicaciones(state, { context = 'general', showLoadin
   }
 }
 
-/**
- * Carga una publicación individual (para detalle)
- */
 export async function getPublicacionById(id) {
   try {
     const resp = await fetch(`${URL_API}/publicaciones/${id}`, {
@@ -109,9 +91,6 @@ export async function getPublicacionById(id) {
   }
 }
 
-/**
- * Crea una nueva publicación (para el formulario de alta)
- */
 export async function crearPublicacion(payload, token) {
   try {
     const resp = await fetch(`${URL_API}/publicaciones`, {
@@ -130,9 +109,6 @@ export async function crearPublicacion(payload, token) {
   }
 }
 
-/**
- * Elimina una publicación por ID (solo admin o dueño)
- */
 export async function eliminarPublicacion(id, token) {
   try {
     const resp = await fetch(`${URL_API}/publicaciones/${id}`, {
@@ -154,7 +130,6 @@ export async function loadPublicacionesPorUsuario(usuarioIdParam) {
   const token = localStorage.getItem('token');
 
   if (!usuarioId || !token) {
-    // Sin sesión válida → mandamos a login (o podés mostrar un mensaje)
     window.location.href = 'login.html';
     return;
   }

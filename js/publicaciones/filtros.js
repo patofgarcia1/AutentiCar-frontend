@@ -37,7 +37,6 @@ export async function drawChips (state, reloadFn = (currentState) => loadPublica
     const colores = cResp.ok ? await cResp.json() : [];
     const anios   = aResp.ok ? await aResp.json() : [];
 
-    // === Marcas ===
     if (chipsMarcas) {
       chipsMarcas.classList.add('brand-grid');
       chipsMarcas.innerHTML = marcas.map(m => {
@@ -57,7 +56,6 @@ export async function drawChips (state, reloadFn = (currentState) => loadPublica
       });
     }
 
-    // === Colores ===
     if (chipsColores) {
       chipsColores.innerHTML = colores.map(c =>
         `<button class="chip chip-secondary" data-color="${c}">${c}</button>`
@@ -67,12 +65,10 @@ export async function drawChips (state, reloadFn = (currentState) => loadPublica
         toggleIn(state.colores, b.dataset.color);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.colores.includes(b.dataset.color));
-        //loadPublicaciones(state);
         reloadFn(state);
       });
     }
 
-    // === Años ===
     if (chipsAnios) {
       chipsAnios.innerHTML = anios.map(a =>
         `<button class="chip" data-anio="${a}">${a}</button>`
@@ -83,12 +79,10 @@ export async function drawChips (state, reloadFn = (currentState) => loadPublica
         toggleIn(state.anios, val);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.anios.includes(val));
-        //loadPublicaciones(state);
         reloadFn(state);
       });
     }
 
-    // === Precio ===
     if (chipsPrecio) {
       chipsPrecio.innerHTML = PRICE_BUCKETS.map(b =>
         `<button class="chip chip-secondary" data-precio="${b.id}">${b.label}</button>`
@@ -99,12 +93,10 @@ export async function drawChips (state, reloadFn = (currentState) => loadPublica
         toggleIn(state.priceIds, id);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.priceIds.includes(id));
-        //loadPublicaciones(state);
         reloadFn(state);
       });
     }
 
-    // === Kilometraje ===
     if (chipsKm) {
       chipsKm.innerHTML = KM_BUCKETS.map(b =>
         `<button class="chip chip-secondary" data-km="${b.id}">${b.label}</button>`
@@ -115,12 +107,10 @@ export async function drawChips (state, reloadFn = (currentState) => loadPublica
         toggleIn(state.kmIds, id);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.kmIds.includes(id));
-        //loadPublicaciones(state);
         reloadFn(state);
       });
     }
 
-    // === Rol ===
     if (chipsRol) {
       chipsRol.innerHTML = `
         <button class="chip chip-secondary" data-rol="CONCESIONARIO">Concesionarios</button>
@@ -131,7 +121,6 @@ export async function drawChips (state, reloadFn = (currentState) => loadPublica
         toggleIn(state.roles, val);
         state.q = null; if (inputQ) inputQ.value = '';
         setActive(b, state.roles.includes(val));
-        //loadPublicaciones(state);
         reloadFn(state);
       });
     }
@@ -143,7 +132,6 @@ export async function drawChips (state, reloadFn = (currentState) => loadPublica
       formQ.addEventListener('submit', (e) => {
         e.preventDefault();
         state.q = inputQ.value.trim() || null;
-        //loadPublicaciones(state);
         reloadFn(state);
       });
     }

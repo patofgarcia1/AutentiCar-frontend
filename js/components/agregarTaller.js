@@ -1,12 +1,10 @@
 import { URL_API } from '../../constants/database.js';
 
 export function abrirBuscarTaller(usuarioId, token) {
-  // usa la misma lógica que ya tenés: crea la modal y la muestra
   mostrarModalAgregarTaller(usuarioId, token); 
 }
 
 export function initAgregarTaller(usuarioId, token) {
-  // Insertar botón "Agregar Taller" en la card de acciones del dueño
   const cardAcciones = document.querySelector('.card-autoplat.p-4.mt-3 .d-flex');
   if (!cardAcciones) return;
 
@@ -16,15 +14,11 @@ export function initAgregarTaller(usuarioId, token) {
   btnAgregarTaller.textContent = 'Agregar Taller';
   cardAcciones.appendChild(btnAgregarTaller);
 
-  // === Evento click ===
   btnAgregarTaller.addEventListener('click', () => {
     mostrarModalAgregarTaller(usuarioId, token);
   });
 }
 
-/**
- * Crea y muestra la modal de búsqueda de talleres.
- */
 function mostrarModalAgregarTaller(usuarioId, token) {
   const modal = document.createElement('div');
   modal.className = 'modal fade show';
@@ -55,7 +49,6 @@ function mostrarModalAgregarTaller(usuarioId, token) {
 
   let timeout = null;
 
-  // Buscar mientras el usuario escribe
   inputBusqueda.addEventListener('input', () => {
     const query = inputBusqueda.value.trim();
     clearTimeout(timeout);

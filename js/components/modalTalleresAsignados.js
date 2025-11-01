@@ -1,4 +1,4 @@
-// js/usuarios/modalTalleresAsignados.js
+
 import { renderTalleresAsignados } from './listarTalleres.js';
 
 export function initModalTalleresAsignados() {
@@ -24,17 +24,17 @@ export function initModalTalleresAsignados() {
 
     const btnAgregar = document.getElementById('btn-agregar-taller');
     btnAgregar.addEventListener('click', async () => {
-        const { abrirBuscarTaller } = await import('../components/agregarTaller.js');
-        const usuarioId = Number(localStorage.getItem('usuarioId'));
-        const token = localStorage.getItem('token');
+      const { abrirBuscarTaller } = await import('../components/agregarTaller.js');
+      const usuarioId = Number(localStorage.getItem('usuarioId'));
+      const token = localStorage.getItem('token');
 
-        const modalEl = document.getElementById('modalTalleresAsignados');
-        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-        modalInstance?.hide();
+      const modalEl = document.getElementById('modalTalleresAsignados');
+      const modalInstance = bootstrap.Modal.getInstance(modalEl);
+      modalInstance?.hide();
 
-        setTimeout(() => {
-            abrirBuscarTaller?.(usuarioId, token);
-        }, 300);
+      setTimeout(() => {
+        abrirBuscarTaller?.(usuarioId, token);
+      }, 300);
     });
 
 }
@@ -55,12 +55,11 @@ export async function abrirModalTalleresAsignados() {
 
   await renderTalleresAsignados(usuarioId, token, contenedor);
 
-  // 🔁 refrescar cuando se agrega un taller desde la otra modal
   const onAgregado = async () => {
     contenedor.innerHTML = '';
     await renderTalleresAsignados(usuarioId, token, contenedor);
   };
-  // quitamos duplicados si ya estaba
+
   window.removeEventListener('taller:agregado', onAgregado);
   window.addEventListener('taller:agregado', onAgregado, { once: true });
 
