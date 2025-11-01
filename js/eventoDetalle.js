@@ -1,5 +1,5 @@
 import { URL_API } from '../constants/database.js';
-import { isAdmin, isUser, isTaller, getSession } from './roles.js';
+import { isAdmin, getSession } from './roles.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    // 1) Traer detalle del evento
     const evResp = await fetch(`${URL_API}/eventos/${eventoId}`);
     if (!evResp.ok) {
       const msg = await evResp.text();
@@ -36,14 +35,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     const ev = await evResp.json();
 
-    // 2) Traer usuario público (creador), opcional
     let usuario = null;
     try {
       const usuarioResp = await fetch(`${URL_API}/usuarios/publico/${ev.idUsuario}`);
       usuario = usuarioResp.ok ? await usuarioResp.json() : null;
     } catch {}
 
-    // 3) Traer vehículo (para saber dueño)
     let veh = null;
     try {
       const vResp = await fetch(`${URL_API}/vehiculos/${ev.idVehiculo}`);
@@ -89,17 +86,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
 
-    // dueño del vehículo (según tu DTO de VehiculosDTO: idUsuario)
-    const ownerId = (veh?.idUsuario != null) ? Number(veh.idUsuario) : null;
-    // creador del evento
     const creadorId = (ev?.idUsuario != null) ? Number(ev.idUsuario) : null;
 
-    // Sesión
     const sess = getSession();                
     const loggedId = (sess?.userId != null) ? Number(sess.userId) : null;
     const authToken = sess?.token || null;
 
-    // Reglas
     const puedeEliminar =
       !!authToken && (
         isAdmin() ||
@@ -112,15 +104,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnEliminar = document.getElementById('btnEliminarEvento');
     const btnVerDocs = document.getElementById('btnVerDocs');
 
-    // asignar href correcto
     if (btnVerDocs) btnVerDocs.href = `docsEvento.html?id=${ev.idEvento}`;
     if (btnAddDocs) btnAddDocs.href = `addDocumento.html?id=${ev.idVehiculo}&evento=${ev.idEvento}`;
 
     if (!puedeAdjuntar && btnAddDocs) btnAddDocs.style.display = 'none';
     if (!puedeEliminar && btnEliminar) btnEliminar.style.display = 'none';
 
-
-    // 4) Handler: eliminar evento
     if (puedeEliminar) {
       const btnEliminar = document.getElementById('btnEliminarEvento');
       btnEliminar.addEventListener('click', async () => {
@@ -138,14 +127,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-          // const resp = await fetch(`${URL_API}/eventos/${ev.idEvento}`, 
-          //   { method: 'DELETE',
-          //     headers: {
-          //       'Authorization': `Bearer ${authToken}`,   
-          //       'Accept': 'application/json'
-          //     } 
-          // });
-
           const resp = await fetch(`${URL_API}/eventos/${ev.idEvento}/eliminarLogico`, {
             method: 'PUT',
             headers: {

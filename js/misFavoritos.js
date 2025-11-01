@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   if (!token) {
     container.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
-    // opcional: window.location.href = 'login.html';
     return;
   }
 
@@ -51,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (response.status === 401 || response.status === 403) {
       container.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
-      // opcional: window.location.href = 'login.html';
       return;
     }
 
@@ -67,7 +65,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Traemos en paralelo la portada (si existe) de cada vehículo
     const portadas = await Promise.all(
       publicaciones.map(async (pub) => {
         const vehiculoId = resolveVehiculoId(pub);

@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const mensaje = document.getElementById('mensaje');
 
-      // intentar parsear JSON; si viene texto, lo mostramos igual
       const readBody = async (res) => {
         const text = await res.text();
         try { return JSON.parse(text); } catch { return { ok: res.ok, mensaje: text }; }
@@ -38,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.ok && (data.ok === true || data.ok === undefined)) {
         mensaje.innerHTML = `<div class="alert alert-success">${data.mensaje || 'Fuiste logueado exitosamente'}</div>`;
 
-        // --- Compatibilidad: exponer data.id para mantener tu línea intacta
         if (data.id == null) {
           const u = data.usuario || {};
           data.id = u.idUsuario ?? u.id ?? null;

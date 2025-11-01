@@ -42,15 +42,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
         `;
 
-    // Debug OCR
     const o = data.debug?.ocr_stats || {};
     pagesEl.textContent = o.pages ?? '-';
     charsEl.textContent = o.total_chars ?? '-';
     timeEl.textContent  = (o.time_ms != null ? `${o.time_ms} ms` : '-');
-    // Nota: o.time_ms es el tiempo de OCR (render PDF + Tesseract).
-    // El análisis total puede tardar un poco más por metadatos, features y reglas.
 
-    // Flags del text_summary
     const t = data.debug?.text_summary || {};
     const flag = (label, val) => `
         <li class="list-group-item flag-item">
@@ -67,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         flag('Entidad emisora encontrada', t.has_entidad_emisora)
     ].join('');
 
-    // Metadatos (metadata_summary)
     const m = data.debug?.metadata_summary || {};
     const metaRow = (k, v) => `
         <tr><th class="fw-normal text-muted" style="width:180px">${k}</th>
@@ -89,7 +84,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
     `;
 
-    // Reasons
     const reasons = data.reasons || [];
     reasonsEl.innerHTML = reasons.length
         ? reasons.map(r => `

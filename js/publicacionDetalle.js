@@ -23,22 +23,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    // === 1) PUBLICACIÓN ===
     const pubResp = await fetch(`${URL_API}/publicaciones/${publicacionId}`);
     if (!pubResp.ok) throw new Error(await pubResp.text());
     const publicacion = await pubResp.json();
 
-    // === 2) VEHÍCULO ===
     const vehResp = await fetch(`${URL_API}/vehiculos/${publicacion.vehiculoId}`);
     const vehiculo = vehResp.ok ? await vehResp.json() : null;
 
-    // === 3) USUARIO (VENDEDOR) ===
     const userResp = vehiculo?.idUsuario
       ? await fetch(`${URL_API}/usuarios/publico/${vehiculo.idUsuario}`)
       : null;
     const usuario = userResp?.ok ? await userResp.json() : null;
 
-    // === 4) LOGIN & ROLES ===
     const token = localStorage.getItem('token');
     const usuarioIdStr = localStorage.getItem('usuarioId');
     const usuarioId = usuarioIdStr != null ? Number(usuarioIdStr) : null;
@@ -161,7 +157,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
 
-    // === GALERÍA DETALLE (NUEVA) ===
     const canManageImages = isLogged && (isAdmin() || (isUser() && isOwner));
     const galeriaRoot = document.getElementById('galeria-root');
 
@@ -177,7 +172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         authHeaders,
         onChange: (imagenes) => {
           const nuevasFotos = imagenes.map(i => i.urlImagen);
-          actualizarCarousel(nuevasFotos);
+          // actualizarCarousel(nuevasFotos);
         },
         onReady: () => {
           galeriaRoot.classList.remove('loading');
@@ -187,7 +182,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       setTimeout(() => galeriaRoot.classList.remove('loading'), 1200);
 
       if (canManageImages) {
-        // aseguramos posicionamiento relativo en la galería
         galeriaRoot.classList.add('position-relative');
 
         const fab = document.createElement('button');
@@ -208,7 +202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const files = Array.from(input.files || []);
             if (!files.length) return;
 
-            // feedback visual en el FAB mientras sube
             const oldHtml = fab.innerHTML;
             fab.disabled = true;
             fab.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
@@ -230,10 +223,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    // === FAVORITOS ===
     initFavoritos(publicacionId);
 
-    // === ACCIONES DEL DUEÑO ===
     if (isOwner || isAdmin()) initOwnerActions(publicacionId, vehiculo, publicacion.estadoPublicacion);
     
     if (isOwner || isAdmin()) {
@@ -250,7 +241,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// === UTILIDADES ===
 function renderSpec(icon, label, value) {
   return `
     <div class="col spec-item">
@@ -263,9 +253,9 @@ function renderSpec(icon, label, value) {
   `;
 }
 
-function actualizarCarousel(fotos) {
-  // opcional: refrescar portada si querés mantener sincronía visual
-}
+// function actualizarCarousel(fotos) {
+//   // opcional: refrescar portada si querés mantener sincronía visual
+// }
 
 function initFavoritos(publicacionId) {
   const btn = document.getElementById('btnFavorito');
@@ -276,12 +266,10 @@ function initFavoritos(publicacionId) {
   const token = localStorage.getItem('token');
   if (!usuarioId || !token) return;
 
-  // Función auxiliar para actualizar la imagen
   function actualizarIcono(esFav) {
     icono.src = esFav ? 'img/corazonRelleno.png' : 'img/corazonVacio.png';
   }
 
-  // Estado inicial
   fetch(`${URL_API}/usuarios/${usuarioId}/favoritos/check/${publicacionId}`, {
     headers: { Authorization: `Bearer ${token}` },
   })
@@ -293,7 +281,6 @@ function initFavoritos(publicacionId) {
     })
     .catch(() => actualizarIcono(false));
 
-  // Click para alternar
   btn.addEventListener('click', async () => {
     const esActivo = btn.classList.contains('favorito-activo');
 
@@ -354,10 +341,8 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
     }
   }
 
-  // Estado inicial del botón
   actualizarBotonToggle(estadoActual);
 
-  // 🔹 Handler para pausar/activar
   btnToggle?.addEventListener('click', async () => {
     if (!token) return showMsg('Sesión no válida.', 'warning');
 
@@ -374,7 +359,6 @@ function initOwnerActions(publicacionId, vehiculo, estadoActual) {
       });
       if (!resp.ok) throw new Error(await resp.text());
 
-      // Actualizar estado local
       estadoActual = nuevoEstado;
       actualizarBotonToggle(estadoActual);
       showMsg(

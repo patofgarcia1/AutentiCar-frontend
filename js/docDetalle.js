@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const docId = params.get('id');
   const titulo = document.getElementById('titulo');
   const info = document.getElementById('info');
-  const mensaje = document.getElementById('mensaje'); // <- para showMsg
+  const mensaje = document.getElementById('mensaje'); 
   const localToken = localStorage.getItem("token");
   const tipoTag = document.getElementById('tipoDocTag');
   const PLACEHOLDER = 'https://dummyimage.com/800x500/efefef/aaaaaa&text=Documento';
@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     info.innerHTML = `<div class="alert alert-danger">ID de documento no especificado en la URL.</div>`;
     return;
   }
-
-  
 
   function showMsg(html, type='info') {
     if (!mensaje) return;
@@ -37,7 +35,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    // 1) Traer detalle del documento (público)
     const response = await fetch(`${URL_API}/documentos/${docId}`);
     if (!response.ok) {
       const errorMsg = await response.text();
@@ -49,8 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     titulo.textContent = doc.nombre || "Documento sin nombre";
     if (tipoTag) tipoTag.textContent = doc.tipoDoc ?? '—';
 
-    // 2) Resolver si se puede eliminar (ADMIN o USER dueño del vehículo)
-    //    Necesitamos conocer el dueño del vehículo
     const vehiculoId = doc.idVehiculo ?? doc.vehiculoId ?? null;
     let ownerId = null;
     if (vehiculoId != null) {
@@ -58,12 +53,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const vResp = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
         if (vResp.ok) {
           const v = await vResp.json();
-          ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null; // tu DTO usa idUsuario
+          ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null; 
         }
       } catch {}
     }
 
-    const sess = getSession(); // { isLogged, userId, token, rol }
+    const sess = getSession(); 
     const loggedId = (sess?.userId != null) ? Number(sess.userId) : null;
     const authToken = sess?.token || localToken || null;
 
@@ -83,7 +78,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (!puedeEliminar) btnEliminar.style.display = 'none';
 
-    // 4) Render del detalle (similar a eventoDetalle)
     const validadoIA = doc.validadoIA
       ? `<span class="badge bg-success-subtle text-success fw-semibold px-3 py-2 rounded-pill">Validado por IA</span>`
       : `<span class="badge bg-secondary px-3 py-2 rounded-pill">No validado por IA</span>`;
@@ -116,7 +110,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div id="doc-preview" class="doc-preview text-center"></div>
     `;
 
-    // 5) Vista previa
     const preview = document.getElementById('doc-preview');
     const thumb = cloudThumb(doc.urlDoc, doc.mimeType);
 
@@ -134,7 +127,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     a.appendChild(img);
     preview.appendChild(a);
 
-    // 6) Handler de eliminación (solo si hay botón)
     btnEliminar?.addEventListener('click', async () => {
       if (!confirm('¿Seguro que querés eliminar este documento? Esta acción es permanente.')) return;
 

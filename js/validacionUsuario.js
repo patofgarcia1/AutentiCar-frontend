@@ -1,25 +1,22 @@
-// js/validacionUsuario.js
+
 import { URL_API } from '../constants/database.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const fileFrente      = document.getElementById('fileFrente');
   const btnSubirFrente  = document.getElementById('btnSubirFrente');
   const frenteEstado    = document.getElementById('frenteEstado');
-
   const fileDorso       = document.getElementById('fileDorso');
   const btnSubirDorso   = document.getElementById('btnSubirDorso');
   const dorsoEstado     = document.getElementById('dorsoEstado');
-
   const mensaje         = document.getElementById('mensaje');
   const usuarioId = localStorage.getItem("usuarioId");
-
   const token = localStorage.getItem('token');
+
   if (!token) {
     showMsg('Sesión no válida. Iniciá sesión nuevamente.', 'warning');
     return;
   }
 
-  // Helpers UI
   function showMsg(html, type='info') {
     if (!mensaje) return;
     mensaje.innerHTML = `<div class="alert alert-${type}">${html}</div>`;
@@ -34,8 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     el.innerHTML = `<span class="badge bg-${tone}">${text}</span>`;
   }
 
-  // Validaciones de archivo (coinciden con backend)
-  const MAX_BYTES = 15 * 1024 * 1024; // 15MB
+  const MAX_BYTES = 15 * 1024 * 1024; 
   function validarArchivo(file) {
     if (!file) { showMsg('Seleccioná un archivo.', 'warning'); return false; }
     if (file.size > MAX_BYTES) { showMsg('El archivo supera 15MB.', 'danger'); return false; }
@@ -44,12 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return true;
   }
 
-  // Carga inicial: mostrar si ya hay algo subido
   initEstadoActual();
 
   async function initEstadoActual() {
     try {
-      // Frente
+
       const f = await fetch(`${URL_API}/usuarios/validacion/frente-url`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
@@ -59,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data?.url) setEstado(frenteEstado, 'Frente cargado', 'success');
       }
 
-      // Dorso
       const d = await fetch(`${URL_API}/usuarios/validacion/dorso-url`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
@@ -69,12 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data?.url) setEstado(dorsoEstado, 'Dorso cargado', 'success');
       }
     } catch (e) {
-      // silencioso; la pantalla igual permite subir
       console.warn('No se pudo consultar estado inicial de DNI', e);
     }
   }
 
-  // Subida genérica
   async function subirArchivo(endpoint, file, btn, estadoEl, etiquetaOk) {
     clearMsg();
     if (!validarArchivo(file)) return;
@@ -114,17 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Listeners
   btnSubirFrente?.addEventListener('click', async () => {
     const file = fileFrente?.files?.[0];
     await subirArchivo('/usuarios/validacion/frente', file, btnSubirFrente, frenteEstado, 'Frente cargado');
-    // fileFrente.value = ''; // opcional: limpiar input
   });
 
   btnSubirDorso?.addEventListener('click', async () => {
     const file = fileDorso?.files?.[0];
     await subirArchivo('/usuarios/validacion/dorso', file, btnSubirDorso, dorsoEstado, 'Dorso cargado');
-    // fileDorso.value = ''; // opcional: limpiar input
   });
 
   const btnEnviar = document.getElementById('btnEnviar');
@@ -143,8 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       showMsg('Enviado para validación. Quedó en estado PENDIENTE.', 'success');
-      setTimeout(() => {
-        //window.location.href = `docsVehiculo.html?id=${vId}`; 
+      setTimeout(() => { 
         window.location.href = `usuarioDetalle.html?id=${usuarioId}`;
       }, 1000);
     } catch (e) {

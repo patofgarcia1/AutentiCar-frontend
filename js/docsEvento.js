@@ -30,9 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     return null;
   }
-
   
-  //skeleton de carga
   contenedor.innerHTML = `
     <div class="col">
       <div class="card placeholder-wave border-0 shadow-sm h-100">

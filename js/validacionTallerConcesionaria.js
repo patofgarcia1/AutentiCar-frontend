@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // === Helpers ===
   function showMsg(html, type = 'info') {
     if (!mensaje) return;
     mensaje.innerHTML = `<div class="alert alert-${type} mt-2">${html}</div>`;
@@ -31,8 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     el.innerHTML = `<span class="badge bg-${tone}">${text}</span>`;
   }
 
-  // === Validación de archivo ===
-  const MAX_BYTES = 15 * 1024 * 1024; // 15 MB
+  const MAX_BYTES = 15 * 1024 * 1024; 
   function validarArchivo(file) {
     if (!file) { showMsg('Seleccioná un archivo.', 'warning'); return false; }
     if (file.size > MAX_BYTES) { showMsg('El archivo supera 15MB.', 'danger'); return false; }
@@ -41,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return true;
   }
 
-  // === Estado inicial (si ya hay archivo) ===
   initEstadoActual();
 
   async function initEstadoActual() {
@@ -60,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // === Subir archivo ===
   btnSubirArchivo?.addEventListener('click', async () => {
     clearMsg();
     const file = fileInput?.files?.[0];
@@ -101,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // === Enviar para validar ===
   btnEnviar?.addEventListener('click', async () => {
     clearMsg();
     const domicilio = inputDomicilio?.value?.trim();

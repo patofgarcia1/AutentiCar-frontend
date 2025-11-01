@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Deja la modal como está
   ensureValidacionModal();
 
   try {
@@ -85,7 +84,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
   }).join('');
 
-    // Abrir modal
     contenedor.addEventListener('click', async (e) => {
       const btn = e.target.closest('.ver-validacion');
       if (!btn) return;
@@ -107,7 +105,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-/* ===== Helper: color por estado ===== */
 function estadoColorClass(estadoUpper) {
   switch (estadoUpper) {
     case 'REGISTRADO': return 'text-primary';
@@ -205,9 +202,6 @@ async function abrirModalValidacion(userId, token) {
 
     setImg(linkFrente, imgFrente, frente);
     setImg(linkDorso,  imgDorso,  dorso);
-
-    // btnValidar.disabled  = !(frente && dorso);
-    // btnRechazar.disabled = false;
 
     if (!(frente && dorso)) {
       btnValidar.disabled = true;

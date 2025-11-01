@@ -1,5 +1,4 @@
 import { URL_API } from '../constants/database.js';
-
 import { abrirModalTalleresAsignados } from './components/modalTalleresAsignados.js';
 
 const mensaje = document.getElementById("mensaje");
@@ -9,7 +8,6 @@ const userEmail = document.getElementById('user-email');
 const userTel = document.getElementById('user-tel');
 const nivelContainer = document.getElementById('nivel-container');
 const accionesContainer = document.getElementById('acciones-container');
-const btnSubirFoto = document.getElementById('btn-subir-foto');
 const inputFoto = document.getElementById('file-fotoPerfil');
 
 function showMsg(html, type = 'info') {
@@ -56,7 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const rol = (localStorage.getItem('rol') || '').toUpperCase();
     const esTaller = rol === 'TALLER';
 
-    // Mostrar datos
     userNombre.textContent = `${usuario.nombre} ${usuario.apellido}`;
     userEmail.textContent = usuario.mail;
     if (usuario.telefonoCelular) {
@@ -103,70 +100,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     accionesContainer.innerHTML = botonesHTML;
 
     const suscripcionWrapId = 'suscripcion-wrap';
-const suscripcionWrap = document.createElement('div');
-suscripcionWrap.id = suscripcionWrapId;
-suscripcionWrap.className = 'mt-3';
+    const suscripcionWrap = document.createElement('div');
+    suscripcionWrap.id = suscripcionWrapId;
+    suscripcionWrap.className = 'mt-3';
 
-if (usuario.quiereOferta === true) {
-  suscripcionWrap.innerHTML = `
-    <div class="d-flex align-items-center gap-2 p-2 rounded border bg-light-subtle">
-      <span class="text-success fw-semibold">Plan mensual activo</span>
-      <button id="btn-cancelar-oferta" class="btn btn-sm btn-outline-danger ms-auto">
-        Cancelar suscripción
-      </button>
-    </div>
-  `;
-} else {
-  suscripcionWrap.innerHTML = `
-    <div class="d-flex align-items-center gap-2 p-2 rounded border" style="background:#f8f9fa;">
-      <span class="text-muted small">Sin plan mensual activo</span>
-    </div>
-  `;
-}
+    if (usuario.quiereOferta === true) {
+      suscripcionWrap.innerHTML = `
+        <div class="d-flex align-items-center gap-2 p-2 rounded border bg-light-subtle">
+          <span class="text-success fw-semibold">Plan mensual activo</span>
+          <button id="btn-cancelar-oferta" class="btn btn-sm btn-outline-danger ms-auto">
+            Cancelar suscripción
+          </button>
+        </div>
+      `;
+    } else {
+      suscripcionWrap.innerHTML = `
+        <div class="d-flex align-items-center gap-2 p-2 rounded border" style="background:#f8f9fa;">
+          <span class="text-muted small">Sin plan mensual activo</span>
+        </div>
+      `;
+    }
 
-accionesContainer.insertAdjacentElement('afterend', suscripcionWrap);
+    accionesContainer.insertAdjacentElement('afterend', suscripcionWrap);
 
-// Listener del botón "Cancelar"
-document.getElementById('btn-cancelar-oferta')?.addEventListener('click', async () => {
-  const ok = confirm('¿Seguro querés cancelar la suscripción?');
-  if (!ok) return;
-  try {
-    const token = localStorage.getItem("token");
-    const usuarioId = localStorage.getItem("usuarioId");
+    document.getElementById('btn-cancelar-oferta')?.addEventListener('click', async () => {
+      const ok = confirm('¿Seguro querés cancelar la suscripción?');
+      if (!ok) return;
+      try {
+        const token = localStorage.getItem("token");
+        const usuarioId = localStorage.getItem("usuarioId");
 
-    const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/oferta/toggle`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        const resp = await fetch(`${URL_API}/usuarios/${usuarioId}/oferta/toggle`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!resp.ok) {
+          const err = await resp.text();
+          showMsg(err || 'No se pudo cancelar la suscripción', 'danger');
+          return;
+        }
+
+        const data = await resp.json(); 
+        if (data?.quiereOferta === false) {
+          document.getElementById(suscripcionWrapId).innerHTML = `
+            <div class="d-flex align-items-center gap-2 p-2 rounded border" style="background:#f8f9fa;">
+              <span class="text-muted small">Suscripción cancelada</span>
+            </div>
+          `;
+          showMsg('Suscripción cancelada correctamente', 'success');
+        } else {
+          showMsg('La suscripción siguió activa.', 'warning');
+        }
+      } catch (e) {
+        console.error(e);
+        showMsg('Error de conexión con el servidor', 'danger');
       }
     });
 
-    if (!resp.ok) {
-      const err = await resp.text();
-      showMsg(err || 'No se pudo cancelar la suscripción', 'danger');
-      return;
-    }
-
-    const data = await resp.json(); // { quiereOferta: false, message: ... }
-    if (data?.quiereOferta === false) {
-      // Refrescá solo el wrapper
-      document.getElementById(suscripcionWrapId).innerHTML = `
-        <div class="d-flex align-items-center gap-2 p-2 rounded border" style="background:#f8f9fa;">
-          <span class="text-muted small">Suscripción cancelada</span>
-        </div>
-      `;
-      showMsg('Suscripción cancelada correctamente', 'success');
-    } else {
-      showMsg('La suscripción siguió activa.', 'warning');
-    }
-  } catch (e) {
-    console.error(e);
-    showMsg('Error de conexión con el servidor', 'danger');
-  }
-});
-
-    // Listeners
     document.getElementById('btn-vehiculos')?.addEventListener('click', () => {
       window.location.href = `misPublicaciones.html?usuario=${usuarioId}`;
     });
@@ -218,7 +212,6 @@ document.getElementById('btn-cancelar-oferta')?.addEventListener('click', async 
       }
     });
 
-    // Eliminar cuenta
     const btnEliminar = document.getElementById('btn-eliminar');
     btnEliminar.addEventListener('click', async () => {
       const confirmDelete = confirm("¿Seguro querés eliminar tu cuenta?");

@@ -1,5 +1,4 @@
 import { URL_API } from '../constants/database.js';
-import { initDocumentos } from './components/documentos.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -18,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!token) {
     mensaje.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;
-    // opcional: window.location.href = 'login.html';
     return;
   }
 
@@ -28,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (!eventoId) { 
-    // opción A: bloquear la carga y pedir volver al detalle del evento
     showMsg('Falta el parámetro "?evento". Debés entrar desde el detalle del evento para adjuntar documentos.', 'danger');
     if (btnSubirDoc) btnSubirDoc.disabled = true; 
     if (aviso) {
@@ -51,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const nombre = (inputNombre.value || '').trim();
     const tipo = selTipo.value;
 
-    // HTML5 ya valida, pero reforzamos:
     if (!vehiculoId) { showMsg('Falta ?id de vehículo.', 'danger'); return null; }
     if (!file)       { showMsg('Seleccioná un archivo.', 'warning'); return null; }
     if (!nombre)     { showMsg('Ingresá un nombre para el documento.', 'warning'); return null; }
@@ -76,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const started = Date.now();
     modal.show();
 
-    // devolvemos una función que cierra la modal respetando el mínimo
     return async function close() {
       const elapsed = Date.now() - started;
       const wait = Math.max(0, minMs - elapsed);
@@ -134,11 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       await closeSpinner();
 
-      //await docsUI.reload?.();
       showMsg('Documento subido con éxito.', 'success');
 
       setTimeout(() => {
-        //window.location.href = `docsVehiculo.html?id=${vId}`; 
         window.location.href = `eventoDetalle.html?id=${eventoId}`;
       }, 1000);
 
@@ -154,6 +147,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // evitar submit tradicional
   form.addEventListener('submit', (e) => e.preventDefault());
 });

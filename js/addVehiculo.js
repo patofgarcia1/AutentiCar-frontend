@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const formData = new FormData(form);
     const datos = Object.fromEntries(formData.entries());
 
-    // Armá el payload base (sin usuarioId)
     const vehiculo = {
       vin: datos.vin,
       marca: datos.marca,
@@ -48,16 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
       tipoCombustible: datos.tipoCombustible,
       tipoTransmision: datos.tipoTransmision,
       allowedToSee: datos.allowedToSee
-      // NO ponemos usuarioId acá por defecto
     };
 
-    // Si es ADMIN y completó usuario destino, lo incluimos
     if (esAdmin) {
       const usuarioIdDestinoStr = (document.getElementById('usuarioIdDestino')?.value || '').trim();
       if (usuarioIdDestinoStr) {
         const usuarioIdDestino = Number(usuarioIdDestinoStr);
         if (!Number.isNaN(usuarioIdDestino) && usuarioIdDestino > 0) {
-          vehiculo.usuarioId = usuarioIdDestino; // el back solo lo usará si sos ADMIN
+          vehiculo.usuarioId = usuarioIdDestino; 
         } else {
           mensaje.innerHTML = `<div class="alert alert-danger">El ID de usuario destino no es válido.</div>`;
           btnSubmit.textContent = originalText;
@@ -66,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
-    // Si NO es admin, no mandamos usuarioId. El back asigna al dueño = id del token.
 
     try {
       const response = await fetch(`${URL_API}/vehiculos`, {

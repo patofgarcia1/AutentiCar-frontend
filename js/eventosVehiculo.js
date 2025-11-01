@@ -68,26 +68,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     contenedor.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor.</div>`;
   }
 
-  
-
-  // 2) Decidir si mostramos el botón “Agregar evento”
   try {
-    // detalle del vehículo (público) para conocer al dueño
     const vResp = await fetch(`${URL_API}/vehiculos/${vehiculoId}`);
     if (!vResp.ok) {
-      // si falla, no podemos saber el dueño => no mostramos botón
       return;
     }
     const v = await vResp.json();
 
-    // dueño del vehículo según tu DTO (VehiculosDTO.idUsuario)
     const ownerId = (v?.idUsuario != null) ? Number(v.idUsuario) : null;
 
-    // usuario logueado y rol
-    const { userId: loggedIdRaw } = getSession(); // lee de localStorage
+    const { userId: loggedIdRaw } = getSession(); 
     const loggedId = (loggedIdRaw != null) ? Number(loggedIdRaw) : null;
 
-    // Reglas
     const puedeAgregar =
       isAdmin() || isTaller() || (isUser() && ownerId != null && loggedId === ownerId);
 
@@ -128,6 +120,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) {
     console.warn('No se pudo evaluar permisos para el botón Agregar evento:', e);
-    // si falla esta parte, simplemente no mostramos el botón
   }
 });

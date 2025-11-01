@@ -18,8 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (!token) {
-    mensaje.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;    // opcional: window.location.href = 'login.html';
-    return;
+    mensaje.innerHTML = `<div class="alert alert-warning">Sesión no válida. Iniciá sesión nuevamente.</div>`;   
   }
 
   const root = document.getElementById('imagenes-root');
@@ -27,11 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     root,
     vehiculoId: Number(vehiculoId),
     allowUpload: true,
-    allowDelete: true, // o false si no querés borrar acá
+    allowDelete: true, 
     titulo: '',
     authHeaders: { Authorization: `Bearer ${token}` },
     onChange: (imgs) => {
-      // opcional: feedback, contador, etc.
       console.log('imagenes ahora:', imgs.length);
     }
   });
@@ -57,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
       titulo: datos.titulo,
       descripcion: datos.descripcion,
       precio: parseInt(datos.precio, 10),
-      //usuarioId: parseInt(usuarioId, 10),
       vehiculoId: parseInt(vehiculoId, 10),
       moneda: datos.moneda
     };
@@ -72,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify(payload),
       });
 
-      // manejo específico de auth
       if (resp.status === 401 || resp.status === 403) {
         mensaje.innerHTML = `<div class="alert alert-danger">No autorizado. Iniciá sesión nuevamente.</div>`;
         return;
@@ -85,14 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       let data = null;
-      try { data = await resp.json(); } catch { /* puede devolver solo texto */ }
+      try { data = await resp.json(); } catch {  }
 
       mensaje.innerHTML = `<div class="alert alert-success">Publicación creada con éxito.</div>`;
 
-      // Limpio el vehiculoId si ya no lo vas a usar (opcional)
-      // localStorage.removeItem('vehiculoId');
-
-      // Redireccion
       const idPub = data?.idPublicacion ?? data?.id;
       setTimeout(() => {
         if (idPub) {
