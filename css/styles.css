@@ -847,13 +847,6 @@ main { flex: 1 0 auto; }
   color: #111827;
 }
 
-#eventos-lista {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, 520px);
-  gap: 13px;
-}
-
-
 .btn-agregar-evento {
   background-color: var(--secondary);
   color: #fff;
@@ -1392,4 +1385,45 @@ main { flex: 1 0 auto; }
 
 @media (min-width: 992px){
   #mainNav .navbar-nav{ gap:.25rem; }
+}
+
+@media (max-width: 1200px) {
+  #misEventos-lista {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .evento-card {
+    flex-direction: row;      
+    align-items: flex-start;
+    padding: 10px;
+    gap: 0.6rem;
+  }
+
+  .evento-icono {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    margin-top: 28px;
+  }
+
+  .evento-info {
+    flex: 1;
+    min-width: 0;               
+  }
+
+  .evento-info h5 {
+    font-size: 0.95rem;        
+  }
+
+  .evento-info-label,
+  .evento-info-value {
+    font-size: 13px;         
+  }
+
+  .evento-card .btn-sm {
+    font-size: 12.5px;
+    padding: 3px 8px;
+  }
 }
