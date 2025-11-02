@@ -1337,7 +1337,7 @@ main { flex: 1 0 auto; }
 }
 
 
-/* responsive  */
+/* responsive */
 
 @media (max-width: 420px) {
   .input-group { flex-wrap: wrap; }
