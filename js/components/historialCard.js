@@ -9,6 +9,10 @@ export function renderHistorialCard({ puedeVer, isLogged, soloValidados, vehicul
         </p>
         <a href="docsVehiculo.html?id=${vehiculoId}" class="btn btn-outline-primary w-100 mb-2">Ver Documentos</a>
         <a href="eventosVehiculo.html?id=${vehiculoId}" class="btn btn-outline-primary w-100">Ver Eventos</a>
+
+        <p id="doc-recomendados-resumen" class="text-muted small mb-3">
+          Cargando estado de documentos recomendados...
+        </p>
       </div>
     `;
   }

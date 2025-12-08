@@ -5,6 +5,7 @@ import { renderHistorialCard } from './components/historialCard.js';
 import { initTransferirTitularidad } from './components/transferirTitularidad.js';
 import { initAgregarTaller } from './components/agregarTaller.js';
 import { renderTalleresAsignados } from './components/listarTalleres.js';
+import { initDocumentosRecomendados } from './components/documentosRecomendados.js';
 
 function showMsg(html, type = 'info') {
   const mensaje = document.getElementById('mensaje');
@@ -150,6 +151,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       </div>
     `;
+
+    if (puedeVer && vehiculo?.idVehiculo) {
+      initDocumentosRecomendados(vehiculo.idVehiculo);
+    }
 
     const canManageImages = isLogged && (isAdmin() || (isUser() && isOwner));
     const galeriaRoot = document.getElementById('galeria-root');
