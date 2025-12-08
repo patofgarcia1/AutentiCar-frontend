@@ -9,7 +9,7 @@ const RECOMENDADOS = [
 ];
 
 
-export async function initDocumentosRecomendados(vehiculoId) {
+export async function initDocumentosRecomendados(vehiculoId, isOwner = false) {
   const resumenEl = document.getElementById('doc-recomendados-resumen');
   if (!resumenEl || !vehiculoId) return;
 
@@ -35,13 +35,14 @@ export async function initDocumentosRecomendados(vehiculoId) {
     const cargados = RECOMENDADOS.filter(r => tiposPresentes.has(r.tipo)).length;
 
     resumenEl.innerHTML = `
-      <span class="fw-semibold">${cargados} de ${total}</span> documentos recomendados cargados.
-      <button type="button" class="btn btn-link p-0 align-baseline" id="btn-docs-recomendados">
-        Ver documentos recomendados
-      </button>
+      <span class="fw-bold">${cargados} de ${total}
+      <a href="#" id="link-docs-recomendados" class="link-primary text-decoration-underline">
+        documentos recomendados
+      </a>
+      cargados. </span>
     `;
 
-    createDocsRecomendadosModal({ vehiculoId, tiposPresentes });
+    createDocsRecomendadosModal({ vehiculoId, tiposPresentes, isOwner });
 
   } catch (e) {
     console.error('Error al cargar documentos recomendados:', e);
@@ -49,7 +50,7 @@ export async function initDocumentosRecomendados(vehiculoId) {
   }
 }
 
-function createDocsRecomendadosModal({ vehiculoId, tiposPresentes }) {
+function createDocsRecomendadosModal({ vehiculoId, tiposPresentes, isOwner }) {
   if (document.getElementById('modalDocsRecomendados')) return;
 
   const modal = document.createElement('div');
@@ -71,6 +72,17 @@ function createDocsRecomendadosModal({ vehiculoId, tiposPresentes }) {
     `;
   }).join('');
 
+  const ownerExtraHTML = isOwner
+    ? `
+      <p class="small text-muted mb-2">
+        Podés agregar nuevos eventos y adjuntar documentación desde la pantalla de eventos del vehículo.
+      </p>
+      <a href="addEvento.html?id=${vehiculoId}" class="btn btn-primary w-100">
+        Agregar evento
+      </a>
+    `
+    : '';
+
   modal.innerHTML = `
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -85,12 +97,7 @@ function createDocsRecomendadosModal({ vehiculoId, tiposPresentes }) {
           <ul class="list-group mb-3">
             ${itemsHTML}
           </ul>
-          <p class="small text-muted mb-2">
-            Podés agregar nuevos eventos y adjuntar documentación desde la pantalla de eventos del vehículo.
-          </p>
-          <a href="eventosVehiculo.html?id=${vehiculoId}" class="btn btn-primary w-100">
-            Agregar evento
-          </a>
+          ${ownerExtraHTML}
         </div>
       </div>
     </div>
@@ -99,9 +106,10 @@ function createDocsRecomendadosModal({ vehiculoId, tiposPresentes }) {
   document.body.appendChild(modal);
 
   // Listener para el botón/link "Ver documentos recomendados"
-  const btn = document.getElementById('btn-docs-recomendados');
-  if (btn) {
-    btn.addEventListener('click', () => {
+  const link = document.getElementById('link-docs-recomendados');
+  if (link) {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
       const bsModal = new bootstrap.Modal(modal);
       bsModal.show();
     });

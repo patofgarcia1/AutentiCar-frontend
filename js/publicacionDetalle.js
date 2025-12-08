@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
 
     if (puedeVer && vehiculo?.idVehiculo) {
-      initDocumentosRecomendados(vehiculo.idVehiculo);
+      initDocumentosRecomendados(vehiculo.idVehiculo, isOwner);
     }
 
     const canManageImages = isLogged && (isAdmin() || (isUser() && isOwner));
